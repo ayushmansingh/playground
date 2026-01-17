@@ -150,7 +150,7 @@ export default function Logistics() {
                     ))}
                 </div>
                 <p className="text-center text-sm text-[var(--color-ink-soft)] mt-4">
-                    Mention &quot;Aarav & Simran Wedding&quot; for special rates
+                    Mention &quot;Ayushman & Dhwani Wedding&quot; for special rates
                 </p>
             </div>
         </div>

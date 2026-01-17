@@ -14,7 +14,7 @@ interface ParallaxJourneyProps {
 }
 
 export default function ParallaxJourney({
-    coupleNames = "Aarav & Simran",
+    coupleNames = "Ayushman & Dhwani",
     eventDate = "February 14, 2026",
     tagline = "A Journey of Love",
 }: ParallaxJourneyProps) {

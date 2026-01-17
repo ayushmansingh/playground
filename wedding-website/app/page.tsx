@@ -8,7 +8,7 @@ export default function Home() {
     <>
       {/* Hero: Parallax scrollytelling journey */}
       <ParallaxJourney
-        coupleNames="Aarav & Simran"
+        coupleNames="Ayushman & Dhwani"
         eventDate="February 14, 2026"
         tagline="A Journey of Love"
       />
@@ -25,7 +25,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-12 px-6 bg-[var(--color-parchment-dark)] text-center">
         <p className="font-accent text-3xl text-[var(--color-gold)] mb-4">
-          Aarav & Simran
+          Ayushman & Dhwani
         </p>
         <p className="font-display text-sm uppercase tracking-widest text-[var(--color-ink-soft)]">
           February 14, 2026

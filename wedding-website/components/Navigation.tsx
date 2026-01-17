@@ -52,7 +52,7 @@ export default function Navigation() {
                     href="#hero"
                     className="font-accent text-3xl text-[var(--color-gold)] hover:text-[var(--color-gold-dark)] transition-colors"
                 >
-                    A & S
+                    A & D
                 </Link>
 
                 {/* Desktop Navigation */}
