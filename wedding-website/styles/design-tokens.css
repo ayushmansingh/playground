@@ -1,0 +1,80 @@
+/* Design Tokens - Modern Heritage Palette */
+:root {
+  /* === COLORS === */
+  --color-parchment: #F5E6C8;
+  --color-parchment-dark: #E8D4A8;
+  --color-parchment-light: #FDF6E7;
+  --color-gold: #C9A227;
+  --color-gold-light: #E8C547;
+  --color-gold-dark: #8B7116;
+  --color-peacock-blue: #1E4D5C;
+  --color-peacock-teal: #2A7B8C;
+  --color-peacock-light: #3A9DB0;
+  --color-deep-maroon: #6B1C23;
+  --color-maroon-light: #8B2C36;
+  --color-blush: #F2D7D9;
+  --color-blush-dark: #E5C0C4;
+  --color-ink: #1A1A1A;
+  --color-ink-soft: #3A3A3A;
+  --color-cream: #FFFDF8;
+  
+  /* === TYPOGRAPHY === */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-accent: 'Great Vibes', cursive;
+  
+  /* === SPACING (8px base) === */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 8rem;
+  --space-2xl: 12rem;
+  
+  /* === ANIMATIONS === */
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 200ms;
+  --duration-normal: 400ms;
+  --duration-slow: 800ms;
+  --duration-slower: 1200ms;
+  
+  /* === SHADOWS === */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lifted: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --shadow-glow-gold: 0 0 40px rgba(201, 162, 39, 0.3);
+  
+  /* === BORDERS === */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  
+  /* === Z-INDEX LAYERS === */
+  --z-background: 0;
+  --z-peacocks: 10;
+  --z-flowers: 20;
+  --z-bird: 30;
+  --z-text: 40;
+  --z-ui: 50;
+  --z-modal: 100;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-parchment);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-dark);
+}

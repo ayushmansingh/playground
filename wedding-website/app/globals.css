@@ -1,0 +1,166 @@
+/* Google Fonts - must be first */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
+@import "tailwindcss";
+@import "../styles/design-tokens.css";
+
+@theme inline {
+  --color-parchment: var(--color-parchment);
+  --color-parchment-dark: var(--color-parchment-dark);
+  --color-parchment-light: var(--color-parchment-light);
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+  --color-gold-dark: var(--color-gold-dark);
+  --color-peacock: var(--color-peacock-blue);
+  --color-peacock-teal: var(--color-peacock-teal);
+  --color-peacock-light: var(--color-peacock-light);
+  --color-maroon: var(--color-deep-maroon);
+  --color-maroon-light: var(--color-maroon-light);
+  --color-blush: var(--color-blush);
+  --color-blush-dark: var(--color-blush-dark);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-cream: var(--color-cream);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-accent: var(--font-accent);
+}
+
+html {
+  scroll-behavior: auto;
+  /* Lenis handles smooth scroll */
+}
+
+body {
+  background: var(--color-parchment);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection colors */
+::selection {
+  background: var(--color-gold);
+  color: var(--color-cream);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* Smooth scroll for Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Utility classes for design tokens */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-accent {
+  font-family: var(--font-accent);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold), var(--color-gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Parchment background texture */
+.bg-parchment {
+  background-color: var(--color-parchment);
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(232, 212, 168, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(242, 215, 217, 0.3) 0%, transparent 50%);
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 253, 248, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+/* Gold border glow */
+.border-glow-gold {
+  box-shadow: 0 0 20px rgba(201, 162, 39, 0.3), inset 0 0 20px rgba(201, 162, 39, 0.05);
+}
+
+/* Animation keyframes */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes flutter {
+
+  0%,
+  100% {
+    transform: rotateY(0deg) scale(1);
+  }
+
+  25% {
+    transform: rotateY(5deg) scale(1.02);
+  }
+
+  75% {
+    transform: rotateY(-5deg) scale(0.98);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.animate-flutter {
+  animation: flutter 4s ease-in-out infinite;
+}
