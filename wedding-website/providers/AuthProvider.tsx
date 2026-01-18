@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 
 interface AuthContextType {
     user: User | null;
@@ -51,17 +51,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
+        supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+            setSession(data.session);
+            setUser(data.session?.user ?? null);
             setLoading(false);
         });
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setSession(session);
-                setUser(session?.user ?? null);
+            (_event: AuthChangeEvent, newSession: Session | null) => {
+                setSession(newSession);
+                setUser(newSession?.user ?? null);
                 setLoading(false);
             }
         );
