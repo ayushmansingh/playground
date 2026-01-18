@@ -1,3 +1,4 @@
+import FrameSequence from '@/modules/frame-sequence';
 import ParallaxJourney from '@/modules/parallax-journey';
 import DJBooth from '@/modules/dj-booth';
 import PhotoVault from '@/modules/photo-vault';
@@ -6,6 +7,12 @@ import HomeHub from '@/modules/home-hub';
 export default function Home() {
   return (
     <>
+      {/* Opening: Scroll-triggered frame animation */}
+      <FrameSequence
+        title="Celebrating Togetherness"
+        subtitle="Ayushman & Dhwani"
+      />
+
       {/* Hero: Parallax scrollytelling journey */}
       <ParallaxJourney
         coupleNames="Ayushman & Dhwani"
