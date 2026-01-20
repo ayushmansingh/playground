@@ -1,7 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import EnvelopeIntro from '@/modules/envelope-intro';
 
 // Dynamic imports for heavy modules (bundle-dynamic-imports rule)
-// These are loaded on demand to reduce initial bundle size
 const FrameSequence = dynamic(() => import('@/modules/frame-sequence'), {
   loading: () => (
     <div className="h-screen flex items-center justify-center bg-[#FAF6F1]">
@@ -43,8 +46,13 @@ const HomeHub = dynamic(() => import('@/modules/home-hub'), {
 });
 
 export default function Home() {
+  const [showIntro, setShowIntro] = useState(true);
+
   return (
     <>
+      {/* Envelope Intro Overlay */}
+      {showIntro && <EnvelopeIntro onComplete={() => setShowIntro(false)} />}
+
       {/* Opening: Scroll-triggered frame animation */}
       <FrameSequence
         title="Celebrating Togetherness"
