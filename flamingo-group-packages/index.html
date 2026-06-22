@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flamingo Group Tours — Escorted Group Holiday Packages</title>
+<meta name="description" content="Discover Flamingo Group Tours — escorted group holidays to Europe, Far East, Australia, USA, Dubai & more. Indian meals, expert tour managers, 25+ years of trust." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+<style>
+  /* ===== MMT design tokens (pulled from Figma) ===== */
+  :root {
+    --primary: #008CFF;
+    --primary-dark: #16477F;
+    --blue-light: #EAF5FF;
+    --blue-mid: #CCE8FF;
+    --rating-bg: #0C58B4;
+    --text-dark: #0F0F0F;
+    --text-body: #4A4A4A;
+    --text-low: #757575;
+    --screen-bg: #F2F2F2;
+    --card-border: #D8D8D8;
+    --divider: #DEDEDE;
+    --success: #007E7D;
+    --success-bg: #C1F1DD;
+    --accent: #FF664B;          /* warm CTA accent in MMT funnel */
+    --accent-dark: #EC2127;
+    --radius: 8px;
+    --radius-lg: 16px;
+    --shadow: 0 1px 7px rgba(0,0,0,0.20);
+    --shadow-card: 0 2px 12px rgba(0,0,0,0.10);
+    --max: 1120px;
+    --quote-link: "https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt";
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-dark);
+    background: var(--screen-bg);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; color: inherit; }
+  img { max-width: 100%; display: block; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+
+  /* ===== Header ===== */
+  header.site {
+    position: sticky; top: 0; z-index: 50;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  }
+  .nav {
+    display: flex; align-items: center; gap: 28px;
+    height: 64px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 900; font-size: 24px; letter-spacing: -0.5px;
+    color: var(--primary-dark);
+  }
+  .logo .dot { color: var(--primary); }
+  .logo .bird { font-size: 22px; }
+  .nav-links { display: flex; gap: 26px; margin-left: 10px; }
+  .nav-links a {
+    font-size: 14px; font-weight: 700; color: var(--text-body);
+    padding: 6px 2px; border-bottom: 2px solid transparent;
+  }
+  .nav-links a:hover { color: var(--primary); border-color: var(--primary); }
+  .nav .spacer { flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 900; font-size: 14px;
+    border: none; cursor: pointer; border-radius: var(--radius);
+    padding: 11px 22px; transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #FF7E5F 0%, var(--accent) 60%, #F4452C 100%);
+    color: #fff; box-shadow: 0 4px 14px rgba(255,102,75,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.04); }
+  .btn-blue { background: var(--primary); color:#fff; }
+  .btn-blue:hover { filter: brightness(1.05); }
+  .btn-ghost {
+    background: #fff; color: var(--primary); border: 1px solid var(--primary);
+    font-weight: 700;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(255,255,255,0.18), transparent 60%),
+      linear-gradient(135deg, #0A65C6 0%, var(--primary) 45%, #2BA4FF 100%);
+    color: #fff;
+    padding: 56px 0 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 60px;
+    background: var(--screen-bg);
+    clip-path: ellipse(70% 100% at 50% 100%);
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.16); backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: 44px; font-weight: 900; line-height: 1.1; margin: 18px 0 12px;
+    max-width: 720px;
+  }
+  .hero p.sub { font-size: 18px; max-width: 620px; opacity: 0.95; font-weight: 400; }
+  .hero-cta { display: flex; gap: 14px; margin-top: 26px; flex-wrap: wrap; }
+  .trust-row {
+    display: flex; gap: 28px; margin-top: 38px; flex-wrap: wrap;
+  }
+  .trust-row .ti { display: flex; align-items: center; gap: 10px; }
+  .trust-row .ti .big { font-size: 26px; font-weight: 900; }
+  .trust-row .ti small { display:block; font-size: 12px; opacity: 0.9; font-weight: 700; }
+
+  /* ===== Section scaffolding ===== */
+  section.block { padding: 30px 0; }
+  .sec-head { display:flex; align-items:flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .sec-head h2 { font-size: 26px; font-weight: 900; color: var(--text-dark); }
+  .sec-head p { color: var(--text-low); font-size: 14px; margin-top: 4px; }
+  .view-all { color: var(--primary); font-weight: 900; font-size: 14px; white-space: nowrap; }
+
+  /* ===== USP cards ===== */
+  .usp-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    margin-top: -70px; position: relative; z-index: 5;
+  }
+  .usp {
+    background: #fff; border-radius: var(--radius-lg); padding: 20px;
+    box-shadow: var(--shadow-card); border: 1px solid #fff;
+  }
+  .usp .ic {
+    width: 44px; height: 44px; border-radius: 12px; display:grid; place-items:center;
+    background: var(--blue-light); font-size: 22px; margin-bottom: 12px;
+  }
+  .usp h3 { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+  .usp p { font-size: 13px; color: var(--text-body); }
+
+  /* ===== Filter chips ===== */
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+  .chip {
+    border: 1px solid var(--card-border); background: #fff;
+    border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700;
+    color: var(--text-body); cursor: pointer; transition: all .15s ease;
+  }
+  .chip:hover { border-color: var(--primary); color: var(--primary); }
+  .chip.active { background: var(--blue-light); border-color: var(--primary); color: var(--primary-dark); }
+
+  /* ===== Package cards (MMT CardVariation9) ===== */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card {
+    background: #fff; border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow-card); border: 1px solid var(--card-border);
+    display: flex; flex-direction: column;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(0,0,0,0.14); }
+  .card .media {
+    height: 168px; position: relative; color: #fff;
+    display: flex; align-items: flex-end; padding: 12px;
+  }
+  .card .media::before {
+    content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 100%);
+  }
+  .card .media > * { position: relative; z-index: 1; }
+  .m-europe   { background: linear-gradient(135deg,#3a7bd5,#00d2ff); }
+  .m-fareast  { background: linear-gradient(135deg,#f7971e,#ffd200); }
+  .m-anz      { background: linear-gradient(135deg,#11998e,#38ef7d); }
+  .m-usa      { background: linear-gradient(135deg,#3f51b1,#5a55ae 30%,#a93aff); }
+  .m-dubai    { background: linear-gradient(135deg,#c79081,#dfa579); }
+  .m-japan    { background: linear-gradient(135deg,#ee9ca7,#ff5e62); }
+  .wishlist {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.92);
+    display: grid; place-items: center; font-size: 16px; color: var(--accent-dark); cursor: pointer;
+  }
+  .rating-tag {
+    position: absolute; top: 12px; left: 12px; z-index: 2;
+    background: var(--rating-bg); color: #fff; font-size: 12px; font-weight: 900;
+    padding: 4px 8px; border-radius: 6px;
+  }
+  .media .place { font-size: 13px; font-weight: 700; }
+  .card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .card h3 { font-size: 17px; font-weight: 900; line-height: 1.25; }
+  .route { font-size: 12px; color: var(--text-low); font-weight: 700; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 6px;
+    background: var(--blue-light); color: var(--primary-dark);
+  }
+  .pill.green { background: var(--success-bg); color: var(--success); }
+  .card .price-row {
+    margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--divider);
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+  }
+  .price-row .label { font-size: 11px; color: var(--text-low); font-weight: 700; }
+  .price-row .amt { font-size: 20px; font-weight: 900; color: var(--text-dark); }
+  .price-row .amt small { font-size: 11px; font-weight: 700; color: var(--text-low); }
+  .card .quote-btn { width: 100%; justify-content: center; margin-top: 12px; }
+
+  /* ===== Reviews ===== */
+  .reviews-block { background: var(--blue-light); }
+  .reviews { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .review {
+    background:#fff; border-radius: var(--radius-lg); padding: 22px;
+    box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 12px;
+  }
+  .stars { color: #FFB400; font-size: 15px; letter-spacing: 2px; }
+  .review p.text { font-size: 14px; color: var(--text-body); flex: 1; }
+  .reviewer { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; display:grid; place-items:center;
+    color:#fff; font-weight: 900; font-size: 16px;
+  }
+  .reviewer .who b { display: block; font-size: 14px; font-weight: 900; }
+  .reviewer .who span { font-size: 12px; color: var(--text-low); }
+
+  .rating-summary {
+    display:flex; align-items:center; gap: 22px; flex-wrap: wrap;
+    background:#fff; border-radius: var(--radius-lg); padding: 18px 24px;
+    box-shadow: var(--shadow-card); margin-bottom: 22px;
+  }
+  .rating-summary .score { font-size: 40px; font-weight: 900; color: var(--primary-dark); line-height: 1; }
+  .rating-summary .score small { display:block; font-size: 12px; color: var(--text-low); font-weight: 700; }
+  .rating-summary .div { width:1px; height: 42px; background: var(--divider); }
+  .rating-summary .meta-item b { font-size: 18px; font-weight:900; }
+  .rating-summary .meta-item span { font-size: 12px; color: var(--text-low); display:block; }
+
+  /* ===== Final CTA ===== */
+  .quote-banner {
+    background:
+      radial-gradient(900px 400px at 90% 120%, rgba(255,255,255,0.12), transparent 55%),
+      linear-gradient(135deg, var(--primary-dark) 0%, #0A65C6 55%, var(--primary) 100%);
+    color:#fff; border-radius: 20px; padding: 44px; text-align: center;
+    box-shadow: var(--shadow-card);
+  }
+  .quote-banner h2 { font-size: 30px; font-weight: 900; margin-bottom: 10px; }
+  .quote-banner p { font-size: 16px; opacity: 0.95; max-width: 620px; margin: 0 auto 24px; }
+  .quote-banner .btn { font-size: 16px; padding: 15px 34px; }
+  .quote-note { font-size: 12px; opacity: 0.85; margin-top: 16px; }
+
+  /* ===== Footer ===== */
+  footer.site { background: #fff; border-top: 1px solid var(--divider); padding: 30px 0; margin-top: 30px; }
+  footer.site .cols { display:flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  footer .logo { font-size: 20px; }
+  footer p.addr { font-size: 13px; color: var(--text-low); max-width: 320px; margin-top: 10px; }
+  footer .legal { font-size: 12px; color: var(--text-low); margin-top: 18px; border-top:1px solid var(--divider); padding-top: 16px; }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .usp-grid { grid-template-columns: repeat(2,1fr); }
+    .cards, .reviews { grid-template-columns: repeat(2,1fr); }
+    .hero h1 { font-size: 34px; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 600px) {
+    .usp-grid, .cards, .reviews { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .hero p.sub { font-size: 16px; }
+    .sec-head h2 { font-size: 22px; }
+    .quote-banner { padding: 30px 20px; }
+    .quote-banner h2 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site">
+  <div class="wrap nav">
+    <a href="#" class="logo"><span class="bird">🦩</span>flamingo<span class="dot">.</span></a>
+    <nav class="nav-links">
+      <a href="#packages">Group Tours</a>
+      <a href="#why">Why Flamingo</a>
+      <a href="#reviews">Reviews</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="btn btn-primary" target="_blank" rel="noopener"
+       href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">
+       Get a Quote
+    </a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">🌍 Escorted Group Holidays · Since 1973</span>
+    <h1>Travel the world together with Flamingo Group Tours</h1>
+    <p class="sub">Fully escorted group holidays to 30+ countries — with caring tour managers,
+       homely Indian &amp; Jain meals, handpicked hotels and zero planning stress. Just pack and go.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" target="_blank" rel="noopener"
+         href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">
+         Get a Free Quote →
+      </a>
+      <a class="btn btn-ghost" style="background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.6)" href="#packages">Explore Packages</a>
+    </div>
+    <div class="trust-row">
+      <div class="ti"><div><span class="big">50+</span><small>Years of Expertise</small></div></div>
+      <div class="ti"><div><span class="big">10 Lakh+</span><small>Happy Travellers</small></div></div>
+      <div class="ti"><div><span class="big">30+</span><small>Countries Covered</small></div></div>
+      <div class="ti"><div><span class="big">4.6★</span><small>Average Tour Rating</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ USP / WHY ============ -->
+<section class="block" id="why">
+  <div class="wrap">
+    <div class="usp-grid">
+      <div class="usp">
+        <div class="ic">🧑‍✈️</div>
+        <h3>Expert Tour Managers</h3>
+        <p>Experienced, empathetic managers travel with you start to finish.</p>
+      </div>
+      <div class="usp">
+        <div class="ic">🍛</div>
+        <h3>Indian &amp; Jain Meals</h3>
+        <p>Daily homely Indian food — and an Indian chef on select tours.</p>
+      </div>
+      <div class="usp">
+        <div class="ic">🏨</div>
+        <h3>Handpicked Hotels</h3>
+        <p>Comfortable 4★ &amp; 5★ stays, central locations, all transfers included.</p>
+      </div>
+      <div class="usp">
+        <div class="ic">🎟️</div>
+        <h3>All-Inclusive Value</h3>
+        <p>Flights, sightseeing, visas &amp; meals bundled — no hidden surprises.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGES ============ -->
+<section class="block" id="packages">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Best-selling Group Tour Packages</h2>
+        <p>Curated departures across the globe — handpicked for families, couples and groups.</p>
+      </div>
+      <a class="view-all" target="_blank" rel="noopener"
+         href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">View All →</a>
+    </div>
+
+    <div class="chips">
+      <span class="chip active">All Destinations</span>
+      <span class="chip">Europe</span>
+      <span class="chip">Far East</span>
+      <span class="chip">Australia &amp; NZ</span>
+      <span class="chip">USA &amp; Canada</span>
+      <span class="chip">Dubai</span>
+      <span class="chip">Japan</span>
+    </div>
+
+    <div class="cards">
+
+      <!-- Europe -->
+      <article class="card">
+        <div class="media m-europe">
+          <span class="rating-tag">4.7 ★</span>
+          <span class="wishlist">♥</span>
+          <span class="place">🇨🇭 Switzerland · 🇫🇷 France · 🇮🇹 Italy</span>
+        </div>
+        <div class="body">
+          <h3>European Experience</h3>
+          <div class="route">London · Paris · Switzerland · Venice · Rome</div>
+          <div class="meta">
+            <span class="pill">14 Nights / 15 Days</span>
+            <span class="pill green">Group Departure</span>
+          </div>
+          <div class="price-row">
+            <div><span class="label">Budget per person</span>
+              <div class="amt">₹2,75,000 <small>onwards</small></div></div>
+          </div>
+          <a class="btn btn-blue quote-btn" target="_blank" rel="noopener"
+             href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">Get a Quote</a>
+        </div>
+      </article>
+
+      <!-- Eastern Europe -->
+      <article class="card">
+        <div class="media m-europe">
+          <span class="rating-tag">4.6 ★</span>
+          <span class="wishlist">♥</span>
+          <span class="place">🇭🇺 Hungary · 🇦🇹 Austria · 🇨🇿 Czechia</span>
+        </div>
+        <div class="body">
+          <h3>Enchanting Eastern Europe</h3>
+          <div class="route">Budapest · Vienna · Prague · Salzburg</div>
+          <div class="meta">
+            <span class="pill">10 Nights / 11 Days</span>
+            <span class="pill green">Group Departure</span>
+          </div>
+          <div class="price-row">
+            <div><span class="label">Budget per person</span>
+              <div class="amt">₹2,15,000 <small>onwards</small></div></div>
+          </div>
+          <a class="btn btn-blue quote-btn" target="_blank" rel="noopener"
+             href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">Get a Quote</a>
+        </div>
+      </article>
+
+      <!-- Far East -->
+      <article class="card">
+        <div class="media m-fareast">
+          <span class="rating-tag">4.5 ★</span>
+          <span class="wishlist">♥</span>
+          <span class="place">🇸🇬 Singapore · 🇲🇾 Malaysia</span>
+        </div>
+        <div class="body">
+          <h3>Singapore &amp; Malaysia Delight</h3>
+          <div class="route">Singapore · Sentosa · Kuala Lumpur · Genting</div>
+          <div class="meta">
+            <span class="pill">6 Nights / 7 Days</span>
+            <span class="pill green">Group Departure</span>
+          </div>
+          <div class="price-row">
+            <div><span class="label">Budget per person</span>
+              <div class="amt">₹89,000 <small>onwards</small></div></div>
+          </div>
+          <a class="btn btn-blue quote-btn" target="_blank" rel="noopener"
+             href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">Get a Quote</a>
+        </div>
+      </article>
+
+      <!-- Bali / Far East -->
+      <article class="card">
+        <div class="media m-fareast">
+          <span class="rating-tag">4.6 ★</span>
+          <span class="wishlist">♥</span>
+          <span class="place">🇮🇩 Bali, Indonesia</span>
+        </div>
+        <div class="body">
+          <h3>Beautiful Bali Getaway</h3>
+          <div class="route">Kuta · Ubud · Nusa Penida · Tanah Lot</div>
+          <div class="meta">
+            <span class="pill">5 Nights / 6 Days</span>
+            <span class="pill green">Group Departure</span>
+          </div>
+          <div class="price-row">
+            <div><span class="label">Budget per person</span>
+              <div class="amt">₹74,000 <small>onwards</small></div></div>
+          </div>
+          <a class="btn btn-blue quote-btn" target="_blank" rel="noopener"
+             href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">Get a Quote</a>
+        </div>
+      </article>
+
+      <!-- Australia & NZ -->
+      <article class="card">
+        <div class="media m-anz">
+          <span class="rating-tag">4.7 ★</span>
+          <span class="wishlist">♥</span>
+          <span class="place">🇦🇺 Australia · 🇳🇿 New Zealand</span>
+        </div>
+        <div class="body">
+          <h3>Australia &amp; New Zealand Grand</h3>
+          <div class="route">Sydney · Melbourne · Gold Coast · Auckland · Rotorua</div>
+          <div class="meta">
+            <span class="pill">12 Nights / 13 Days</span>
+            <span class="pill green">Group Departure</span>
+          </div>
+          <div class="price-row">
+            <div><span class="label">Budget per person</span>
+              <div class="amt">₹3,45,000 <small>onwards</small></div></div>
+          </div>
+          <a class="btn btn-blue quote-btn" target="_blank" rel="noopener"
+             href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">Get a Quote</a>
+        </div>
+      </article>
+
+      <!-- USA -->
+      <article class="card">
+        <div class="media m-usa">
+          <span class="rating-tag">4.5 ★</span>
+          <span class="wishlist">♥</span>
+          <span class="place">🇺🇸 USA · 🇨🇦 Canada</span>
+        </div>
+        <div class="body">
+          <h3>Grand American Holiday</h3>
+          <div class="route">New York · Niagara · Las Vegas · Los Angeles</div>
+          <div class="meta">
+            <span class="pill">13 Nights / 14 Days</span>
+            <span class="pill green">Group Departure</span>
+          </div>
+          <div class="price-row">
+            <div><span class="label">Budget per person</span>
+              <div class="amt">₹3,10,000 <small>onwards</small></div></div>
+          </div>
+          <a class="btn btn-blue quote-btn" target="_blank" rel="noopener"
+             href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">Get a Quote</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="block reviews-block" id="reviews">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>What our travellers say</h2>
+        <p>Real stories from Flamingo group tour guests.</p>
+      </div>
+    </div>
+
+    <div class="rating-summary">
+      <div class="score">4.6<small>out of 5</small></div>
+      <div class="div"></div>
+      <div class="meta-item"><b>12,400+</b><span>Verified reviews</span></div>
+      <div class="div"></div>
+      <div class="meta-item"><b>96%</b><span>Would travel again</span></div>
+      <div class="div"></div>
+      <div class="meta-item"><b>4.8★</b><span>Tour Manager care</span></div>
+    </div>
+
+    <div class="reviews">
+      <div class="review">
+        <div class="stars">★★★★★</div>
+        <p class="text">"Our Europe tour was flawless. The tour manager handled everything and the
+          daily Indian meals made my parents feel completely at home. Worth every rupee!"</p>
+        <div class="reviewer">
+          <div class="avatar" style="background:#3a7bd5">R</div>
+          <div class="who"><b>Rajesh &amp; Meena Patel</b><span>European Experience · Ahmedabad</span></div>
+        </div>
+      </div>
+
+      <div class="review">
+        <div class="stars">★★★★★</div>
+        <p class="text">"First international trip with my kids and I never felt lost. Hotels were great,
+          sightseeing well-paced, and the group became like family by the end."</p>
+        <div class="reviewer">
+          <div class="avatar" style="background:#11998e">S</div>
+          <div class="who"><b>Sneha Desai</b><span>Singapore &amp; Malaysia · Surat</span></div>
+        </div>
+      </div>
+
+      <div class="review">
+        <div class="stars">★★★★☆</div>
+        <p class="text">"Australia &amp; New Zealand was a dream. Beautifully organised, punctual coaches,
+          and the Jain food arrangement was spot on. Highly recommend Flamingo."</p>
+        <div class="reviewer">
+          <div class="avatar" style="background:#a93aff">K</div>
+          <div class="who"><b>Kirti Shah</b><span>Australia &amp; NZ Grand · Mumbai</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="block" id="quote">
+  <div class="wrap">
+    <div class="quote-banner">
+      <h2>Ready for your dream group holiday?</h2>
+      <p>Tell us your destination and travel dates — our holiday experts will craft a
+         personalised Flamingo group tour quote, just for you.</p>
+      <a class="btn btn-primary" target="_blank" rel="noopener"
+         href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">
+         Get a Quote →
+      </a>
+      <div class="quote-note">No obligation · Free of cost · Response within 24 hours</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a href="#" class="logo"><span class="bird">🦩</span>flamingo<span class="dot">.</span></a>
+        <p class="addr">Flamingo Travels — escorted group tours &amp; customised holidays
+          across the globe, trusted by Indian travellers since 1973.</p>
+      </div>
+      <div>
+        <a class="btn btn-primary" target="_blank" rel="noopener"
+           href="https://holidayz.makemytrip.com/holidays/sendQuery30!packageSendQueryForm?cmp=flamingo_globalmmt">
+           Get a Quote
+        </a>
+      </div>
+    </div>
+    <p class="legal">© 2026 Flamingo Travels. Promotional page · UI inspired by the MakeMyTrip Holidays design system.
+      Package names, durations and prices shown are indicative examples.</p>
+  </div>
+</footer>
+
+<script>
+  // simple, non-essential chip toggle for the filter row
+  document.querySelectorAll('.chip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      document.querySelectorAll('.chip').forEach(function (x) { x.classList.remove('active'); });
+      c.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
