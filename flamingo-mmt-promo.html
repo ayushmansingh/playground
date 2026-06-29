@@ -10,130 +10,116 @@
 <style>
   /* ===== MMT design language ===== */
   *{margin:0;padding:0;box-sizing:border-box;outline:0 none}
-  ::-webkit-scrollbar{height:8px;width:8px}
-  ::-webkit-scrollbar-thumb{background:#cbd6e6;border-radius:8px}
   html{scroll-behavior:smooth}
-  body{font-family:'Lato',sans-serif;color:#2f2f2f;font-size:14px;line-height:18px;font-weight:400;
-        background:#f2f6fb;}
+  body{font-family:'Lato',sans-serif;color:#2f2f2f;font-size:14px;line-height:18px;font-weight:400;background:#f2f6fb}
   a{text-decoration:none;color:#008cff}
   img{vertical-align:top}
   .wrapper{width:100%;max-width:1100px;margin:0 auto;padding:0 16px}
 
-  /* ---- buttons (MMT pill) ---- */
-  .btn{display:inline-block;border:0;cursor:pointer;font-family:inherit;font-weight:900;
-        font-size:13px;line-height:16px;text-transform:uppercase;border-radius:30px;
-        padding:9px 20px;text-align:center;transition:.2s}
+  /* shared card image (with gradient fallback) */
+  .cardImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+  .cardImg--fail{display:none}
+
+  /* buttons */
+  .btn{display:inline-block;border:0;cursor:pointer;font-family:inherit;font-weight:900;font-size:13px;line-height:16px;
+        text-transform:uppercase;border-radius:30px;padding:9px 20px;text-align:center;transition:.2s}
   .btn--primary{background:linear-gradient(93.66deg,#53b2fe 0%,#065af3 100%);color:#fff}
   .btn--primary:hover{filter:brightness(1.05);box-shadow:0 6px 16px rgba(6,90,243,.3)}
-  .btn--outline{background:#fff;border:1px solid #008cff;color:#008cff}
-  .btn--ghostWhite{background:transparent;border:1px solid #fff;color:#fff}
 
-  /* ---- banner placeholder ---- */
-  /* Recommended banner image: 1100 x 320 (desktop) / 2x retina 2200 x 640.
+  /* banner placeholder */
+  /* Recommended banner image: 1100 x 320 (desktop) / retina 2200 x 640.
      Swap this <div> for: <img src="..." alt="..." class="banner__img"> */
   .banner{padding:18px 0 0}
   .banner__ph{position:relative;width:100%;aspect-ratio:1100/320;border-radius:16px;
         background:repeating-linear-gradient(45deg,#dfe7f1,#dfe7f1 18px,#e8eef6 18px,#e8eef6 36px);
-        border:2px dashed #9fb3cd;display:flex;flex-direction:column;align-items:center;
-        justify-content:center;text-align:center;color:#5b6e8c;overflow:hidden}
+        border:2px dashed #9fb3cd;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        text-align:center;color:#5b6e8c;overflow:hidden}
   .banner__ph b{font-size:22px;font-weight:900;color:#2b3e71;letter-spacing:.5px}
   .banner__ph small{font-size:12px;margin-top:6px;color:#73849e}
-  .banner__ph .banner__icon{width:46px;height:46px;border-radius:50%;background:#fff;
-        display:flex;align-items:center;justify-content:center;margin-bottom:10px;
-        box-shadow:0 4px 12px rgba(43,62,113,.12);font-size:22px}
+  .banner__icon{width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;
+        justify-content:center;margin-bottom:10px;box-shadow:0 4px 12px rgba(43,62,113,.12);font-size:22px}
 
-  /* ---- section heading w/ dotted centerline (MMT) ---- */
+  /* section heading w/ dotted centerline */
   .section{padding:48px 0}
   .sectionHead{text-align:center;margin-bottom:28px}
-  .sectionHead h2{color:#2b3e71;font-size:30px;line-height:34px;font-weight:900;
-        text-transform:uppercase;letter-spacing:.5px}
-  .sectionHead .eyebrow{display:inline-block;color:#065af3;font-size:12px;font-weight:900;
-        text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+  .sectionHead h2{color:#2b3e71;font-size:30px;line-height:34px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+  .sectionHead .eyebrow{display:inline-block;color:#065af3;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
   .centerLine{overflow:hidden;text-align:center;margin-top:14px}
-  .centerLine:before,.centerLine:after{content:"";border-bottom:2px dotted #2b3e71;display:inline-block;
-        height:1px;position:relative;vertical-align:middle;width:18%}
-  .centerLine:before{right:.6em;margin-left:-50%}
-  .centerLine:after{left:.6em;margin-right:-50%}
-  .centerLine span{display:inline-block;width:9px;height:9px;border-radius:50%;
-        background:#f7c50d;vertical-align:middle}
+  .centerLine:before,.centerLine:after{content:"";border-bottom:2px dotted #2b3e71;display:inline-block;height:1px;position:relative;vertical-align:middle;width:18%}
+  .centerLine:before{right:.6em;margin-left:-50%} .centerLine:after{left:.6em;margin-right:-50%}
+  .centerLine span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#f7c50d;vertical-align:middle}
 
-  /* ===== Trending grid ===== */
-  .trendGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-  .trendCard{position:relative;border-radius:20px 0 20px 0;overflow:hidden;display:block;
-        box-shadow:0 4px 14px rgba(12,45,86,.12);transition:transform .25s,box-shadow .25s}
+  /* ===== Trending carousel (MMT-styled) ===== */
+  .carousel{position:relative}
+  .carousel__track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+        padding:6px 2px 16px;scrollbar-width:none;-ms-overflow-style:none}
+  .carousel__track::-webkit-scrollbar{display:none}
+  .carousel__nav{position:absolute;top:44%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;
+        background:#fff;border:0;box-shadow:0 6px 18px rgba(12,45,86,.22);cursor:pointer;display:flex;align-items:center;
+        justify-content:center;z-index:6;transition:.2s}
+  .carousel__nav:hover{background:#eaf3ff;box-shadow:0 8px 22px rgba(12,45,86,.3)}
+  .carousel__nav:disabled{opacity:0;pointer-events:none}
+  .carousel__nav--prev{left:-20px} .carousel__nav--next{right:-20px}
+
+  .trendCard{flex:0 0 auto;width:238px;scroll-snap-align:start;position:relative;border-radius:20px 0 20px 0;
+        overflow:hidden;display:block;box-shadow:0 4px 14px rgba(12,45,86,.12);transition:transform .25s,box-shadow .25s}
   .trendCard:hover{transform:translateY(-6px);box-shadow:0 12px 26px rgba(12,45,86,.22)}
-  .trendCard__img{position:relative;aspect-ratio:170/240;display:flex;align-items:center;
-        justify-content:center}
-  .trendCard__placeholder{color:rgba(255,255,255,.85);font-size:18px;font-weight:900;
-        text-transform:uppercase;letter-spacing:1px;text-align:center;padding:0 12px;
-        opacity:.6}
-  .trendCard__pk{position:absolute;top:12px;left:0;background:#f7c50d;color:#2f2f2f;
-        font-size:11px;font-weight:900;text-transform:uppercase;padding:5px 12px 5px 10px;
-        border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-  .trendCard__overlay{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 14px;
-        background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,0) 100%)}
+  .trendCard:hover .cardImg{transform:scale(1.06)}
+  .trendCard__img{position:relative;aspect-ratio:170/240;overflow:hidden}
+  .trendCard__pk{position:absolute;top:12px;left:0;z-index:3;background:#f7c50d;color:#2f2f2f;font-size:11px;font-weight:900;
+        text-transform:uppercase;padding:5px 12px 5px 10px;border-radius:0 12px 12px 0;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+  .trendCard__overlay{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:38px 14px 14px;
+        background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,0) 100%)}
   .trendCard__name{color:#fff;font-size:20px;line-height:22px;font-weight:900}
-  .trendCard__name:after{content:"";display:block;width:46px;height:3px;background:#f7c50d;
-        margin-top:7px;border-radius:3px}
+  .trendCard__name:after{content:"";display:block;width:46px;height:3px;background:#f7c50d;margin-top:7px;border-radius:3px}
   .trendCard__price{color:#fff;font-size:16px;font-weight:900;margin-top:9px}
   .trendCard__price span{font-size:11px;font-weight:400;opacity:.85;margin-left:3px}
 
   /* ===== Budget section ===== */
   .budget{background:linear-gradient(180deg,#eaf2fb 0%,#f2f6fb 60%)}
   .tabs{display:flex;justify-content:center;gap:10px;margin-bottom:30px;flex-wrap:wrap}
-  .tab{background:#fff;border:1px solid #c9dcf2;color:#2b3e71;font-weight:900;font-size:13px;
-        text-transform:uppercase;letter-spacing:.5px;padding:10px 22px;border-radius:30px;
-        cursor:pointer;transition:.2s}
-  .tab.active{background:linear-gradient(93.66deg,#53b2fe 0%,#065af3 100%);color:#fff;
-        border-color:transparent;box-shadow:0 6px 16px rgba(6,90,243,.25)}
+  .tab{background:#fff;border:1px solid #c9dcf2;color:#2b3e71;font-weight:900;font-size:13px;text-transform:uppercase;
+        letter-spacing:.5px;padding:10px 22px;border-radius:30px;cursor:pointer;transition:.2s}
+  .tab.active{background:linear-gradient(93.66deg,#53b2fe 0%,#065af3 100%);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(6,90,243,.25)}
 
   .dealGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-  .dealCard{background:#fff;border-radius:20px 0 20px 0;overflow:hidden;display:flex;
-        flex-direction:column;box-shadow:0 4px 14px rgba(12,45,86,.1);transition:transform .25s,box-shadow .25s}
+  .dealCard{background:#fff;border-radius:20px 0 20px 0;overflow:hidden;display:flex;flex-direction:column;
+        box-shadow:0 4px 14px rgba(12,45,86,.1);transition:transform .25s,box-shadow .25s}
   .dealCard:hover{transform:translateY(-5px);box-shadow:0 14px 28px rgba(12,45,86,.18)}
-  .dealCard__head{display:flex;align-items:center;justify-content:space-between;
-        padding:10px 14px;background:#f5f9ff}
-  .badge{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;
-        padding:5px 10px;border-radius:20px}
-  .badge--type{background:#e3efff;color:#065af3}
-  .badge--budget{background:#f7c50d;color:#2f2f2f}
-  .dealCard__img{position:relative;height:140px;display:flex;align-items:center;justify-content:center}
-  .dealCard__imgLabel{color:rgba(255,255,255,.7);font-size:13px;font-weight:900;
+  .dealCard:hover .cardImg{transform:scale(1.06)}
+  .dealCard__head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f5f9ff}
+  .badge{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;padding:5px 10px;border-radius:20px}
+  .badge--type{background:#e3efff;color:#065af3} .badge--budget{background:#f7c50d;color:#2f2f2f}
+  .dealCard__img{position:relative;height:150px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .dealCard__imgLabel{position:relative;z-index:1;color:rgba(255,255,255,.7);font-size:13px;font-weight:900;
         text-transform:uppercase;text-align:center;padding:0 14px;letter-spacing:.5px}
-  .dealCard__nights{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.55);
-        color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:30px 0 30px 0}
+  .dealCard__nights{position:absolute;right:10px;bottom:10px;z-index:3;background:rgba(0,0,0,.6);color:#fff;font-size:11px;
+        font-weight:700;padding:5px 10px;border-radius:30px 0 30px 0}
   .dealCard__body{padding:16px;display:flex;flex-direction:column;flex:1}
   .dealCard__title{font-size:18px;line-height:22px;font-weight:900;margin-bottom:6px;min-height:44px}
-  .dealCard__title a{color:#2b3e71}
-  .dealCard__title a:hover{color:#065af3}
+  .dealCard__title a{color:#2b3e71} .dealCard__title a:hover{color:#065af3}
   .dealCard__places{color:#6b7a90;font-size:13px;line-height:18px;margin-bottom:10px;min-height:36px}
-  .dealCard__flight{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;
-        display:inline-block;padding:4px 10px;border-radius:20px;margin-bottom:14px;width:fit-content}
-  .flight--no{background:#fdeceb;color:#d33}
-  .flight--yes{background:#e7f6ec;color:#1f9d52}
-  .dealCard__priceRow{display:flex;align-items:center;justify-content:space-between;
-        padding-top:14px;border-top:1px dashed #d8e2ef;margin-top:auto}
+  .dealCard__flight{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;display:inline-block;
+        padding:4px 10px;border-radius:20px;margin-bottom:14px;width:fit-content}
+  .flight--no{background:#fdeceb;color:#d33} .flight--yes{background:#e7f6ec;color:#1f9d52}
+  .dealCard__priceRow{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px dashed #d8e2ef;margin-top:auto}
   .dealCard__price{color:#2f2f2f;font-size:24px;font-weight:900;line-height:24px}
-  .dealCard__price span{display:block;font-size:11px;font-weight:400;color:#8090a4;
-        text-transform:uppercase;margin-top:3px}
-  .dealCard__call{margin-top:12px;text-align:center;color:#065af3;font-weight:900;font-size:12px;
-        text-transform:uppercase;letter-spacing:.5px;border:1px solid #cfe0f6;border-radius:30px;
-        padding:8px;transition:.2s}
+  .dealCard__price span{display:block;font-size:11px;font-weight:400;color:#8090a4;text-transform:uppercase;margin-top:3px}
+  .dealCard__call{margin-top:12px;text-align:center;color:#065af3;font-weight:900;font-size:12px;text-transform:uppercase;
+        letter-spacing:.5px;border:1px solid #cfe0f6;border-radius:30px;padding:8px;transition:.2s}
   .dealCard__call:hover{background:#f0f6ff}
 
-  /* ---- footer strip ---- */
   .footStrip{background:#2b3e71;color:#fff;text-align:center;padding:26px 16px;margin-top:10px}
   .footStrip p{opacity:.85;font-size:13px;margin-top:6px}
 
-  /* ===== responsive ===== */
-  @media(max-width:980px){
-    .trendGrid{grid-template-columns:repeat(3,1fr)}
-    .dealGrid{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:980px){ .dealGrid{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:760px){
+    .carousel__nav--prev{left:4px} .carousel__nav--next{right:4px}
   }
   @media(max-width:640px){
     .sectionHead h2{font-size:23px;line-height:27px}
-    .trendGrid{grid-template-columns:repeat(2,1fr);gap:14px}
     .dealGrid{grid-template-columns:1fr}
+    .trendCard{width:200px}
     .centerLine:before,.centerLine:after{width:10%}
   }
 </style>
@@ -151,7 +137,7 @@
     </div>
   </header>
 
-  <!-- ===== TOP TRENDING ===== -->
+  <!-- ===== TOP TRENDING (carousel) ===== -->
   <section class="section">
     <div class="wrapper">
       <div class="sectionHead">
@@ -159,117 +145,121 @@
         <h2>Top Trending Travel Destinations</h2>
         <div class="centerLine"><span></span></div>
       </div>
-      <div class="trendGrid">
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
-            <span class="trendCard__placeholder">Iceland</span>
-            <span class="trendCard__pk">3+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Iceland</h3>
-            <div class="trendCard__price">From $1,741<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
-            <span class="trendCard__placeholder">Scandinavia</span>
-            <span class="trendCard__pk">11+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Scandinavia</h3>
-            <div class="trendCard__price">From $1,341<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#00b4d8,#0077b6)">
-            <span class="trendCard__placeholder">Spain</span>
-            <span class="trendCard__pk">12+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Spain</h3>
-            <div class="trendCard__price">From $1,405<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
-            <span class="trendCard__placeholder">All of Europe</span>
-            <span class="trendCard__pk">17+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">All of Europe</h3>
-            <div class="trendCard__price">From $2,140<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
-            <span class="trendCard__placeholder">Greece</span>
-            <span class="trendCard__pk">2+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Greece</h3>
-            <div class="trendCard__price">From $1,860<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
-            <span class="trendCard__placeholder">South Africa</span>
-            <span class="trendCard__pk">18+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">South Africa</h3>
-            <div class="trendCard__price">From $971<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#654ea3,#43c6ac)">
-            <span class="trendCard__placeholder">Canada</span>
-            <span class="trendCard__pk">5+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Canada</h3>
-            <div class="trendCard__price">From $1,198<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#1f4037,#99f2c8)">
-            <span class="trendCard__placeholder">Baku - Azerbaijan</span>
-            <span class="trendCard__pk">11+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Baku - Azerbaijan</h3>
-            <div class="trendCard__price">From $447<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#c31432,#240b36)">
-            <span class="trendCard__placeholder">Vietnam</span>
-            <span class="trendCard__pk">31+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Vietnam</h3>
-            <div class="trendCard__price">From $227<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#0083b0,#00b4db)">
-            <span class="trendCard__placeholder">Singapore</span>
-            <span class="trendCard__pk">27+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Singapore</h3>
-            <div class="trendCard__price">From $347<span>/ per person</span></div>
-          </div>
-        </a>
-        <a class="trendCard" href="#">
-          <div class="trendCard__img" style="background:linear-gradient(135deg,#f12711,#f5af19)">
-            <span class="trendCard__placeholder">Malaysia</span>
-            <span class="trendCard__pk">28+ Packages</span>
-          </div>
-          <div class="trendCard__overlay">
-            <h3 class="trendCard__name">Malaysia</h3>
-            <div class="trendCard__price">From $313<span>/ per person</span></div>
-          </div>
-        </a>
+      <div class="carousel">
+        <button class="carousel__nav carousel__nav--prev" aria-label="Previous"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#065af3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <div class="carousel__track" id="trendTrack">
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/BestSellingDestination/trending-iceland.jpg" alt="Iceland" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">3+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Iceland</h3>
+                <div class="trendCard__price">From $1,741<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-scandinavia.jpg" alt="Scandinavia" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">11+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Scandinavia</h3>
+                <div class="trendCard__price">From $1,341<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#00b4d8,#0077b6)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-spain.jpg" alt="Spain" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">12+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Spain</h3>
+                <div class="trendCard__price">From $1,405<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-all-of-europe.jpg" alt="All of Europe" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">17+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">All of Europe</h3>
+                <div class="trendCard__price">From $2,140<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-greece.jpg" alt="Greece" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">2+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Greece</h3>
+                <div class="trendCard__price">From $1,860<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-south-africa.jpeg" alt="South Africa" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">18+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">South Africa</h3>
+                <div class="trendCard__price">From $971<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#654ea3,#43c6ac)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-canada.jpg" alt="Canada" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">5+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Canada</h3>
+                <div class="trendCard__price">From $1,198<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#1f4037,#99f2c8)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-baku.jpg" alt="Baku - Azerbaijan" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">11+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Baku - Azerbaijan</h3>
+                <div class="trendCard__price">From $447<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#c31432,#240b36)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-Vietnam.jpg" alt="Vietnam" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">31+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Vietnam</h3>
+                <div class="trendCard__price">From $227<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#0083b0,#00b4db)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-singapore.jpeg" alt="Singapore" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">27+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Singapore</h3>
+                <div class="trendCard__price">From $347<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+          <a class="trendCard" href="#">
+            <div class="trendCard__img" style="background:linear-gradient(135deg,#f12711,#f5af19)">
+              <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Website/ExploreDestinationByTheme/trending-Malaysia.jpg" alt="Malaysia" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+              <span class="trendCard__pk">28+ Packages</span>
+              <div class="trendCard__overlay">
+                <h3 class="trendCard__name">Malaysia</h3>
+                <div class="trendCard__price">From $313<span>/ per person</span></div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <button class="carousel__nav carousel__nav--next" aria-label="Next"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#065af3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
     </div>
   </section>
@@ -293,6 +283,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/saigon-municipality-in-vietnam1.jpg" alt="Experience Vietnam With Phu Quoc" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Experience Vietnam With Phu Quoc</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -313,6 +304,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/hochi-minh-mausoleum.jpg" alt="Discovery Vietnam With Ninh Binh" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Discovery Vietnam With Ninh Binh</span>
             <span class="dealCard__nights">8 Nights / 9 Days</span>
           </div>
@@ -333,6 +325,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#00b4d8,#0077b6)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/one-pillarpagoda-buddhist.jpg" alt="Discovery Vietnam with Sapa" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Discovery Vietnam with Sapa</span>
             <span class="dealCard__nights">10 Nights / 11 Days</span>
           </div>
@@ -353,6 +346,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/wings-of-time-sentosa02.jpg" alt="South East Eminence Singapore Malaysia With Cruise" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">South East Eminence Singapore Malaysia With Cruise</span>
             <span class="dealCard__nights">8 Nights / 9 Days</span>
           </div>
@@ -373,6 +367,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/kl-tower-image-02.jpg" alt="South East Discovery Singapore Malaysia With Cruise" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">South East Discovery Singapore Malaysia With Cruise</span>
             <span class="dealCard__nights">8 Nights / 9 Days</span>
           </div>
@@ -393,6 +388,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/ItineraryImage/76_203_cangocaves_1.jpg" alt="Glimpse of South Africa - Self Drive" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Glimpse of South Africa - Self Drive</span>
             <span class="dealCard__nights">7 Nights / 8 Days</span>
           </div>
@@ -413,6 +409,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#654ea3,#43c6ac)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/sagradafamilia-cover.jpg" alt="Fascinating Spain by Rail" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Fascinating Spain by Rail</span>
             <span class="dealCard__nights">10 Nights / 11 Days</span>
           </div>
@@ -433,6 +430,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#1f4037,#99f2c8)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/boulders-beach-penguin-colony.jpg" alt="Splendid South Africa - Private Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Splendid South Africa - Private Tour</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -453,6 +451,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#c31432,#240b36)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/keila-joa-castle-1.jpg" alt="Best Of Baltic Capitals - Sic Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Best Of Baltic Capitals - Sic Tour</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -473,6 +472,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#0083b0,#00b4db)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/visit-royal-palace-of-madrid.jpg" alt="Highlights Of Spain By Rail" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Highlights Of Spain By Rail</span>
             <span class="dealCard__nights">10 Nights / 11 Days</span>
           </div>
@@ -493,6 +493,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#f12711,#f5af19)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/stratosphere-Tower-Observatory-0.jpg" alt="Las Vegas &amp; Surround" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Las Vegas &amp; Surround</span>
             <span class="dealCard__nights">7 Nights / 8 Days</span>
           </div>
@@ -513,6 +514,7 @@
             <span class="badge badge--budget">Upto 1500 USD</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/cap-town-boulders-beach.jpg" alt="Exotic South Africa - Self Drive" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Exotic South Africa - Self Drive</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -533,6 +535,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/Madame-Tussauds.jpg" alt="European Elements" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">European Elements</span>
             <span class="dealCard__nights">14 Nights / 15 Days</span>
           </div>
@@ -553,6 +556,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#00b4d8,#0077b6)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/moraine-lake-banffnationalpark.jpg" alt="Experience Canadian Rockies" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Experience Canadian Rockies</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -573,6 +577,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/melbourne-aerial-view-001.jpg" alt="Experience New Zealand with Australia" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Experience New Zealand with Australia</span>
             <span class="dealCard__nights">18 Nights / 19 Days</span>
           </div>
@@ -593,6 +598,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/table-mountain-from-harbour.jpg" alt="South African Lite Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">South African Lite Tour</span>
             <span class="dealCard__nights">8 Nights / 9 Days</span>
           </div>
@@ -613,6 +619,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/bukchon-hanok-village-1.jpg" alt="Discover South Korea" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Discover South Korea</span>
             <span class="dealCard__nights">6 Nights / 7 Days</span>
           </div>
@@ -633,6 +640,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#654ea3,#43c6ac)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/usa-package-jip.jpg" alt="American Explorer" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">American Explorer</span>
             <span class="dealCard__nights">12 Nights / 13 Days</span>
           </div>
@@ -653,6 +661,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#1f4037,#99f2c8)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/tanah-lot-temple02.JPG" alt="Discovery Bali With Mara River Safari" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Discovery Bali With Mara River Safari</span>
             <span class="dealCard__nights">6 Nights / 7 Days</span>
           </div>
@@ -673,6 +682,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#c31432,#240b36)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/batu-caves--00.jpg" alt="Escape Singapore Malaysia with Langkawi" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Escape Singapore Malaysia with Langkawi</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -693,6 +703,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#0083b0,#00b4db)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/halongbay-daytrip.jpg" alt="Discovery Vietnam With Ninh Binh - Senior Citizen Special Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Discovery Vietnam With Ninh Binh - Senior Citizen Special Tour</span>
             <span class="dealCard__nights">8 Nights / 9 Days</span>
           </div>
@@ -713,6 +724,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#f12711,#f5af19)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/universal-studio-singapre.jpg" alt="Dazzling Singapore" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Dazzling Singapore</span>
             <span class="dealCard__nights">4 Nights / 5 Days</span>
           </div>
@@ -733,6 +745,7 @@
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/agrodome-sheep-show-001.jpg" alt="Naturally New Zealand - Self Drive" loading="lazy" onerror="this.classList.add('cardImg--fail')">
             <span class="dealCard__imgLabel">Naturally New Zealand - Self Drive</span>
             <span class="dealCard__nights">9 Nights / 10 Days</span>
           </div>
@@ -757,18 +770,37 @@
   </div>
 
 <script>
-  // Budget tab filtering
-  const tabs=document.querySelectorAll('.tab');
-  const cards=document.querySelectorAll('.dealCard');
-  function show(target){
-    cards.forEach(c=>c.style.display = c.dataset.tab===target ? 'flex':'none');
-  }
-  tabs.forEach(t=>t.addEventListener('click',()=>{
-    tabs.forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    show(t.dataset.target);
-  }));
-  show('t1');
+  // ---- Trending carousel ----
+  (function(){
+    var track=document.getElementById('trendTrack');
+    var prev=document.querySelector('.carousel__nav--prev');
+    var next=document.querySelector('.carousel__nav--next');
+    function step(){
+      var card=track.querySelector('.trendCard');
+      var gap=20; return card?card.offsetWidth+gap:260;
+    }
+    function update(){
+      prev.disabled = track.scrollLeft<=2;
+      next.disabled = track.scrollLeft+track.clientWidth>=track.scrollWidth-2;
+    }
+    prev.addEventListener('click',function(){track.scrollBy({left:-step()*2,behavior:'smooth'});});
+    next.addEventListener('click',function(){track.scrollBy({left:step()*2,behavior:'smooth'});});
+    track.addEventListener('scroll',update);
+    window.addEventListener('resize',update);
+    update();
+  })();
+
+  // ---- Budget tab filtering ----
+  (function(){
+    var tabs=document.querySelectorAll('.tab');
+    var cards=document.querySelectorAll('.dealCard');
+    function show(t){cards.forEach(function(c){c.style.display=c.dataset.tab===t?'flex':'none';});}
+    tabs.forEach(function(t){t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active'); show(t.dataset.target);
+    });});
+    show('t1');
+  })();
 </script>
 </body>
 </html>
