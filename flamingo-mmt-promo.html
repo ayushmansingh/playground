@@ -16,18 +16,15 @@
   img{vertical-align:top}
   .wrapper{width:100%;max-width:1100px;margin:0 auto;padding:0 16px}
 
-  /* shared card image (with gradient fallback) */
   .cardImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
   .cardImg--fail{display:none}
 
-  /* buttons */
   .btn{display:inline-block;border:0;cursor:pointer;font-family:inherit;font-weight:900;font-size:13px;line-height:16px;
         text-transform:uppercase;border-radius:30px;padding:9px 20px;text-align:center;transition:.2s}
   .btn--primary{background:linear-gradient(93.66deg,#53b2fe 0%,#065af3 100%);color:#fff}
   .btn--primary:hover{filter:brightness(1.05);box-shadow:0 6px 16px rgba(6,90,243,.3)}
 
-  /* banner placeholder */
-  /* Recommended banner image: 1100 x 320 (desktop) / retina 2200 x 640.
+  /* banner placeholder. Recommended image: 1100 x 320 (retina 2200 x 640).
      Swap this <div> for: <img src="..." alt="..." class="banner__img"> */
   .banner{padding:18px 0 0}
   .banner__ph{position:relative;width:100%;aspect-ratio:1100/320;border-radius:16px;
@@ -39,7 +36,6 @@
   .banner__icon{width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;
         justify-content:center;margin-bottom:10px;box-shadow:0 4px 12px rgba(43,62,113,.12);font-size:22px}
 
-  /* section heading w/ dotted centerline */
   .section{padding:48px 0}
   .sectionHead{text-align:center;margin-bottom:28px}
   .sectionHead h2{color:#2b3e71;font-size:30px;line-height:34px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
@@ -49,7 +45,7 @@
   .centerLine:before{right:.6em;margin-left:-50%} .centerLine:after{left:.6em;margin-right:-50%}
   .centerLine span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#f7c50d;vertical-align:middle}
 
-  /* ===== Trending carousel (MMT-styled) ===== */
+  /* ===== Trending carousel ===== */
   .carousel{position:relative}
   .carousel__track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
         padding:6px 2px 16px;scrollbar-width:none;-ms-overflow-style:none}
@@ -113,9 +109,7 @@
   .footStrip p{opacity:.85;font-size:13px;margin-top:6px}
 
   @media(max-width:980px){ .dealGrid{grid-template-columns:repeat(2,1fr)} }
-  @media(max-width:760px){
-    .carousel__nav--prev{left:4px} .carousel__nav--next{right:4px}
-  }
+  @media(max-width:760px){ .carousel__nav--prev{left:4px} .carousel__nav--next{right:4px} }
   @media(max-width:640px){
     .sectionHead h2{font-size:23px;line-height:27px}
     .dealGrid{grid-template-columns:1fr}
@@ -274,7 +268,9 @@
       </div>
       <div class="tabs">
         <button class="tab active" data-target="t1">Upto 1500 USD</button>
-        <button class="tab" data-target="t2">Monsoon Special</button>
+        <button class="tab" data-target="t2">Upto 3500 USD</button>
+        <button class="tab" data-target="t3">Upto 5000 USD</button>
+        <button class="tab" data-target="t4">Monsoon Special</button>
       </div>
       <div class="dealGrid">
         <article class="dealCard" data-tab="t1">
@@ -532,6 +528,468 @@
         <article class="dealCard" data-tab="t2">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/hanoi.jpg" alt="Vietnam &amp; Cambodia Highlights" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Vietnam &amp; Cambodia Highlights</span>
+            <span class="dealCard__nights">12 Nights / 13 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Vietnam &amp; Cambodia Highlights</a></h3>
+            <p class="dealCard__places">Hanoi (2N),  Halong (1N) , +3 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$1,935<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#00b4d8,#0077b6)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/Game Drive Experience.jpg" alt="Whole of South Africa 3 with Chef" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Whole of South Africa 3 with Chef</span>
+            <span class="dealCard__nights">13 Nights / 14 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Whole of South Africa 3 with Chef</a></h3>
+            <p class="dealCard__places">Cape Town (4N),  George (3N) , +4 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,495<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/Singapore-city-skyline.JPG" alt="Dreams 1 Singapore Malaysia with 2 Nights Cruise" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Dreams 1 Singapore Malaysia with 2 Nights Cruise</span>
+            <span class="dealCard__nights">9 Nights / 10 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Dreams 1 Singapore Malaysia with 2 Nights Cruise</a></h3>
+            <p class="dealCard__places">Kuala Lumpur (1N),  Genting Highlands (1N) , +3 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$1,565<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/moraine-lake-banffnationalpark.jpg" alt="Experience Canadian Rockies" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Experience Canadian Rockies</span>
+            <span class="dealCard__nights">9 Nights / 10 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Experience Canadian Rockies</a></h3>
+            <p class="dealCard__places">Calgary (1N),  Canmore (2N) , +4 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,765<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/ItineraryImage/victoria- Fall.jpg" alt="Exotic Africa With Victoria Falls with Chef" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Exotic Africa With Victoria Falls with Chef</span>
+            <span class="dealCard__nights">13 Nights / 14 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Exotic Africa With Victoria Falls with Chef</a></h3>
+            <p class="dealCard__places">Cape Town (4N),  George (3N) , +4 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,715<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#654ea3,#43c6ac)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/vevey-citycentreview.jpg" alt="European Dreams" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">European Dreams</span>
+            <span class="dealCard__nights">7 Nights / 8 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">European Dreams</a></h3>
+            <p class="dealCard__places">Paris (3N),  Lausanne (1N) , +1 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$2,135<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Free &amp; Easy – SIC Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#1f4037,#99f2c8)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/48543073737_b0f1e92795_o.jpg" alt="Amazing Australia With Heavenly Hamilton" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Amazing Australia With Heavenly Hamilton</span>
+            <span class="dealCard__nights">14 Nights / 15 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Amazing Australia With Heavenly Hamilton</a></h3>
+            <p class="dealCard__places">Gold Coast (4N),  Hamilton Island (3N) , +3 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$2,610<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Self Drive Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#c31432,#240b36)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Fallback/flamingo_fallback_250x120.jpg" alt="Naturally New Zealand With Beautiful Bora Bora Self Drive" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Naturally New Zealand With Beautiful Bora Bora Self Drive</span>
+            <span class="dealCard__nights">14 Nights / 15 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Naturally New Zealand With Beautiful Bora Bora Self Drive</a></h3>
+            <p class="dealCard__places">Auckland (1N),  Rotorua (3N) , +6 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$2,947<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t2">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Private Van Tour</span>
+            <span class="badge badge--budget">Upto 3500 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#0083b0,#00b4db)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/Fallback/flamingo_fallback_250x120.jpg" alt="Stunning South Africa – Private Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Stunning South Africa – Private Tour</span>
+            <span class="dealCard__nights">11 Nights / 12 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Stunning South Africa – Private Tour</a></h3>
+            <p class="dealCard__places">Johannesburg (1N),  Kruger National Park (2N) , +4 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$2,197<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#f12711,#f5af19)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/sulphur-mountain-anff.png" alt="Captivating Canadian Rockies" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Captivating Canadian Rockies</span>
+            <span class="dealCard__nights">9 Nights / 10 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Captivating Canadian Rockies</a></h3>
+            <p class="dealCard__places">Calgary (1N),  Banff (2N) , +4 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,875<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/national-museum-of-dublin-001.jpg" alt="UK Scotland And Ireland Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">UK Scotland And Ireland Tour</span>
+            <span class="dealCard__nights">13 Nights / 14 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">UK Scotland And Ireland Tour</a></h3>
+            <p class="dealCard__places">London (3N),  Cardiff (1N) , +5 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,955<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/seljalandsfoss-waterfalls-1.jpg" alt="Interesting Iceland - Chef Assisted Tour" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Interesting Iceland - Chef Assisted Tour</span>
+            <span class="dealCard__nights">9 Nights / 10 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Interesting Iceland - Chef Assisted Tour</a></h3>
+            <p class="dealCard__places">Reykjavik (2N),  Akyureri (2N) , +3 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$4,115<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#00b4d8,#0077b6)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/statue-of-liberty.jpg" alt="American Escape" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">American Escape</span>
+            <span class="dealCard__nights">12 Nights / 13 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">American Escape</a></h3>
+            <p class="dealCard__places">San Francisco (2N),  Los Angeles (2N) , +4 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$4,145<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/Madame-Tussauds.jpg" alt="European Elements" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">European Elements</span>
+            <span class="dealCard__nights">14 Nights / 15 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">European Elements</a></h3>
+            <p class="dealCard__places">London (2N),  Paris (2N) , +6 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,815<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/new-jersey-1.jpg" alt="American Experience East &amp; West" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">American Experience East &amp; West</span>
+            <span class="dealCard__nights">12 Nights / 13 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">American Experience East &amp; West</a></h3>
+            <p class="dealCard__places">New York City (2N),  Washington (1N) , +4 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$4,645<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/visit-nestle-cailler-chocolate-factorq.jpg" alt="European Euphoria" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">European Euphoria</span>
+            <span class="dealCard__nights">13 Nights / 14 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">European Euphoria</a></h3>
+            <p class="dealCard__places">Paris (3N),  Amsterdam (2N) , +6 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,645<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#654ea3,#43c6ac)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/arc-de-triomphe-aerial-view.jpg" alt="European Elegance (Hook on to Exotic)" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">European Elegance (Hook on to Exotic)</span>
+            <span class="dealCard__nights">12 Nights / 13 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">European Elegance (Hook on to Exotic)</a></h3>
+            <p class="dealCard__places">Paris (3N),  Lausanne (2N) , +5 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,675<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#1f4037,#99f2c8)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/melbourne-aerial-view-001.jpg" alt="Experience New Zealand with Australia" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Experience New Zealand with Australia</span>
+            <span class="dealCard__nights">18 Nights / 19 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Experience New Zealand with Australia</a></h3>
+            <p class="dealCard__places">Auckland (1N),  Rotorua (2N) , +7 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$5,575<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#c31432,#240b36)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/usa-package-jip.jpg" alt="American Explorer" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">American Explorer</span>
+            <span class="dealCard__nights">12 Nights / 13 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">American Explorer</a></h3>
+            <p class="dealCard__places">New York City (2N),  Washington (1N) , +4 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$4,445<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#0083b0,#00b4db)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/great ocean road-002.jpg" alt="Experience Australia Tour Perth Special" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Experience Australia Tour Perth Special</span>
+            <span class="dealCard__nights">11 Nights / 12 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Experience Australia Tour Perth Special</a></h3>
+            <p class="dealCard__places">Perth (3N),  Cairns (2N) , +2 more</p>
+            <p class="dealCard__flight flight--yes">Internal Flight Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$3,755<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Private Van Tour</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#f12711,#f5af19)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/cathedral-cove-001.jpg" alt="Naturally New Zealand With Pure Pods  Private" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Naturally New Zealand With Pure Pods  Private</span>
+            <span class="dealCard__nights">22 Nights / 23 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Naturally New Zealand With Pure Pods  Private</a></h3>
+            <p class="dealCard__places">Auckland (1N),  Paihia (2N) , +10 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$4,565<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t3">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Fixed Departure</span>
+            <span class="badge badge--budget">Upto 5000 USD</span>
+          </div>
+          <div class="dealCard__img" style="background:linear-gradient(135deg,#53b2fe,#065af3)">
+            <img class="cardImg" src="https://imgcdn.flamingotravels.co.in/Images/City/kenya-1.jpg" alt="Kenya With Tanzania Migration Special" loading="lazy" onerror="this.classList.add('cardImg--fail')">
+            <span class="dealCard__imgLabel">Kenya With Tanzania Migration Special</span>
+            <span class="dealCard__nights">10 Nights / 11 Days</span>
+          </div>
+          <div class="dealCard__body">
+            <h3 class="dealCard__title"><a href="#">Kenya With Tanzania Migration Special</a></h3>
+            <p class="dealCard__places">Nairobi (1N),  Masai Mara (2N) , +5 more</p>
+            <p class="dealCard__flight flight--no">Flight Not Included</p>
+            <div class="dealCard__priceRow">
+              <div class="dealCard__price">$4,589<span>per person</span></div>
+              <a class="btn btn--primary" href="#">View Details</a>
+            </div>
+            <a class="dealCard__call" href="#">Call Now</a>
+          </div>
+        </article>
+        <article class="dealCard" data-tab="t4">
+          <div class="dealCard__head">
+            <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
           </div>
           <div class="dealCard__img" style="background:linear-gradient(135deg,#2b3e71,#0c2d56)">
@@ -550,7 +1008,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -571,7 +1029,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -592,7 +1050,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -613,7 +1071,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -634,7 +1092,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -655,7 +1113,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -676,7 +1134,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -697,7 +1155,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Group Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -718,7 +1176,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Private Van Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -739,7 +1197,7 @@
             <a class="dealCard__call" href="#">Call Now</a>
           </div>
         </article>
-        <article class="dealCard" data-tab="t2">
+        <article class="dealCard" data-tab="t4">
           <div class="dealCard__head">
             <span class="badge badge--type">Self Drive Tour</span>
             <span class="badge badge--budget">Monsoon Special</span>
@@ -770,27 +1228,20 @@
   </div>
 
 <script>
-  // ---- Trending carousel ----
   (function(){
     var track=document.getElementById('trendTrack');
     var prev=document.querySelector('.carousel__nav--prev');
     var next=document.querySelector('.carousel__nav--next');
-    function step(){
-      var card=track.querySelector('.trendCard');
-      var gap=20; return card?card.offsetWidth+gap:260;
-    }
+    function step(){var card=track.querySelector('.trendCard');return card?card.offsetWidth+20:260;}
     function update(){
-      prev.disabled = track.scrollLeft<=2;
-      next.disabled = track.scrollLeft+track.clientWidth>=track.scrollWidth-2;
+      prev.disabled=track.scrollLeft<=2;
+      next.disabled=track.scrollLeft+track.clientWidth>=track.scrollWidth-2;
     }
     prev.addEventListener('click',function(){track.scrollBy({left:-step()*2,behavior:'smooth'});});
     next.addEventListener('click',function(){track.scrollBy({left:step()*2,behavior:'smooth'});});
-    track.addEventListener('scroll',update);
-    window.addEventListener('resize',update);
-    update();
+    track.addEventListener('scroll',update); window.addEventListener('resize',update); update();
   })();
 
-  // ---- Budget tab filtering ----
   (function(){
     var tabs=document.querySelectorAll('.tab');
     var cards=document.querySelectorAll('.dealCard');
