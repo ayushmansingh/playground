@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:5000/api/todos";
+// Use whatever host the page was loaded from, so this works both on
+// localhost and when another machine loads the page via your LAN IP.
+const API_URL = `http://${window.location.hostname}:5000/api/todos`;
 
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
