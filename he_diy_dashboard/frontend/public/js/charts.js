@@ -754,3 +754,120 @@ export function divergingBarChart(el, options) {
     hit.addEventListener("pointerleave", hideTooltip);
   });
 }
+
+/* ---------- 100% stacked composition ---------- */
+
+/* Part-to-whole over time. Two shares that always add to 100 are complements,
+   so drawing them as lines pins both to the axis extremes and leaves the middle
+   of the plot empty; as stacked bands the mix reads instantly and the smaller
+   cohort's growth is a widening wedge rather than a flat line on zero. */
+export function stackedShareChart(el, options) {
+  const {
+    dates = [],
+    series = [],
+    label = "Composition",
+    dateLabel = (value) => value,
+    valueLabel = "",
+    height = 320,
+    meta = () => [],
+  } = options;
+
+  const hasData = dates.length && series.some((item) => item.points.some((point) => point != null));
+  if (!hasData) {
+    emptyState(el, "No data in this range.");
+    return;
+  }
+
+  const width = measureWidth(el);
+  const pad = { top: 20, right: 88, bottom: 40, left: 52 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+
+  const x = (index) => (dates.length === 1 ? pad.left + plotW / 2 : pad.left + (index / (dates.length - 1)) * plotW);
+  const y = (value) => pad.top + plotH - (Math.min(Math.max(num(value), 0), 100) / 100) * plotH;
+
+  const ticks = [0, 25, 50, 75, 100];
+  const grid = ticks
+    .map((tick) => gridLine(pad.left, width - pad.right, y(tick)) + axisText(pad.left - 12, y(tick) + 4, `${tick}%`, "end"))
+    .join("");
+
+  const slots = Math.max(2, Math.floor(plotW / 96));
+  const stride = Math.max(1, Math.ceil(dates.length / slots));
+  const xLabels = dates
+    .map((date, index) =>
+      index % stride === 0 || index === dates.length - 1 ? axisText(x(index), height - pad.bottom + 22, dateLabel(date)) : ""
+    )
+    .join("");
+
+  /* Running tops, so each band sits on the one below it. */
+  const bases = dates.map(() => 0);
+  const bands = series.map((item, seriesIndex) => {
+    const lower = bases.slice();
+    const upper = dates.map((_, index) => {
+      bases[index] += Math.min(Math.max(num(item.points[index]), 0), 100);
+      return bases[index];
+    });
+    const forward = dates.map((_, index) => `${x(index).toFixed(1)},${y(upper[index]).toFixed(1)}`).join(" L");
+    const backward = dates
+      .map((_, index) => index)
+      .reverse()
+      .map((index) => `${x(index).toFixed(1)},${y(lower[index]).toFixed(1)}`)
+      .join(" L");
+    const color = item.color || seriesColor(seriesIndex);
+    /* The 2px surface stroke is the spacer between bands, not a border. */
+    const shape = `<path class="viz-band" d="M${forward} L${backward} Z" fill="${color}" />`;
+    /* The top edge of a band is the actual measured boundary, so it gets the
+       crisp 2px line while the fill stays a quieter wash. */
+    const edge =
+      seriesIndex < series.length - 1
+        ? `<polyline points="${dates.map((_, index) => `${x(index).toFixed(1)},${y(upper[index]).toFixed(1)}`).join(" ")}"
+            fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />`
+        : "";
+    const mid = (lower[dates.length - 1] + upper[dates.length - 1]) / 2;
+    const endLabel = `<text class="viz-end-label" x="${(x(dates.length - 1) + 12).toFixed(1)}" y="${(y(mid) + 4).toFixed(1)}">${escapeHtml(item.name)}</text>`;
+    return { shape, edge, endLabel };
+  });
+
+  const body = `${grid}
+    ${bands.map((band) => band.shape).join("")}
+    ${bands.map((band) => band.edge).join("")}
+    ${bands.map((band) => band.endLabel).join("")}
+    <line class="viz-crosshair" x1="0" x2="0" y1="${pad.top}" y2="${pad.top + plotH}" opacity="0" />
+    ${xLabels}
+    <rect class="viz-capture" x="${pad.left}" y="${pad.top}" width="${plotW}" height="${plotH}" fill="transparent" />`;
+
+  el.innerHTML = svgShell(width, height, label, body);
+
+  const svg = el.querySelector("svg");
+  const crosshair = svg.querySelector(".viz-crosshair");
+  const capture = svg.querySelector(".viz-capture");
+
+  capture.addEventListener("pointermove", (event) => {
+    const point = viewPoint(svg, event, width, height);
+    const step = dates.length === 1 ? plotW : plotW / (dates.length - 1);
+    const index = Math.min(dates.length - 1, Math.max(0, Math.round((point.x - pad.left) / step)));
+    const cx = x(index);
+    crosshair.setAttribute("x1", cx);
+    crosshair.setAttribute("x2", cx);
+    crosshair.setAttribute("opacity", "1");
+    showTooltip(
+      tooltipHtml(
+        dateLabel(dates[index], true),
+        valueLabel,
+        series
+          .map((item, seriesIndex) => ({
+            label: item.name,
+            color: item.color || seriesColor(seriesIndex),
+            value: item.points[index] == null ? "—" : `${num(item.points[index]).toFixed(1)}%`,
+          }))
+          .concat(meta(index))
+      ),
+      event.clientX,
+      event.clientY
+    );
+  });
+  capture.addEventListener("pointerleave", () => {
+    crosshair.setAttribute("opacity", "0");
+    hideTooltip();
+  });
+}

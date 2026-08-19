@@ -17,10 +17,22 @@ Why each panel is the shape it is, and what a future version could add.
 
 **One axis, never two.** New DIY created runs in the hundreds while Old DIY runs
 in the tens of thousands. Plotting both against two y-scales would invent a
-correlation that is not in the data, so the trend chart offers an **Indexed**
-mode instead: both cohorts rebased to 100 on the first day of the range, on one
-axis. Absolute mode stays the default because absolute volume is what most people
-come for.
+correlation that is not in the data, so the trend chart offers two alternative
+readings on a single axis instead. **Indexed** rebases both cohorts to 100 on the
+first day of the range, which answers "which one is growing faster". **Share %**
+plots each cohort as a percentage of that day's combined total, which answers
+"how much of the mix is New DIY yet". Absolute stays the default because absolute
+volume is what most people come for.
+
+**Share mode is stacked bands, not two lines.** The two shares are exact
+complements — they always add to 100. Drawn as lines they pin to the top and
+bottom of the axis with an empty 90-point gap between them, and New DIY's climb
+from under 1% to around 7% is invisible against a 0–100 scale. As stacked bands
+the mix reads at a glance and that climb is a widening wedge on the baseline. New
+DIY sits at the bottom of the stack because it is the smaller cohort and the one
+being watched; the boundary between the bands is the measured value, so it gets
+the crisp 2px line while the fills stay quiet washes separated by a 2px surface
+gap.
 
 **Conversion rates get small multiples, not one multi-line chart.** Save, send,
 download and booking rates share a unit but not a magnitude — booking rate is

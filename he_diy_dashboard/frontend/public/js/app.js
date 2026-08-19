@@ -26,7 +26,7 @@ import {
   weekdayProfile,
   withRates,
 } from "./util.js";
-import { barChart, divergingBarChart, funnelChart, groupedBarChart, heatmap, hideTooltip, lineChart, scatterChart } from "./charts.js";
+import { barChart, divergingBarChart, funnelChart, groupedBarChart, heatmap, hideTooltip, lineChart, scatterChart, stackedShareChart } from "./charts.js";
 import { ChartCard, TableCard, dataTable, deltaChip, insight, legend, statTile } from "./components.js";
 import { isDark, seriesColor } from "./palette.js";
 
@@ -47,7 +47,7 @@ const state = {
   dayMetric: "created",
   agentMetric: "created",
   showAvg: true,
-  indexed: false,
+  trendScale: "absolute",
   data: null,
   loading: false,
   booted: false,
@@ -712,44 +712,104 @@ function renderAgentView() {
     color: seriesColor(FLAG_SLOT[flag]),
     points: dates.map((date) => (byFlag[flag][date] ? num(byFlag[flag][date][metric]) : null)),
   }));
+
+  /* Each day's total across both cohorts — the denominator for share mode. */
+  const dayTotals = dates.map((date, index) =>
+    rawSeries.reduce((sum, series) => sum + (series.points[index] ?? 0), 0)
+  );
   /* New DIY volume is a rounding error next to Old DIY, so absolute lines hide
-     its shape. Indexing both to 100 at the first day puts the two growth
-     trajectories on one honest axis — never a second y-scale. */
-  const trendSeries = state.indexed ? rawSeries.map(indexToBase) : rawSeries;
+     its shape. Two alternatives put both on one honest axis — never a second
+     y-scale: Indexed rebases each cohort to 100 on the first day (growth
+     shape), Share plots each as a percentage of that day's combined total
+     (mix). A day with no volume at all has no share, so it stays a gap rather
+     than a fabricated zero. */
+  const asShare = (series) => ({
+    ...series,
+    points: series.points.map((point, index) =>
+      point == null || dayTotals[index] === 0 ? null : (point / dayTotals[index]) * 100
+    ),
+  });
+  const trendSeries =
+    state.trendScale === "indexed"
+      ? rawSeries.map(indexToBase)
+      : state.trendScale === "share"
+        ? /* New DIY is the smaller cohort and the one being watched, so it sits
+             on the baseline where its wedge is easiest to read. */
+          rawSeries.map(asShare)
+        : rawSeries;
+
+  const scaleModes = [
+    { key: "absolute", label: "Absolute" },
+    { key: "indexed", label: "Indexed" },
+    { key: "share", label: "Share %" },
+  ];
   cards.agentTrend.controls = `${metricChips("agent-metric", metric)}
     <div class="seg seg--sm" role="group" aria-label="Trend scale">
-      <button type="button" class="seg__btn${state.indexed ? "" : " is-active"}" data-agent-scale="absolute" aria-pressed="${!state.indexed}">Absolute</button>
-      <button type="button" class="seg__btn${state.indexed ? " is-active" : ""}" data-agent-scale="indexed" aria-pressed="${state.indexed}">Indexed</button>
+      ${scaleModes
+        .map(
+          (mode) =>
+            `<button type="button" class="seg__btn${state.trendScale === mode.key ? " is-active" : ""}"
+              data-agent-scale="${mode.key}" aria-pressed="${state.trendScale === mode.key}">${mode.label}</button>`
+        )
+        .join("")}
     </div>`;
   refreshControls(cards.agentTrend);
-  cards.agentTrend.el.querySelector(".card__titles p").textContent = state.indexed
-    ? `${METRIC_LABELS[metric]} indexed to 100 on ${formatDayShort(dates[0])} — shape, not size`
-    : `${METRIC_LABELS[metric]} per day, New DIY against Old DIY`;
+
+  const metricWord = METRIC_LABELS[metric].toLowerCase();
+  cards.agentTrend.el.querySelector(".card__titles p").textContent =
+    state.trendScale === "indexed"
+      ? `${METRIC_LABELS[metric]} indexed to 100 on ${formatDayShort(dates[0])} — shape, not size`
+      : state.trendScale === "share"
+        ? `Each cohort's share of that day's total ${metricWord} — the bands add up to 100%`
+        : `${METRIC_LABELS[metric]} per day, New DIY against Old DIY`;
   setCardLegend(
     cards.agentTrend,
     legend(["1", "0"].map((flag) => ({ color: seriesColor(FLAG_SLOT[flag]), label: FLAG_LABEL[flag] })))
   );
   cards.agentTrend.render(
     (el) =>
-      lineChart(el, {
-        dates,
-        series: trendSeries,
-        valueLabel: state.indexed ? `${METRIC_LABELS[metric]} (indexed)` : METRIC_LABELS[metric],
-        format: state.indexed ? (value) => num(value).toFixed(0) : formatNumber,
-        dateLabel: (date, long) => (long ? formatDayLong(date) : formatDayShort(date)),
-        label: `${METRIC_LABELS[metric]}: New DIY versus Old DIY`,
-        height: 320,
-      }),
+      state.trendScale === "share"
+        ? stackedShareChart(el, {
+            dates,
+            series: trendSeries,
+            valueLabel: `Share of the day's ${metricWord}`,
+            dateLabel: (date, long) => (long ? formatDayLong(date) : formatDayShort(date)),
+            label: `New DIY and Old DIY share of daily ${metricWord}`,
+            height: 320,
+            meta: (index) => [{ label: `Total ${metricWord}`, value: formatNumber(dayTotals[index]) }],
+          })
+        : lineChart(el, {
+            dates,
+            series: trendSeries,
+            valueLabel: state.trendScale === "indexed" ? `${METRIC_LABELS[metric]} (indexed)` : METRIC_LABELS[metric],
+            format: state.trendScale === "indexed" ? (value) => num(value).toFixed(0) : formatNumber,
+            dateLabel: (date, long) => (long ? formatDayLong(date) : formatDayShort(date)),
+            label: `${METRIC_LABELS[metric]}: New DIY versus Old DIY`,
+            height: 320,
+          }),
     {
-      rows: dates.map((date) => ({
-        date,
-        new_diy: byFlag["1"][date] ? num(byFlag["1"][date][metric]) : 0,
-        old_diy: byFlag["0"][date] ? num(byFlag["0"][date][metric]) : 0,
-      })),
+      /* The table twin carries counts and shares in every mode, so the numbers
+         behind the current view are always one click away. */
+      rows: dates.map((date, index) => {
+        const newValue = byFlag["1"][date] ? num(byFlag["1"][date][metric]) : 0;
+        const oldValue = byFlag["0"][date] ? num(byFlag["0"][date][metric]) : 0;
+        const total = dayTotals[index];
+        return {
+          date,
+          new_diy: newValue,
+          old_diy: oldValue,
+          total,
+          new_share: total ? `${((newValue / total) * 100).toFixed(1)}%` : "—",
+          old_share: total ? `${((oldValue / total) * 100).toFixed(1)}%` : "—",
+        };
+      }),
       columns: [
         { key: "date", label: "Date" },
-        { key: "new_diy", label: `New DIY ${METRIC_LABELS[metric].toLowerCase()}` },
-        { key: "old_diy", label: `Old DIY ${METRIC_LABELS[metric].toLowerCase()}` },
+        { key: "new_diy", label: `New DIY ${metricWord}` },
+        { key: "old_diy", label: `Old DIY ${metricWord}` },
+        { key: "total", label: `Total ${metricWord}` },
+        { key: "new_share", label: "New DIY share" },
+        { key: "old_share", label: "Old DIY share" },
       ],
     }
   );
@@ -1209,7 +1269,7 @@ function wire() {
     }
     const scale = event.target.closest("[data-agent-scale]");
     if (scale) {
-      state.indexed = scale.dataset.agentScale === "indexed";
+      state.trendScale = scale.dataset.agentScale;
       render();
     }
   });

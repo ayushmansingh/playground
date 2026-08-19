@@ -31,7 +31,7 @@ Everything is derived from the two Redash results the backend already returns â€
 | Panel | What it answers |
 | --- | --- |
 | Stat tiles | Same tiles plus the New-vs-Old volume mix |
-| New vs Old daily trend | Both cohorts on one axis. **Indexed** rebases both to 100 on the first day, so New DIY's shape is readable next to Old DIY's much larger volume |
+| New vs Old daily trend | Three readings of the same data. **Absolute** is raw volume per day. **Indexed** rebases both cohorts to 100 on the first day, so New DIY's growth shape is readable next to Old DIY's much larger volume. **Share %** plots each cohort as a percentage of that day's combined total, as stacked bands adding to 100% |
 | Funnel volume by DIY type | The same eight stages for both cohorts on one shared scale |
 | Conversion rate comparison | Percent of created reaching each stage, New against Old |
 | Save rate spread | How save rate is distributed across agents, with the median called out |
