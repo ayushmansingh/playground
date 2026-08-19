@@ -1,0 +1,133 @@
+{
+  "id": 172937,
+  "cached_result_id": 62704114,
+  "retrieved_at": "2026-08-19T01:33:55.980+05:30",
+  "runtime_seconds": 21.935050010681152,
+  "row_count": 12,
+  "column_count": 9,
+  "columns": [
+    "date_part",
+    "created",
+    "saved",
+    "sent",
+    "downloaded",
+    "psm_detail",
+    "psm_review",
+    "checkout",
+    "bookings"
+  ],
+  "csv_path": "C:\\Users\\mmt11842\\Downloads\\SQL Stuff\\redash_172937_174655_run_20260819_180544\\query_172937_cached_result.csv",
+  "preview_path": "C:\\Users\\mmt11842\\Downloads\\SQL Stuff\\redash_172937_174655_run_20260819_180544\\query_172937_cached_preview.json",
+  "preview_rows": [
+    {
+      "date_part": "2026-08-19",
+      "saved": 21,
+      "created": 31,
+      "psm_review": 1,
+      "bookings": 0,
+      "downloaded": 11,
+      "psm_detail": 4,
+      "checkout": 0,
+      "sent": 10
+    },
+    {
+      "date_part": "2026-08-18",
+      "saved": 496,
+      "created": 645,
+      "psm_review": 14,
+      "bookings": 0,
+      "downloaded": 199,
+      "psm_detail": 103,
+      "checkout": 0,
+      "sent": 260
+    },
+    {
+      "date_part": "2026-08-17",
+      "saved": 127,
+      "created": 192,
+      "psm_review": 7,
+      "bookings": 2,
+      "downloaded": 59,
+      "psm_detail": 44,
+      "checkout": 2,
+      "sent": 58
+    },
+    {
+      "date_part": "2026-08-16",
+      "saved": 83,
+      "created": 131,
+      "psm_review": 1,
+      "bookings": 0,
+      "downloaded": 47,
+      "psm_detail": 19,
+      "checkout": 0,
+      "sent": 28
+    },
+    {
+      "date_part": "2026-08-15",
+      "saved": 72,
+      "created": 90,
+      "psm_review": 2,
+      "bookings": 0,
+      "downloaded": 39,
+      "psm_detail": 20,
+      "checkout": 0,
+      "sent": 29
+    },
+    {
+      "date_part": "2026-08-14",
+      "saved": 78,
+      "created": 173,
+      "psm_review": 7,
+      "bookings": 1,
+      "downloaded": 43,
+      "psm_detail": 28,
+      "checkout": 2,
+      "sent": 27
+    },
+    {
+      "date_part": "2026-08-13",
+      "saved": 70,
+      "created": 126,
+      "psm_review": 1,
+      "bookings": 0,
+      "downloaded": 31,
+      "psm_detail": 18,
+      "checkout": 0,
+      "sent": 25
+    },
+    {
+      "date_part": "2026-08-12",
+      "saved": 78,
+      "created": 147,
+      "psm_review": 4,
+      "bookings": 0,
+      "downloaded": 30,
+      "psm_detail": 40,
+      "checkout": 0,
+      "sent": 38
+    },
+    {
+      "date_part": "2026-08-11",
+      "saved": 77,
+      "created": 162,
+      "psm_review": 6,
+      "bookings": 2,
+      "downloaded": 33,
+      "psm_detail": 32,
+      "checkout": 3,
+      "sent": 35
+    },
+    {
+      "date_part": "2026-08-10",
+      "saved": 52,
+      "created": 106,
+      "psm_review": 2,
+      "bookings": 0,
+      "downloaded": 22,
+      "psm_detail": 17,
+      "checkout": 0,
+      "sent": 25
+    }
+  ]
+}

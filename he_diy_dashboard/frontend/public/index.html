@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>HE DIY Performance Console</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232a78d6'/><path d='M8 22V13m8 9V9m8 13v-6' stroke='%23fff' stroke-width='3.2' stroke-linecap='round'/></svg>" />
+  </head>
+  <body>
+    <a class="skip-link" href="#mainContent">Skip to dashboard</a>
+
+    <header class="appbar">
+      <div class="appbar__inner">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="8" /><path d="M8 22V13m8 9V9m8 13v-6" /></svg>
+          </span>
+          <span class="brand__text">
+            <span class="brand__eyebrow">Holidays Expert</span>
+            <span class="brand__title">DIY Performance Console</span>
+          </span>
+        </div>
+
+        <div class="appbar__meta">
+          <button id="freshnessBtn" class="freshness" type="button" aria-expanded="false" aria-controls="sourcePanel">
+            <span class="freshness__dot" aria-hidden="true"></span>
+            <span id="freshnessText">Loading snapshot…</span>
+            <span class="freshness__caret" aria-hidden="true">▾</span>
+          </button>
+        </div>
+
+        <div class="appbar__actions">
+          <button id="themeBtn" class="icon-btn icon-btn--bare" type="button" title="Switch theme (T)" aria-label="Switch colour theme">
+            <span data-theme-icon>◐</span>
+          </button>
+          <button id="refreshBtn" class="btn btn--primary" type="button" title="Pull fresh results from Redash (R)">
+            <span class="btn__spinner" aria-hidden="true"></span>
+            <span class="btn__icon" aria-hidden="true">↻</span>
+            <span class="btn__text">Refresh Redash</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="sourcePanel" class="source-panel is-hidden">
+        <div class="source-panel__inner" id="sourcePanelBody"></div>
+      </div>
+    </header>
+
+    <nav class="viewbar" aria-label="Dashboard views">
+      <div class="viewbar__inner">
+        <div class="seg" role="tablist" aria-label="Dashboard views">
+          <button class="seg__btn is-active" role="tab" data-view="day" aria-selected="true" type="button">
+            <span class="seg__key" aria-hidden="true">1</span> Day-on-Day New DIY
+          </button>
+          <button class="seg__btn" role="tab" data-view="agent" aria-selected="false" type="button">
+            <span class="seg__key" aria-hidden="true">2</span> Agent · New vs Old
+          </button>
+        </div>
+        <p class="viewbar__hint" id="viewHint">Query 172937 · New DIY only</p>
+      </div>
+    </nav>
+
+    <section class="filters" aria-label="Filters">
+      <div class="filters__inner">
+        <div class="filters__row">
+          <div class="field field--presets">
+            <span class="field__label">Range</span>
+            <div class="seg seg--sm" id="rangePresets" role="group" aria-label="Quick date ranges">
+              <button class="seg__btn" type="button" data-preset="7">7D</button>
+              <button class="seg__btn" type="button" data-preset="14">14D</button>
+              <button class="seg__btn" type="button" data-preset="30">30D</button>
+              <button class="seg__btn is-active" type="button" data-preset="all">All</button>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field__label">From</span>
+            <input id="startDate" type="date" />
+          </label>
+          <label class="field">
+            <span class="field__label">To</span>
+            <input id="endDate" type="date" />
+          </label>
+
+          <div class="field field--agent-only">
+            <span class="field__label">DIY type</span>
+            <div class="seg seg--sm" id="flagFilter" role="group" aria-label="DIY type">
+              <button class="seg__btn is-active" type="button" data-flag="all">Both</button>
+              <button class="seg__btn" type="button" data-flag="1">New</button>
+              <button class="seg__btn" type="button" data-flag="0">Old</button>
+            </div>
+          </div>
+
+          <label class="field field--agent-only field--grow">
+            <span class="field__label">Agent</span>
+            <span class="input-wrap">
+              <span class="input-wrap__icon" aria-hidden="true">⌕</span>
+              <input id="agentFilter" type="search" placeholder="Search agent id  (press /)" autocomplete="off" />
+            </span>
+          </label>
+
+          <label class="field field--agent-only">
+            <span class="field__label">Rank by</span>
+            <select id="sortBy">
+              <option value="created">Created</option>
+              <option value="saved">Saved</option>
+              <option value="sent">Sent</option>
+              <option value="downloaded">Downloaded</option>
+              <option value="bookings">Bookings</option>
+              <option value="save_rate">Save rate</option>
+              <option value="send_rate">Send rate</option>
+            </select>
+          </label>
+
+          <label class="field field--agent-only">
+            <span class="field__label">Show</span>
+            <select id="limit">
+              <option value="25">Top 25</option>
+              <option value="50">Top 50</option>
+              <option value="100" selected>Top 100</option>
+              <option value="250">Top 250</option>
+              <option value="500">Top 500</option>
+            </select>
+          </label>
+
+          <button id="resetBtn" class="btn btn--ghost" type="button">Reset</button>
+        </div>
+        <div class="filters__chips" id="filterChips" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <div id="notice" class="notice is-hidden" role="status"></div>
+
+    <main id="mainContent" class="content" tabindex="-1">
+      <div class="loading-veil" id="loadingVeil" aria-hidden="true"></div>
+
+      <section id="dayView" class="view" role="tabpanel" aria-label="Day-on-day New DIY">
+        <div class="tiles" id="dayTiles"></div>
+        <div class="grid" id="dayGrid"></div>
+      </section>
+
+      <section id="agentView" class="view is-hidden" role="tabpanel" aria-label="Agent New versus Old">
+        <div class="tiles" id="agentTiles"></div>
+        <div class="grid" id="agentGrid"></div>
+      </section>
+    </main>
+
+    <footer class="appfoot">
+      <p>Snapshot-first. Live refresh needs the Common Redash key in <code>.env</code>.</p>
+      <p class="appfoot__keys">
+        <kbd>1</kbd><kbd>2</kbd> switch view · <kbd>/</kbd> search agent · <kbd>R</kbd> refresh · <kbd>T</kbd> theme
+      </p>
+    </footer>
+
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>

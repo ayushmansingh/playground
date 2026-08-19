@@ -1,0 +1,11 @@
+{
+  "name": "he-diy-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local dashboard for HE DIY Redash snapshots and refreshes.",
+  "scripts": {
+    "backend": "python backend/server.py",
+    "frontend": "node frontend/server.js",
+    "start": "node frontend/server.js"
+  }
+}
