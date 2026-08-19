@@ -58,6 +58,9 @@ cd "C:\Users\mmt11842\Downloads\SQL Stuff\he_diy_dashboard"
 .\start_dashboard.ps1
 ```
 
+This shares the dashboard on your LAN and prints the URL to send round. See
+[Sharing on the LAN](#sharing-on-the-lan) below.
+
 Start the backend:
 
 ```powershell
@@ -79,6 +82,48 @@ http://127.0.0.1:5174
 ```
 
 No install step and no internet access is required for the UI: the charts are hand-rolled SVG with no npm packages and no CDN.
+
+## Sharing on the LAN
+
+`start_dashboard.ps1` binds the UI to every interface, so anyone on the same
+network can open it. On start it prints your machine's address:
+
+```text
+  Share this with your team:
+    http://10.14.32.87:5174
+```
+
+The Python API stays bound to `127.0.0.1` and is only reachable through the UI
+server's proxy. The Redash key never leaves the machine and the API is not
+exposed to the network directly.
+
+| Command | Effect |
+| --- | --- |
+| `.\start_dashboard.ps1` | Shared on the LAN (default) |
+| `.\start_dashboard.ps1 -Local` | This machine only |
+| `.\start_dashboard.ps1 -OpenFirewall` | Also adds the inbound firewall rule (needs an elevated PowerShell) |
+| `.\start_dashboard.ps1 -UiPort 8080` | Serve on a different port |
+
+If colleagues cannot connect, Windows Firewall is almost always the reason. Run
+this once in an elevated PowerShell:
+
+```powershell
+New-NetFirewallRule -DisplayName "HE DIY Dashboard (5174)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5174 -Profile Private,Domain
+```
+
+The rule is scoped to the Private and Domain profiles on purpose, so the port
+does not open on a public network.
+
+**Worth knowing before you share the link:**
+
+- **There is no login.** Anyone on the network who opens the URL sees
+  agent-level performance data. Keep it to a trusted office LAN or VPN.
+- **Anyone can press Refresh Redash.** That runs both queries against your key
+  (roughly 22 seconds each). The key itself stays server-side, but the button is
+  not rate-limited.
+- **Your machine is the server.** The link dies when the laptop sleeps or
+  disconnects, and the IP can change when DHCP renews. For anything permanent,
+  host it somewhere rather than on a laptop.
 
 ## Move To Another Laptop
 
