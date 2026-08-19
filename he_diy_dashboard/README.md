@@ -61,25 +61,60 @@ cd "C:\Users\mmt11842\Downloads\SQL Stuff\he_diy_dashboard"
 This shares the dashboard on your LAN and prints the URL to send round. See
 [Sharing on the LAN](#sharing-on-the-lan) below.
 
-Start the backend:
+### Running the two servers separately
+
+Use two terminals when you want to watch the logs, restart one side on its own,
+or change ports. The launcher does nothing the two commands below don't.
+
+**Terminal 1 — Python API.** Leave this on `127.0.0.1`; it does not need to be
+reachable from the network, only from the UI server on the same machine.
 
 ```powershell
 cd "C:\Users\mmt11842\Downloads\SQL Stuff\he_diy_dashboard"
 python backend\server.py
 ```
 
-Start the frontend in another terminal:
+```text
+Python backend listening on http://127.0.0.1:8765
+```
+
+**Terminal 2 — Node UI.** Set `UI_HOST` first to share it on the LAN; without
+it the UI is reachable from this machine only.
 
 ```powershell
 cd "C:\Users\mmt11842\Downloads\SQL Stuff\he_diy_dashboard"
+$env:UI_HOST = "0.0.0.0"
 node frontend\server.js
 ```
 
-Open:
-
 ```text
-http://127.0.0.1:5174
+Node dashboard listening on http://0.0.0.0:5174
+Proxying API requests to http://127.0.0.1:8765
 ```
+
+Then open `http://127.0.0.1:5174` yourself, and give colleagues
+`http://<your-ip>:5174` — run `ipconfig` to find it.
+
+`$env:UI_HOST` only applies to that PowerShell window. In `cmd` use
+`set UI_HOST=0.0.0.0` instead.
+
+**Ports and hosts** are all environment variables, so either server can move:
+
+| Variable | Default | Used by |
+| --- | --- | --- |
+| `UI_HOST` | `127.0.0.1` | Node — the address the dashboard listens on |
+| `UI_PORT` | `5174` | Node — the dashboard port |
+| `API_HOST` | `127.0.0.1` | Node — where to proxy `/api/*` |
+| `API_PORT` | `8765` | Node — the API port to proxy to |
+
+The Python side takes flags rather than variables: `python backend\server.py --host 127.0.0.1 --port 8765`.
+If you move the API, change it in both places so the proxy still finds it.
+
+**Order does not matter.** Starting the UI first is fine — API calls return
+`502 Backend unavailable` until the Python side is up, and the dashboard
+recovers on its own once it is, with no restart. Stop each with `Ctrl+C`;
+unlike the launcher, running separately means nothing cleans up the other
+process for you.
 
 No install step and no internet access is required for the UI: the charts are hand-rolled SVG with no npm packages and no CDN.
 
