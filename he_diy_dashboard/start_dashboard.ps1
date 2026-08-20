@@ -64,6 +64,50 @@ function Test-Elevated {
         [Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+function Resolve-PythonCommand {
+    # A fresh Windows box may have no python at all, or the Microsoft Store
+    # stub, which sits on PATH and does nothing useful. Only accept a candidate
+    # that actually reports a Python 3 version.
+    foreach ($candidate in @(
+            @{ File = "python";  Prefix = @() },
+            @{ File = "py";      Prefix = @("-3") },
+            @{ File = "python3"; Prefix = @() })) {
+        try {
+            $reported = & $candidate.File @($candidate.Prefix + "--version") 2>&1
+            if ($LASTEXITCODE -eq 0 -and "$reported" -match "Python 3") {
+                $candidate.Version = "$reported".Trim()
+                return $candidate
+            }
+        }
+        catch { }
+    }
+    return $null
+}
+
+$python = Resolve-PythonCommand
+if (-not $python) {
+    Write-Host ""
+    Write-Error @"
+Python 3 was not found.
+
+Install it from https://www.python.org/downloads/ and tick
+"Add python.exe to PATH" on the first screen of the installer.
+Then close this window, open a new PowerShell, and run this script again.
+"@
+    exit 1
+}
+
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Host ""
+    Write-Error @"
+Node.js was not found.
+
+Install the LTS build from https://nodejs.org/ and accept the defaults.
+Then close this window, open a new PowerShell, and run this script again.
+"@
+    exit 1
+}
+
 $ruleName = "HE DIY Dashboard ($UiPort)"
 $ruleExists = $false
 try { $ruleExists = [bool](Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue) } catch { }
@@ -82,14 +126,15 @@ if ($OpenFirewall -and -not $Local -and -not $ruleExists) {
     }
 }
 
-$backend = Start-Process -FilePath python `
-    -ArgumentList @("backend\server.py", "--host", "127.0.0.1", "--port", "$ApiPort") `
+$backend = Start-Process -FilePath $python.File `
+    -ArgumentList @($python.Prefix + @("backend\server.py", "--host", "127.0.0.1", "--port", "$ApiPort")) `
     -WorkingDirectory $root -PassThru -WindowStyle Hidden
 
 try {
     Write-Host ""
     Write-Host "HE DIY Dashboard" -ForegroundColor Cyan
     Write-Host "----------------"
+    Write-Host "  Using    $($python.Version) and Node $(node --version)"
     Write-Host "  API      http://127.0.0.1:$ApiPort  (local only, not shared)"
 
     if ($Local) {

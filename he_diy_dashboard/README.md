@@ -51,15 +51,23 @@ Design and charting rationale, including what would need a backend change, is in
 
 ## Run
 
-One-command launcher:
+Never run it on this machine before? Follow [RUN_STEPS.md](RUN_STEPS.md), which
+covers installing Python and Node and the usual Windows snags.
+
+One-command launcher — double-click `start_dashboard.cmd`, or from PowerShell:
 
 ```powershell
 cd "C:\Users\mmt11842\Downloads\SQL Stuff\he_diy_dashboard"
 .\start_dashboard.ps1
 ```
 
-This shares the dashboard on your LAN and prints the URL to send round. See
+It checks that Python and Node are present, starts both servers, shares the
+dashboard on your LAN and prints the URL to send round. See
 [Sharing on the LAN](#sharing-on-the-lan) below.
+
+Requirements: Python 3.8+ and Node 14+ (tested on Python 3.11 and Node 22), and
+a current Chrome, Edge or Firefox. There is nothing to install with npm or pip —
+the dashboard has no dependencies.
 
 ### Running the two servers separately
 

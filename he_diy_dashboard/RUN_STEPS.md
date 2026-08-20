@@ -1,45 +1,143 @@
-# Run HE DIY Dashboard On Another Laptop
+# Running the HE DIY Dashboard from scratch
 
-## Prerequisites
+Start-to-finish on a machine that has never run this before. Ten minutes,
+most of it waiting for two installers.
 
-- Python 3
-- Node.js
-- VPN/network access to `common-redash.mmt.live` only if you want live refresh
+## 1. Install Python 3
 
-## Steps
-
-1. Extract the zip.
-2. Open PowerShell in the extracted `he_diy_dashboard` folder.
-3. Optional for live refresh: copy `.env.example` to `.env` and replace `YOUR_COMMON_REDASH_API_KEY`.
-4. Run:
+Check whether you already have it. In PowerShell:
 
 ```powershell
+python --version
+```
+
+If that prints something like `Python 3.11.9`, skip to step 2.
+
+If it prints nothing, opens the Microsoft Store, or errors, install Python from
+<https://www.python.org/downloads/>. **On the first screen of the installer,
+tick "Add python.exe to PATH"** before pressing Install — almost every "python
+is not recognised" problem traces back to that box.
+
+Close PowerShell and open a new one afterwards, or the new PATH will not apply.
+
+## 2. Install Node.js
+
+```powershell
+node --version
+```
+
+If that prints something like `v20.11.1`, skip to step 3. Otherwise install the
+**LTS** build from <https://nodejs.org/> and accept the defaults. Again, open a
+new PowerShell window afterwards.
+
+There is nothing to `npm install`. The dashboard has no dependencies.
+
+## 3. Extract the zip
+
+Right-click the zip, **Extract All**, and pick somewhere with a short path such
+as `C:\Tools`. Avoid running it from inside the zip preview window — Windows
+extracts to a temporary folder and the snapshot data will not be found.
+
+You should end up with a folder containing `backend`, `frontend`, `data` and
+`start_dashboard.cmd`.
+
+## 4. Start it
+
+**The easy way:** double-click **`start_dashboard.cmd`**.
+
+**From PowerShell**, if you prefer:
+
+```powershell
+cd C:\Tools\he_diy_dashboard
 .\start_dashboard.ps1
 ```
 
-5. Open:
+If PowerShell refuses with *"running scripts is disabled on this system"*, that
+is Windows blocking a script that came out of a zip. Either use
+`start_dashboard.cmd`, which sidesteps it, or allow scripts for this one window:
 
-```text
-http://127.0.0.1:5174/
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\start_dashboard.ps1
 ```
 
-The dashboard works from the bundled cached snapshot even without `.env`. The Refresh Redash button needs `.env` and Redash network access.
+That lasts until you close the window and changes nothing permanently.
 
-## Sharing it with the team
+A successful start looks like this:
 
-The launcher shares the dashboard on your LAN by default and prints the address
-to send round, for example `http://10.14.32.87:5174`.
+```text
+HE DIY Dashboard
+----------------
+  Using    Python 3.11.9 and Node v20.11.1
+  API      http://127.0.0.1:8765  (local only, not shared)
+  On this machine   http://127.0.0.1:5174
 
-If colleagues cannot open it, add the firewall rule once in an elevated
-PowerShell:
+  Share this with your team:
+    http://10.14.32.87:5174
+```
+
+## 5. Open it
+
+Go to <http://127.0.0.1:5174> in Chrome or Edge.
+
+The dashboard loads from the snapshot bundled in `data/snapshots`, so it works
+straight away with no key, no VPN and no internet. Internet Explorer will not
+work; any current Chrome, Edge or Firefox will.
+
+Stop the dashboard with `Ctrl+C` in the window it is running in.
+
+## 6. Let the team in
+
+The launcher already shares it on your network and prints the address in step 4.
+Send colleagues that `http://<your-ip>:5174` link.
+
+If they cannot connect, Windows Firewall is blocking the port. Run this once in
+an **elevated** PowerShell (right-click PowerShell, Run as Administrator):
 
 ```powershell
 New-NetFirewallRule -DisplayName "HE DIY Dashboard (5174)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5174 -Profile Private,Domain
 ```
 
-Or start it with `.\start_dashboard.ps1 -OpenFirewall` from an elevated prompt,
+Or start with `.\start_dashboard.ps1 -OpenFirewall` from an elevated prompt,
 which does the same thing.
 
-To keep the dashboard to your own machine, use `.\start_dashboard.ps1 -Local`.
+The dashboard has no login, so only share it on a trusted network. To keep it to
+your own machine, start it with `.\start_dashboard.ps1 -Local`.
 
-The dashboard has no login, so only share it on a trusted network.
+## 7. Optional: live Redash refresh
+
+Everything above runs on the bundled snapshot. To enable the **Refresh Redash**
+button:
+
+1. Copy `.env.example` to `.env`.
+2. Replace `YOUR_COMMON_REDASH_API_KEY` with the Common Redash key.
+3. Be on VPN so `common-redash.mmt.live` is reachable.
+
+The key is read on the server side only and is never sent to the browser.
+
+Live refresh currently fails with `INVALID_GLUE_SCHEMA` because of a Glue/Delta
+mismatch on the shared tables. That is expected: the dashboard reports the
+failure and keeps showing the last good snapshot.
+
+## Troubleshooting
+
+| Symptom | Cause and fix |
+| --- | --- |
+| `python is not recognised` | Python missing or not on PATH. Reinstall with "Add python.exe to PATH" ticked, then open a new PowerShell. |
+| `python` opens the Microsoft Store | That is the Store stub, not Python. Install from python.org; the launcher will also try `py -3` on its own. |
+| `running scripts is disabled on this system` | Use `start_dashboard.cmd`, or `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` first. |
+| `EADDRINUSE` / `address already in use` | The dashboard is already running, or something else holds the port. Close the other window, or use `.\start_dashboard.ps1 -UiPort 5175`. |
+| Page loads but every panel is empty | The Python side is not running. Its window shows the error. Started separately, the API returns `502 Backend unavailable` until it is up, then recovers on its own. |
+| `No snapshot CSV found` | The app was run from inside the zip preview instead of an extracted folder, so `data\snapshots` is missing. Extract properly and retry. |
+| Colleagues cannot open the link | Windows Firewall — see step 6. Check they are on the same network and that your machine is awake. |
+| The shared link stops working later | Your IP changed when DHCP renewed, or the laptop slept. Restart the launcher and send the newly printed address. |
+
+## What runs where
+
+| Piece | Address | Reachable from the network |
+| --- | --- | --- |
+| Node UI server | `0.0.0.0:5174` | Yes — this is the link you share |
+| Python API | `127.0.0.1:8765` | No — only via the UI server's proxy |
+
+Tested against Python 3.11 and Node 22. Python 3.8 or newer and Node 14 or newer
+should both be fine.
