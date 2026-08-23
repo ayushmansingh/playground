@@ -1,0 +1,9 @@
+# Snapshots written by live refresh runs; only the bundled cached one is tracked.
+data/snapshots/run_*/
+!data/snapshots/run_20260819_cached/
+
+# Local secrets, never commit.
+.env
+
+__pycache__/
+*.pyc
