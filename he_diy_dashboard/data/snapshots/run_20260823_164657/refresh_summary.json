@@ -1,0 +1,16 @@
+{
+  "attempted_at": "2026-08-23T16:46:58",
+  "snapshot_dir": "/home/user/playground/he_diy_dashboard/data/snapshots/run_20260823_164657",
+  "queries": [
+    {
+      "id": 172937,
+      "status": "failed",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    },
+    {
+      "id": 174655,
+      "status": "failed",
+      "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+    }
+  ]
+}

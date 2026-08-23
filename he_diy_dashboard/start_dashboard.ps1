@@ -21,11 +21,19 @@
 .EXAMPLE
     .\start_dashboard.ps1 -OpenFirewall
     Also adds the inbound Windows Firewall rule. Needs an elevated PowerShell.
+
+.EXAMPLE
+    .\start_dashboard.ps1 -Proxy "http://proxy.example.com:8080"
+    Routes the Redash calls through a corporate proxy. Needed when the browser
+    reaches Redash but Refresh Redash fails with "connection refused": Python
+    reads only the manual proxy setting from Windows, not an auto-config (PAC)
+    script, so a PAC-based proxy has to be named explicitly.
 #>
 [CmdletBinding()]
 param(
     [switch]$Local,
     [switch]$OpenFirewall,
+    [string]$Proxy,
     [int]$UiPort = 5174,
     [int]$ApiPort = 8765
 )
@@ -126,6 +134,16 @@ if ($OpenFirewall -and -not $Local -and -not $ruleExists) {
     }
 }
 
+# Python's urllib picks up proxy environment variables and the *manual* Windows
+# proxy setting, but not an auto-config (PAC) script or WPAD. On a network that
+# uses one, Redash is unreachable from Python even though the browser is fine,
+# so -Proxy names it explicitly. Start-Process inherits these variables.
+if ($Proxy) {
+    $env:HTTPS_PROXY = $Proxy
+    $env:HTTP_PROXY = $Proxy
+}
+$activeProxy = if ($env:HTTPS_PROXY) { $env:HTTPS_PROXY } else { $null }
+
 $backend = Start-Process -FilePath $python.File `
     -ArgumentList @($python.Prefix + @("backend\server.py", "--host", "127.0.0.1", "--port", "$ApiPort")) `
     -WorkingDirectory $root -PassThru -WindowStyle Hidden
@@ -136,6 +154,9 @@ try {
     Write-Host "----------------"
     Write-Host "  Using    $($python.Version) and Node $(node --version)"
     Write-Host "  API      http://127.0.0.1:$ApiPort  (local only, not shared)"
+    if ($activeProxy) {
+        Write-Host "  Proxy    $activeProxy  (used for Redash refresh)"
+    }
 
     if ($Local) {
         Write-Host "  Dashboard  http://127.0.0.1:$UiPort  (this machine only)"

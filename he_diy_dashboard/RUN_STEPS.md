@@ -119,6 +119,50 @@ Live refresh currently fails with `INVALID_GLUE_SCHEMA` because of a Glue/Delta
 mismatch on the shared tables. That is expected: the dashboard reports the
 failure and keeps showing the last good snapshot.
 
+### If Refresh says "connection refused"
+
+`[WinError 10061] ... actively refused it` means the connection never reached
+Redash at all, so it is a network problem on this machine rather than a Redash
+one. Work through these in order:
+
+1. **Connect to the VPN** and try again. This is the usual answer.
+2. **Open <https://common-redash.mmt.live> in your browser.** If the browser
+   cannot reach it either, it is the VPN or a firewall.
+3. **If the browser reaches it but Refresh still fails, it is the corporate
+   proxy.** Python reads proxy settings from environment variables and from the
+   *manual* Windows proxy setting, but it does not understand an auto-config
+   (PAC) script or WPAD — which is what most corporate networks use. Python
+   therefore tries to connect directly and gets refused, while the browser
+   happily follows the PAC file.
+
+   Find the proxy your browser is actually using. In Chrome or Edge open
+   `chrome://net-internals/#proxy` and read the "Effective proxy settings", or
+   in PowerShell:
+
+   ```powershell
+   netsh winhttp show proxy
+   (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings').AutoConfigURL
+   ```
+
+   Then start the dashboard with that proxy:
+
+   ```powershell
+   .\start_dashboard.ps1 -Proxy "http://your-proxy-host:8080"
+   ```
+
+   If the proxy needs credentials, use
+   `-Proxy "http://user:password@your-proxy-host:8080"`.
+
+Useful checks along the way:
+
+```powershell
+Resolve-DnsName common-redash.mmt.live      # does the name resolve at all?
+Test-NetConnection common-redash.mmt.live -Port 443   # can you open a socket?
+```
+
+If `Resolve-DnsName` fails or returns a loopback address, the VPN is not up. If
+it resolves but `Test-NetConnection` fails, it is a firewall or proxy.
+
 ## Troubleshooting
 
 | Symptom | Cause and fix |
@@ -130,6 +174,8 @@ failure and keeps showing the last good snapshot.
 | Page loads but every panel is empty | The Python side is not running. Its window shows the error. Started separately, the API returns `502 Backend unavailable` until it is up, then recovers on its own. |
 | `No snapshot CSV found` | The app was run from inside the zip preview instead of an extracted folder, so `data\snapshots` is missing. Extract properly and retry. |
 | Colleagues cannot open the link | Windows Firewall — see step 6. Check they are on the same network and that your machine is awake. |
+| Refresh: `WinError 10061 ... actively refused` | Never reached Redash. VPN down, or a PAC-based corporate proxy Python cannot see. See step 7. |
+| Refresh: `Tunnel connection failed: 403/407` | A proxy refused the connection. Not a key problem — check VPN, or supply credentials via `-Proxy`. |
 | The shared link stops working later | Your IP changed when DHCP renewed, or the laptop slept. Restart the launcher and send the newly printed address. |
 
 ## What runs where

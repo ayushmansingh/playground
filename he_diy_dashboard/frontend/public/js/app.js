@@ -296,13 +296,85 @@ function commit() {
 
 /* ---------- notices ---------- */
 
-function showNotice(message, tone = "warn") {
+function showNotice(message, tone = "warn", { steps = [], raw = "" } = {}) {
   const notice = $("notice");
   notice.className = `notice notice--${tone}`;
-  notice.innerHTML = `<span class="notice__icon" aria-hidden="true">${tone === "error" ? "✕" : "!"}</span>
-    <span>${escapeHtml(message)}</span>
+  notice.innerHTML = `<span class="notice__icon" aria-hidden="true">${tone === "error" ? "✕" : tone === "good" ? "✓" : "!"}</span>
+    <div class="notice__body">
+      <p>${escapeHtml(message)}</p>
+      ${steps.length ? `<ul class="notice__steps">${steps.map((step) => `<li>${step}</li>`).join("")}</ul>` : ""}
+      ${raw ? `<details class="notice__raw"><summary>Technical detail</summary><code>${escapeHtml(raw)}</code></details>` : ""}
+    </div>
     <button type="button" class="notice__close" aria-label="Dismiss">×</button>`;
   notice.querySelector(".notice__close").addEventListener("click", clearNotice);
+}
+
+/* A refresh failure is almost always environmental — VPN, proxy, key, or the
+   known Glue mismatch upstream. The raw urllib/Redash string means nothing to
+   the people who read this dashboard, so translate the ones we recognise into
+   the thing to actually go and check. The raw text stays available underneath. */
+function describeRefreshFailure(raw) {
+  const text = String(raw || "");
+  const REDASH = "<code>common-redash.mmt.live</code>";
+
+  if (/10061|Connection refused|ECONNREFUSED/i.test(text)) {
+    return {
+      message: "Could not reach Redash — the connection was refused before Redash answered, so this is a network problem on this machine rather than a Redash one.",
+      steps: [
+        "Check you are connected to the VPN, then try again.",
+        `Open ${REDASH} in this browser. If the browser reaches it but Refresh still fails, the network goes through a corporate proxy that Python cannot see by itself.`,
+        "In that case find the proxy in Chrome at <code>chrome://net-internals/#proxy</code>, then start the dashboard with <code>.\\start_dashboard.ps1 -Proxy \"http://your-proxy:8080\"</code>.",
+      ],
+    };
+  }
+  if (/10060|timed out|timeout/i.test(text)) {
+    return {
+      message: "Timed out reaching Redash. The request left this machine but nothing came back.",
+      steps: ["Check the VPN connection.", `Confirm ${REDASH} loads in this browser.`],
+    };
+  }
+  if (/11001|getaddrinfo|Name or service not known|nodename nor servname/i.test(text)) {
+    return {
+      message: "The Redash hostname could not be resolved, which usually means the VPN is not connected.",
+      steps: ["Connect to the VPN and try again.", `Confirm ${REDASH} loads in this browser.`],
+    };
+  }
+  if (/Common Redash key not found/i.test(text)) {
+    return {
+      message: "No Redash API key is configured, so live refresh cannot run.",
+      steps: [
+        "Copy <code>.env.example</code> to <code>.env</code> in the dashboard folder.",
+        "Put the Common Redash key in it, then restart the dashboard.",
+      ],
+    };
+  }
+  /* A proxy refusing the CONNECT reports its own 407/403, which reads exactly
+     like an auth failure but has nothing to do with the Redash key. This has to
+     be matched before the 401/403 branch below or it is diagnosed as a bad key
+     and sends people to rotate a key that was fine. */
+  if (/Tunnel connection failed|Proxy Authentication|\b407\b|proxy error/i.test(text)) {
+    return {
+      message: "A proxy between this machine and Redash refused the connection. The Redash key is not the problem.",
+      steps: [
+        "Check you are connected to the VPN, then try again.",
+        "If the proxy needs credentials, include them: <code>-Proxy \"http://user:password@proxy:8080\"</code>.",
+        "If you are behind a different proxy than the one configured, find the right one in Chrome at <code>chrome://net-internals/#proxy</code>.",
+      ],
+    };
+  }
+  if (/HTTP Error (401|403)|Unauthorized|Forbidden|Invalid API key/i.test(text)) {
+    return {
+      message: "Redash rejected the API key.",
+      steps: ["Check the key in <code>.env</code> is current and has access to both queries, then restart the dashboard."],
+    };
+  }
+  if (/INVALID_GLUE_SCHEMA|Delta Lake table schema/i.test(text)) {
+    return {
+      message: "Redash ran the query but it failed upstream: the Glue catalogue and the Delta transaction log disagree on the table schema.",
+      steps: ["This one is not fixable from the dashboard — it needs the shared Holidays tables repaired. Until then the snapshot is the trustworthy view."],
+    };
+  }
+  return { message: "Live refresh failed.", steps: [] };
 }
 
 function clearNotice() {
@@ -1158,16 +1230,23 @@ async function refreshRedash() {
     const failed = (payload.queries || []).filter((query) => query.status !== "success");
     await load();
     if (failed.length) {
-      showNotice(
-        `Live refresh failed, still showing the last good snapshot. ${failed.map((query) => `${query.id}: ${query.error}`).join(" · ")}`,
-        "warn"
-      );
+      /* Both queries almost always fail for the same reason, so diagnose once
+         off the first failure rather than repeating the same advice twice. */
+      const diagnosis = describeRefreshFailure(failed[0].error);
+      showNotice(`${diagnosis.message} Still showing the last good snapshot.`, "warn", {
+        steps: diagnosis.steps,
+        raw: failed.map((query) => `${query.id}: ${query.error}`).join("\n"),
+      });
     } else {
       showNotice("Live Redash results loaded.", "good");
       setTimeout(clearNotice, 6000);
     }
   } catch (error) {
-    showNotice(`${error.message} Showing the last good snapshot.`, "error");
+    const diagnosis = describeRefreshFailure(error.message);
+    showNotice(`${diagnosis.message} Showing the last good snapshot.`, "error", {
+      steps: diagnosis.steps,
+      raw: error.message,
+    });
   } finally {
     button.disabled = false;
     button.classList.remove("is-busy");
