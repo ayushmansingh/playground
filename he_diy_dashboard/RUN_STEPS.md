@@ -119,6 +119,43 @@ Live refresh currently fails with `INVALID_GLUE_SCHEMA` because of a Glue/Delta
 mismatch on the shared tables. That is expected: the dashboard reports the
 failure and keeps showing the last good snapshot.
 
+### If the check passes but Refresh still fails
+
+This is the confusing one, and it has a single common cause: **proxy variables
+are per terminal window.** A backend started in one window can be routing
+through a proxy that a check run in another window never sees. Python picks
+`HTTPS_PROXY` up automatically, and if that proxy is not reachable the refresh
+fails with `WinError 10061` while everything else on the machine works.
+
+Prove it by running both in the same window:
+
+```
+start_backend.cmd -check
+```
+
+That prints the proxy variables the backend will use, runs the full connection
+check in that same window, then starts the backend. If the check passes there
+and the refresh still fails, the environment is not the cause and it is worth
+coming back with that output.
+
+If it shows a proxy you did not set, skip it:
+
+```
+start_backend.cmd -noproxy
+```
+
+or, if you are starting the backend by hand, clear them first:
+
+```
+set HTTP_PROXY=
+set HTTPS_PROXY=
+set ALL_PROXY=
+set NO_PROXY=*
+python backend\server.py
+```
+
+The one-command launcher takes the same option: `.\start_dashboard.ps1 -NoProxy`.
+
 ### If Refresh says "connection refused"
 
 `[WinError 10061] ... actively refused it` means the connection never reached

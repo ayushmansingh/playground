@@ -107,6 +107,11 @@ def check_proxy() -> dict[str, str]:
         line(INFO, "That came from Windows Internet Settings, not from this app.")
     if not relevant:
         line(OK, "This process will connect directly, with no proxy.")
+    # These variables belong to the window this ran in. A backend started from a
+    # different window can be looking at entirely different settings, which is
+    # the usual reason this check passes while the dashboard fails.
+    line(INFO, "This reflects THIS window only. Proxy variables are per window --")
+    line(INFO, "run this in the same window you start the backend from.")
     return relevant
 
 
