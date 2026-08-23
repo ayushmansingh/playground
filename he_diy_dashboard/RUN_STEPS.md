@@ -121,6 +121,32 @@ failure and keeps showing the last good snapshot.
 
 ### If the check passes but Refresh still fails
 
+**First suspect: a second backend.** On Windows, a Python `http.server` sets
+`SO_REUSEADDR`, and Windows reads that as permission to bind a port another
+live socket already holds. So a second backend started while an old one is
+still running **binds successfully**. Both print "listening on 127.0.0.1:8765",
+and inbound requests go to whichever one wins — which can be the older copy,
+started from a different folder or a window with different settings. Its
+failures are what the dashboard shows, while a check run from your current
+folder passes.
+
+Section 7 of `check_connection.py` now catches this: it asks whatever is on the
+port which folder it is serving from, and says so when that is not the folder
+you are in.
+
+To clear it:
+
+```
+netstat -ano | findstr :8765
+taskkill /PID <pid> /F
+```
+
+Kill every PID listed, close all dashboard windows, then start exactly one
+backend. `start_backend.cmd` now refuses to start when the port is taken rather
+than adding another copy to the pile.
+
+### If it is still not that
+
 This is the confusing one, and it has a single common cause: **proxy variables
 are per terminal window.** A backend started in one window can be routing
 through a proxy that a check run in another window never sees. Python picks

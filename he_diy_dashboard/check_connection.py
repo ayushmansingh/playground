@@ -193,15 +193,68 @@ def check_http(key: str | None, has_proxy: bool) -> tuple[str, str | None]:
     return default, bypassed
 
 
-def check_running_backend() -> None:
-    section("7. Is a dashboard backend already running")
+def check_running_backend() -> bool:
+    """Returns True if a backend is answering from somewhere other than here."""
+    section("7. Which backend is actually answering")
     try:
         with socket.create_connection(("127.0.0.1", API_PORT), timeout=3):
-            line(INFO, f"Something is listening on 127.0.0.1:{API_PORT}.")
-            line(INFO, "If you started the dashboard more than once, an older backend may still")
-            line(INFO, "be holding the port, and the page you are looking at is served by that one.")
+            pass
     except OSError:
-        line(INFO, f"Nothing on 127.0.0.1:{API_PORT} -- the dashboard is not running right now.")
+        line(INFO, f"Nothing on 127.0.0.1:{API_PORT} -- no backend is running right now.")
+        return False
+
+    line(INFO, f"Something is listening on 127.0.0.1:{API_PORT}.")
+    # Ask it which snapshot folder it is reading. That names the directory the
+    # answering process was started from, which is the only reliable way to tell
+    # a second copy from the one just started.
+    try:
+        request = urllib.request.Request(f"http://127.0.0.1:{API_PORT}/api/dashboard?limit=1")
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(request, timeout=15) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        line(WARN, f"It did not answer /api/dashboard ({exc}).")
+        line(INFO, "Something other than the dashboard backend may be holding this port.")
+        return False
+
+    served = (payload.get("sources", {}).get("172937", {}) or {}).get("path")
+    if not served:
+        line(WARN, "It answered, but reported no snapshot path.")
+        return False
+
+    # Compare by containment rather than a fixed number of parent hops, so this
+    # holds whichever snapshot layout the answering backend happens to use.
+    served_path = Path(served)
+    here = Path(__file__).resolve().parent
+    try:
+        resolved = served_path.resolve()
+        is_local = resolved == here or here in resolved.parents
+    except OSError:
+        is_local = str(served_path).lower().startswith(str(here).lower())
+
+    line(INFO, f"It is serving: {served_path}")
+    if is_local:
+        line(OK, "That is inside this folder, so the backend answering is the one from here.")
+        return False
+
+    line(BAD, f"That is NOT inside this folder. This one is: {here}")
+    line(BAD, "A different backend is answering on this port.")
+    # Windows lets a second process bind a port that is already in use, because
+    # http.server sets SO_REUSEADDR and Windows treats that as permission to
+    # share. Both processes report 'listening'; which one answers is arbitrary.
+    line(INFO, "On Windows a second backend can bind a port that is already taken,")
+    line(INFO, "so both say 'listening' and requests go to whichever one wins.")
+    line(INFO, "Stop every python.exe holding the port, then start exactly one:")
+    line(INFO, f"  netstat -ano | findstr :{API_PORT}")
+    line(INFO, "  taskkill /PID <pid> /F")
+    return True
+
+
+def find_stale_backend() -> bool:
+    try:
+        return check_running_backend()
+    except Exception:
+        return False
 
 
 def main() -> int:
@@ -214,9 +267,15 @@ def main() -> int:
     addresses = check_dns()
     socket_ok = check_socket() if addresses else False
     default, bypassed = check_http(key, bool(proxies)) if addresses else ("network", None)
-    check_running_backend()
+    stale = find_stale_backend()
 
     section("Verdict")
+    if stale:
+        line(BAD, "Redash is reachable from here, but the backend answering on port")
+        line(BAD, f"{API_PORT} was started from a different folder. That is the one the")
+        line(BAD, "dashboard is talking to, and its failures are what you see on screen.")
+        line(INFO, "Close every dashboard window, kill the leftover python.exe, start one.")
+        return 1
     if default == "ok":
         line(OK, "The refresh call works from here. Redash is reachable and the key is accepted.")
         line(INFO, "If the dashboard still reports a failure, press Refresh Redash again now --")

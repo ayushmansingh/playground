@@ -43,6 +43,26 @@ if defined HTTPS_PROXY (
     echo.
 )
 
+REM Windows lets a second process bind a port that is already in use, because
+REM http.server sets SO_REUSEADDR and Windows reads that as permission to share.
+REM Both copies then report "listening" and requests go to whichever wins, so a
+REM leftover backend can answer for the one you just started. Refuse to add to
+REM the pile.
+python -c "import socket,sys; s=socket.socket(); s.settimeout(1); r=s.connect_ex(('127.0.0.1',8765)); s.close(); sys.exit(1 if r==0 else 0)"
+if errorlevel 1 (
+    echo.
+    echo   Port 8765 is already in use, so a backend is already running.
+    echo   Windows would let this one bind anyway, and requests would go to
+    echo   whichever copy wins - which is how a stale backend ends up
+    echo   answering for a new one. Stop it first:
+    echo.
+    netstat -ano ^| findstr ":8765" ^| findstr LISTENING
+    echo.
+    echo     taskkill /PID ^<pid^> /F
+    echo.
+    exit /b 1
+)
+
 if defined RUN_CHECK (
     echo === Connection check, run in this same window ===
     python check_connection.py
