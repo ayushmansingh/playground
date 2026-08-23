@@ -296,12 +296,18 @@ function commit() {
 
 /* ---------- notices ---------- */
 
-function showNotice(message, tone = "warn", { steps = [], raw = "" } = {}) {
+function showNotice(message, tone = "warn", { steps = [], raw = "", at = null } = {}) {
   const notice = $("notice");
   notice.className = `notice notice--${tone}`;
+  /* A refresh message that stays on screen after the user has gone off and
+     changed something reads as if it is describing the latest attempt. The
+     timestamp makes a stale one obvious. */
+  const stamp = at
+    ? `<span class="notice__time">${escapeHtml(at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }))}</span>`
+    : "";
   notice.innerHTML = `<span class="notice__icon" aria-hidden="true">${tone === "error" ? "✕" : tone === "good" ? "✓" : "!"}</span>
     <div class="notice__body">
-      <p>${escapeHtml(message)}</p>
+      <p>${escapeHtml(message)}${stamp}</p>
       ${steps.length ? `<ul class="notice__steps">${steps.map((step) => `<li>${step}</li>`).join("")}</ul>` : ""}
       ${raw ? `<details class="notice__raw"><summary>Technical detail</summary><code>${escapeHtml(raw)}</code></details>` : ""}
     </div>
@@ -1236,9 +1242,10 @@ async function refreshRedash() {
       showNotice(`${diagnosis.message} Still showing the last good snapshot.`, "warn", {
         steps: diagnosis.steps,
         raw: failed.map((query) => `${query.id}: ${query.error}`).join("\n"),
+        at: new Date(),
       });
     } else {
-      showNotice("Live Redash results loaded.", "good");
+      showNotice("Live Redash results loaded.", "good", { at: new Date() });
       setTimeout(clearNotice, 6000);
     }
   } catch (error) {
@@ -1246,6 +1253,7 @@ async function refreshRedash() {
     showNotice(`${diagnosis.message} Showing the last good snapshot.`, "error", {
       steps: diagnosis.steps,
       raw: error.message,
+      at: new Date(),
     });
   } finally {
     button.disabled = false;

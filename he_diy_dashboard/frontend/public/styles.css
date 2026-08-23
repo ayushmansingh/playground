@@ -476,6 +476,13 @@ h1, h2, h3, p, dl, dd, figure { margin: 0; }
 .notice--good .notice__icon { background: var(--good); }
 .notice__body { flex: 1; min-width: 0; }
 .notice__body p { margin: 0; }
+.notice__time {
+  margin-left: 8px;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
 .notice__steps { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 5px; }
 .notice__steps li { line-height: 1.55; }
 .notice__steps code,

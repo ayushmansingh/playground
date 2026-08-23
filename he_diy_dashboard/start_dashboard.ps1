@@ -23,6 +23,13 @@
     Also adds the inbound Windows Firewall rule. Needs an elevated PowerShell.
 
 .EXAMPLE
+    .\start_dashboard.ps1 -Check
+    Runs check_connection.py with the same interpreter and environment the
+    backend gets, then exits. Use this when the dashboard reports a connection
+    failure but running the check by hand says everything is fine -- it rules
+    out the two processes seeing different settings.
+
+.EXAMPLE
     .\start_dashboard.ps1 -NoProxy
     Makes the Redash calls go direct, ignoring any proxy Windows has configured.
     Use this when the browser reaches Redash but Refresh Redash fails with
@@ -43,6 +50,7 @@ param(
     [switch]$OpenFirewall,
     [string]$Proxy,
     [switch]$NoProxy,
+    [switch]$Check,
     [int]$UiPort = 5174,
     [int]$ApiPort = 8765
 )
@@ -167,6 +175,20 @@ elseif ($NoProxy) {
     $env:NO_PROXY = "*"
 }
 $activeProxy = if ($NoProxy) { "none (direct)" } elseif ($env:HTTPS_PROXY) { $env:HTTPS_PROXY } else { $null }
+
+if ($Check) {
+    # Same interpreter, same environment, same working directory the backend
+    # would get -- so a difference between this and running the script by hand
+    # is itself the finding.
+    Write-Host ""
+    Write-Host "Running the connection check as the backend would see it." -ForegroundColor Cyan
+    if ($activeProxy) { Write-Host "  Proxy for this run: $activeProxy" }
+    Write-Host ""
+    Push-Location $root
+    try { & $python.File @($python.Prefix + @("check_connection.py")) }
+    finally { Pop-Location }
+    exit $LASTEXITCODE
+}
 
 $backend = Start-Process -FilePath $python.File `
     -ArgumentList @($python.Prefix + @("backend\server.py", "--host", "127.0.0.1", "--port", "$ApiPort")) `

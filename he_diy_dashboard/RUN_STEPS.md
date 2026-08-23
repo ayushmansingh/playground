@@ -124,15 +124,27 @@ failure and keeps showing the last good snapshot.
 `[WinError 10061] ... actively refused it` means the connection never reached
 Redash, so it is a network problem on this machine rather than a Redash one.
 
-**Run the built-in check first — it tests this exact path and names the cause:**
+**Run the built-in check first — it makes the same authenticated call the
+refresh makes and names the cause:**
 
 ```powershell
 python check_connection.py
 ```
 
-It reports whether a key is configured, what proxy Python will use, whether the
-hostname resolves, whether a socket opens, and whether the request succeeds both
-through the proxy and directly. It never runs a query and never prints your key.
+It reports which Python is running, whether a key is configured, what proxy that
+process will use, whether the hostname resolves, whether a socket opens, and what
+Redash actually answers to `GET /api/queries/172937`. It never runs a query and
+never prints your key.
+
+If the check passes but the dashboard still reports a failure, the two are not
+seeing the same thing. Run the check through the launcher, which uses the same
+interpreter, environment and working directory the backend gets:
+
+```powershell
+.\start_dashboard.ps1 -Check
+```
+
+A difference between the two runs is itself the answer.
 
 The two common verdicts:
 
