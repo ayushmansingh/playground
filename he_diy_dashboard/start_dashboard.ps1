@@ -190,9 +190,78 @@ if ($Check) {
     exit $LASTEXITCODE
 }
 
+function Test-PortInUse([int]$Port) {
+    try {
+        $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
+        $listener.Start()
+        $listener.Stop()
+        return $false
+    }
+    catch { return $true }
+}
+
+function Show-PortHolder([int]$Port) {
+    try {
+        $owners = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction Stop |
+            Select-Object -ExpandProperty OwningProcess -Unique
+        foreach ($owner in $owners) {
+            $process = Get-Process -Id $owner -ErrorAction SilentlyContinue
+            if ($process) { Write-Host "    PID $owner  $($process.ProcessName)" }
+        }
+        Write-Host "  Stop it with:  Stop-Process -Id <PID> -Force"
+    }
+    catch { }
+}
+
+# The backend runs in a hidden window, so if it fails to start nothing is shown
+# and the UI silently proxies to whatever else holds the port -- usually an
+# older copy still running from a previous launch. Refuse to start in that
+# state rather than serve stale results from a process nobody can see.
+foreach ($entry in @(@{ Port = $ApiPort; Name = "Python API" }, @{ Port = $UiPort; Name = "dashboard UI" })) {
+    if (Test-PortInUse $entry.Port) {
+        Write-Host ""
+        Write-Host "Port $($entry.Port) is already in use, so the $($entry.Name) cannot start." -ForegroundColor Red
+        Write-Host "  A dashboard is probably already running. Close it, or find the process:" -ForegroundColor Yellow
+        Show-PortHolder $entry.Port
+        Write-Host "  Or start on different ports:  .\start_dashboard.ps1 -UiPort 5175 -ApiPort 8766" -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
+    }
+}
+
+# Keep the backend's output where it can be read after the fact.
+$backendLog = Join-Path $root "backend.log"
+$backendErrorLog = Join-Path $root "backend.err.log"
+
 $backend = Start-Process -FilePath $python.File `
     -ArgumentList @($python.Prefix + @("backend\server.py", "--host", "127.0.0.1", "--port", "$ApiPort")) `
-    -WorkingDirectory $root -PassThru -WindowStyle Hidden
+    -WorkingDirectory $root -PassThru -WindowStyle Hidden `
+    -RedirectStandardOutput $backendLog -RedirectStandardError $backendErrorLog
+
+# Confirm it actually came up instead of assuming it did.
+$ready = $false
+foreach ($attempt in 1..20) {
+    Start-Sleep -Milliseconds 400
+    if ($backend.HasExited) { break }
+    if (-not (Test-PortInUse $ApiPort)) { continue }
+    $ready = $true
+    break
+}
+
+if (-not $ready) {
+    Write-Host ""
+    Write-Host "The Python backend did not start." -ForegroundColor Red
+    if (Test-Path $backendErrorLog) {
+        $errorText = Get-Content $backendErrorLog -Tail 20
+        if ($errorText) {
+            Write-Host "  Last lines of backend.err.log:" -ForegroundColor Yellow
+            $errorText | ForEach-Object { Write-Host "    $_" }
+        }
+    }
+    Write-Host "  Full log: $backendErrorLog" -ForegroundColor Yellow
+    Write-Host ""
+    exit 1
+}
 
 try {
     Write-Host ""

@@ -323,6 +323,22 @@ function describeRefreshFailure(raw) {
   const text = String(raw || "");
   const REDASH = "<code>common-redash.mmt.live</code>";
 
+  /* The UI server proxies /api to the Python backend. When that backend is not
+     running the proxy reports its own ECONNREFUSED, which looks exactly like a
+     refused connection to Redash but happens a step earlier -- nothing has
+     tried to reach Redash at all. This has to be matched first, or a dead
+     backend sends people off checking the VPN. */
+  if (/Backend unavailable|ECONNREFUSED 127\.0\.0\.1|ECONNREFUSED ::1|ECONNREFUSED localhost/i.test(text)) {
+    return {
+      message: "The dashboard's own Python backend is not responding, so the refresh never left this machine. Redash and the VPN are not involved.",
+      steps: [
+        "Look at the window the dashboard was started from — the Python side has probably stopped or failed to start.",
+        "A common cause is a second copy already holding the port. Close every dashboard window and start it once more.",
+        "Check <code>backend.err.log</code> in the dashboard folder for the reason it stopped.",
+      ],
+    };
+  }
+
   if (/10061|Connection refused|ECONNREFUSED/i.test(text)) {
     return {
       message: "Could not reach Redash — the connection was refused before Redash answered, so this is a network problem on this machine rather than a Redash one.",

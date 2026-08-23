@@ -189,8 +189,9 @@ up. `AutoConfigURL` is a PAC script, which Python ignores entirely.
 | `python is not recognised` | Python missing or not on PATH. Reinstall with "Add python.exe to PATH" ticked, then open a new PowerShell. |
 | `python` opens the Microsoft Store | That is the Store stub, not Python. Install from python.org; the launcher will also try `py -3` on its own. |
 | `running scripts is disabled on this system` | Use `start_dashboard.cmd`, or `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` first. |
-| `EADDRINUSE` / `address already in use` | The dashboard is already running, or something else holds the port. Close the other window, or use `.\start_dashboard.ps1 -UiPort 5175`. |
-| Page loads but every panel is empty | The Python side is not running. Its window shows the error. Started separately, the API returns `502 Backend unavailable` until it is up, then recovers on its own. |
+| `EADDRINUSE` / `address already in use` | The dashboard is already running, or something else holds the port. The launcher now names the process holding it. Close that, or use `.\start_dashboard.ps1 -UiPort 5175 -ApiPort 8766`. |
+| Page loads but every panel is empty | The Python side is not running. Check `backend.err.log`. Started separately, the API returns `502 Backend unavailable` until it is up, then recovers on its own. |
+| Refresh: "the dashboard's own Python backend is not responding" | The Python side stopped, or a second copy is holding the port. Close every dashboard window, start it once, and check `backend.err.log`. |
 | `No snapshot CSV found` | The app was run from inside the zip preview instead of an extracted folder, so `data\snapshots` is missing. Extract properly and retry. |
 | Colleagues cannot open the link | Windows Firewall — see step 6. Check they are on the same network and that your machine is awake. |
 | Refresh: `WinError 10061 ... actively refused` | Never reached Redash. Run `python check_connection.py`. Usually the Windows proxy setting — restart with `-NoProxy`. |
