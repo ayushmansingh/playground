@@ -54,6 +54,9 @@ Design and charting rationale, including what would need a backend change, is in
 Never run it on this machine before? Follow [RUN_STEPS.md](RUN_STEPS.md), which
 covers installing Python and Node and the usual Windows snags.
 
+**No PowerShell access?** Everything works from `cmd.exe` alone — double-click
+`run_dashboard.cmd`, or see [RUN_WITH_CMD.md](RUN_WITH_CMD.md).
+
 One-command launcher — double-click `start_dashboard.cmd`, or from PowerShell:
 
 ```powershell
@@ -68,6 +71,19 @@ dashboard on your LAN and prints the URL to send round. See
 Requirements: Python 3.8+ and Node 14+ (tested on Python 3.11 and Node 22), and
 a current Chrome, Edge or Firefox. There is nothing to install with npm or pip —
 the dashboard has no dependencies.
+
+### Running from cmd.exe only
+
+No PowerShell needed at any point:
+
+| Command | Effect |
+| --- | --- |
+| `run_dashboard.cmd` | Opens the backend and UI in two windows |
+| `start_backend.cmd` | The Python API on its own |
+| `start_ui.cmd` | The dashboard UI on its own |
+
+Full walkthrough, including firewall and troubleshooting, in
+[RUN_WITH_CMD.md](RUN_WITH_CMD.md).
 
 ### Running the two servers separately
 

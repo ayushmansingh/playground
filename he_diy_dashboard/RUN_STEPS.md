@@ -41,6 +41,9 @@ extracts to a temporary folder and the snapshot data will not be found.
 You should end up with a folder containing `backend`, `frontend`, `data` and
 `start_dashboard.cmd`.
 
+> **No PowerShell?** Skip to [RUN_WITH_CMD.md](RUN_WITH_CMD.md) — the whole
+> thing runs from `cmd.exe` with `run_dashboard.cmd`.
+
 ## 4. Start it
 
 **The easy way:** double-click **`start_dashboard.cmd`**.
