@@ -183,6 +183,21 @@ Common Dash=YOUR_COMMON_REDASH_API_KEY
 - `GET /api/dashboard?day_start=YYYY-MM-DD&day_end=YYYY-MM-DD&agent_start=YYYY-MM-DD&agent_end=YYYY-MM-DD&flag=all|1|0&agent=hes&sort_by=created&limit=100`
 - `POST /api/refresh`
 
+## When Refresh Redash fails
+
+Run the bundled check; it exercises the same network path the refresh uses and
+names the cause:
+
+```powershell
+python check_connection.py
+```
+
+The most common finding on a company laptop is that Python is routing through
+the proxy configured in Windows Internet Settings — it picks that up on its own,
+and the setting is often stale — while the browser reaches Redash directly.
+Restart with `.\start_dashboard.ps1 -NoProxy` to go direct. Full walkthrough in
+[RUN_STEPS.md](RUN_STEPS.md).
+
 ## Notes
 
 Live refresh can fail while Redash data source `18` has the current Glue/Delta schema mismatch. That failure is shown in the UI and recorded under `data/snapshots/run_*/refresh_summary.json`.

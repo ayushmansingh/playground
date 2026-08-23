@@ -122,46 +122,53 @@ failure and keeps showing the last good snapshot.
 ### If Refresh says "connection refused"
 
 `[WinError 10061] ... actively refused it` means the connection never reached
-Redash at all, so it is a network problem on this machine rather than a Redash
-one. Work through these in order:
+Redash, so it is a network problem on this machine rather than a Redash one.
 
-1. **Connect to the VPN** and try again. This is the usual answer.
-2. **Open <https://common-redash.mmt.live> in your browser.** If the browser
-   cannot reach it either, it is the VPN or a firewall.
-3. **If the browser reaches it but Refresh still fails, it is the corporate
-   proxy.** Python reads proxy settings from environment variables and from the
-   *manual* Windows proxy setting, but it does not understand an auto-config
-   (PAC) script or WPAD — which is what most corporate networks use. Python
-   therefore tries to connect directly and gets refused, while the browser
-   happily follows the PAC file.
-
-   Find the proxy your browser is actually using. In Chrome or Edge open
-   `chrome://net-internals/#proxy` and read the "Effective proxy settings", or
-   in PowerShell:
-
-   ```powershell
-   netsh winhttp show proxy
-   (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings').AutoConfigURL
-   ```
-
-   Then start the dashboard with that proxy:
-
-   ```powershell
-   .\start_dashboard.ps1 -Proxy "http://your-proxy-host:8080"
-   ```
-
-   If the proxy needs credentials, use
-   `-Proxy "http://user:password@your-proxy-host:8080"`.
-
-Useful checks along the way:
+**Run the built-in check first — it tests this exact path and names the cause:**
 
 ```powershell
-Resolve-DnsName common-redash.mmt.live      # does the name resolve at all?
-Test-NetConnection common-redash.mmt.live -Port 443   # can you open a socket?
+python check_connection.py
 ```
 
-If `Resolve-DnsName` fails or returns a loopback address, the VPN is not up. If
-it resolves but `Test-NetConnection` fails, it is a firewall or proxy.
+It reports whether a key is configured, what proxy Python will use, whether the
+hostname resolves, whether a socket opens, and whether the request succeeds both
+through the proxy and directly. It never runs a query and never prints your key.
+
+The two common verdicts:
+
+**"The proxy is the problem. Direct connections work; the proxy does not."**
+
+Python reads the proxy from Windows Internet Settings on its own, even when
+nothing asked it to. On the company network that setting is often stale, or
+points at a proxy only reachable elsewhere, so Python tries it and is refused
+while the browser goes direct and works. Skip it:
+
+```powershell
+.\start_dashboard.ps1 -NoProxy
+```
+
+**"The hostname does not resolve"** — connect to the VPN and try again.
+
+If instead you are on a network that genuinely requires a proxy, name it
+explicitly. Find the one your browser uses at `chrome://net-internals/#proxy`,
+then:
+
+```powershell
+.\start_dashboard.ps1 -Proxy "http://your-proxy-host:8080"
+```
+
+Add credentials if needed: `-Proxy "http://user:password@host:8080"`.
+
+Manual checks, if you would rather not run the script:
+
+```powershell
+Resolve-DnsName common-redash.mmt.live                  # does the name resolve?
+Test-NetConnection common-redash.mmt.live -Port 443     # can a socket open?
+(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings') | Select-Object ProxyEnable, ProxyServer, AutoConfigURL
+```
+
+`ProxyEnable = 1` with a `ProxyServer` value is the setting Python is picking
+up. `AutoConfigURL` is a PAC script, which Python ignores entirely.
 
 ## Troubleshooting
 
@@ -174,8 +181,8 @@ it resolves but `Test-NetConnection` fails, it is a firewall or proxy.
 | Page loads but every panel is empty | The Python side is not running. Its window shows the error. Started separately, the API returns `502 Backend unavailable` until it is up, then recovers on its own. |
 | `No snapshot CSV found` | The app was run from inside the zip preview instead of an extracted folder, so `data\snapshots` is missing. Extract properly and retry. |
 | Colleagues cannot open the link | Windows Firewall — see step 6. Check they are on the same network and that your machine is awake. |
-| Refresh: `WinError 10061 ... actively refused` | Never reached Redash. VPN down, or a PAC-based corporate proxy Python cannot see. See step 7. |
-| Refresh: `Tunnel connection failed: 403/407` | A proxy refused the connection. Not a key problem — check VPN, or supply credentials via `-Proxy`. |
+| Refresh: `WinError 10061 ... actively refused` | Never reached Redash. Run `python check_connection.py`. Usually the Windows proxy setting — restart with `-NoProxy`. |
+| Refresh: `Tunnel connection failed: 403/407` | A proxy refused the connection. Not a key problem. Try `-NoProxy` first. |
 | The shared link stops working later | Your IP changed when DHCP renewed, or the laptop slept. Restart the launcher and send the newly printed address. |
 
 ## What runs where

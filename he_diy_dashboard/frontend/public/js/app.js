@@ -321,9 +321,9 @@ function describeRefreshFailure(raw) {
     return {
       message: "Could not reach Redash — the connection was refused before Redash answered, so this is a network problem on this machine rather than a Redash one.",
       steps: [
-        "Check you are connected to the VPN, then try again.",
-        `Open ${REDASH} in this browser. If the browser reaches it but Refresh still fails, the network goes through a corporate proxy that Python cannot see by itself.`,
-        "In that case find the proxy in Chrome at <code>chrome://net-internals/#proxy</code>, then start the dashboard with <code>.\\start_dashboard.ps1 -Proxy \"http://your-proxy:8080\"</code>.",
+        `Run <code>python check_connection.py</code> in the dashboard folder. It tests this exact path and names the cause.`,
+        `If you can open ${REDASH} in this browser but Refresh cannot, Python is most likely being routed through the proxy in Windows Internet Settings, which it picks up on its own. Restart with <code>.\\start_dashboard.ps1 -NoProxy</code> to go direct.`,
+        "Otherwise check the VPN connection and try again.",
       ],
     };
   }
@@ -356,9 +356,9 @@ function describeRefreshFailure(raw) {
     return {
       message: "A proxy between this machine and Redash refused the connection. The Redash key is not the problem.",
       steps: [
-        "Check you are connected to the VPN, then try again.",
-        "If the proxy needs credentials, include them: <code>-Proxy \"http://user:password@proxy:8080\"</code>.",
-        "If you are behind a different proxy than the one configured, find the right one in Chrome at <code>chrome://net-internals/#proxy</code>.",
+        "On the company network Redash is usually reachable directly. Restart with <code>.\\start_dashboard.ps1 -NoProxy</code> to skip the proxy Windows has configured.",
+        `Run <code>python check_connection.py</code> to confirm which route works.`,
+        "If the proxy really is required and needs credentials, use <code>-Proxy \"http://user:password@proxy:8080\"</code>.",
       ],
     };
   }

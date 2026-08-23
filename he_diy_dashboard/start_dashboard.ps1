@@ -23,6 +23,14 @@
     Also adds the inbound Windows Firewall rule. Needs an elevated PowerShell.
 
 .EXAMPLE
+    .\start_dashboard.ps1 -NoProxy
+    Makes the Redash calls go direct, ignoring any proxy Windows has configured.
+    Use this when the browser reaches Redash but Refresh Redash fails with
+    "connection refused": Python picks up the Windows Internet Settings proxy on
+    its own, and on the company network that proxy is often stale or unused.
+    Run check_connection.py first if you are not sure which applies.
+
+.EXAMPLE
     .\start_dashboard.ps1 -Proxy "http://proxy.example.com:8080"
     Routes the Redash calls through a corporate proxy. Needed when the browser
     reaches Redash but Refresh Redash fails with "connection refused": Python
@@ -34,6 +42,7 @@ param(
     [switch]$Local,
     [switch]$OpenFirewall,
     [string]$Proxy,
+    [switch]$NoProxy,
     [int]$UiPort = 5174,
     [int]$ApiPort = 8765
 )
@@ -138,11 +147,26 @@ if ($OpenFirewall -and -not $Local -and -not $ruleExists) {
 # proxy setting, but not an auto-config (PAC) script or WPAD. On a network that
 # uses one, Redash is unreachable from Python even though the browser is fine,
 # so -Proxy names it explicitly. Start-Process inherits these variables.
+if ($Proxy -and $NoProxy) {
+    Write-Error "Use either -Proxy or -NoProxy, not both."
+    exit 1
+}
 if ($Proxy) {
     $env:HTTPS_PROXY = $Proxy
     $env:HTTP_PROXY = $Proxy
+    $env:NO_PROXY = $null
 }
-$activeProxy = if ($env:HTTPS_PROXY) { $env:HTTPS_PROXY } else { $null }
+elseif ($NoProxy) {
+    # getproxies() is getproxies_environment() OR getproxies_registry(), and it
+    # takes the first that is non-empty. NO_PROXY on its own is enough to make
+    # the environment win, so the Windows registry proxy is never consulted and
+    # the request goes direct.
+    $env:HTTP_PROXY = $null
+    $env:HTTPS_PROXY = $null
+    $env:ALL_PROXY = $null
+    $env:NO_PROXY = "*"
+}
+$activeProxy = if ($NoProxy) { "none (direct)" } elseif ($env:HTTPS_PROXY) { $env:HTTPS_PROXY } else { $null }
 
 $backend = Start-Process -FilePath $python.File `
     -ArgumentList @($python.Prefix + @("backend\server.py", "--host", "127.0.0.1", "--port", "$ApiPort")) `
