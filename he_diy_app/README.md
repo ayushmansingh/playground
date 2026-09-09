@@ -36,6 +36,28 @@ bundled in `backend/seed_data/`.
 Without a key the dashboard is fully usable; only live refresh is disabled, and
 the UI says so.
 
+### Where the Redash key goes
+
+Preferred: set `COMMON_REDASH_API_KEY` in the **app server's environment**. No
+file, nothing to lose on redeploy.
+
+If you would rather use a file, copy `.env.example` and put it at one of these,
+checked in this order:
+
+| Location | Survives a redeploy? |
+| --- | --- |
+| `$APP_DATA_DIR/.env` | **Yes** — recommended if you use a file |
+| `backend/.env` | No — replaced with the next ZIP |
+| `<zip root>/.env` | No — replaced with the next ZIP |
+
+The environment always wins over a file, so a stale `.env` cannot override a
+rotated key. Accepted names, first match used: `Common Dash`, `COMMON_DASH`,
+`COMMON_REDASH_API_KEY`, `REDASH_API_KEY`. A value still set to the
+`YOUR_COMMON_REDASH_API_KEY` placeholder is ignored.
+
+`GET /api/health` reports `live_refresh_available`, so you can confirm the key
+was picked up without pressing anything.
+
 ## API
 
 ```

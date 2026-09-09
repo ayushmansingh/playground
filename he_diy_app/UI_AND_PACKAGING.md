@@ -93,8 +93,27 @@ Optional environment:
 | --- | --- | --- |
 | `APP_DATA_DIR` | `backend/data` | Where snapshots are written |
 | `COMMON_REDASH_API_KEY` | unset | Enables live refresh; unset is fine |
+| a `.env` file | none | Optional alternative to the variable — see below |
 | `REDASH_HOST` | `https://common-redash.mmt.live` | Redash base URL |
 | `REDASH_VERIFY_TLS` | `1` | Set `0` only for an internal private certificate chain |
+
+## Where the Redash key goes
+
+Preferred: the app server's own environment. If a file is easier, it is read
+from these, in order, and **the environment always wins over all of them** so a
+stale file cannot override a rotated key:
+
+| Location | Survives a redeploy? |
+| --- | --- |
+| `$APP_DATA_DIR/.env` | **Yes** |
+| `backend/.env` | No |
+| `<zip root>/.env` | No |
+
+Accepted names, first match used: `Common Dash`, `COMMON_DASH`,
+`COMMON_REDASH_API_KEY`, `REDASH_API_KEY`. A value left as the
+`YOUR_COMMON_REDASH_API_KEY` placeholder is treated as absent.
+
+Confirm it was picked up with `GET /api/health` → `live_refresh_available`.
 
 ---
 

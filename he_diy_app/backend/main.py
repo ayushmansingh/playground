@@ -82,10 +82,20 @@ def load_dotenv() -> dict[str, str]:
 
 
 def redash_key() -> str | None:
-    """The API key, or None. Never raises, so a missing key cannot stop boot."""
+    """The API key, or None. Never raises, so a missing key cannot stop boot.
+
+    The environment wins over a file, and every environment name is checked
+    before any file is consulted. Doing it the other way round lets a stale
+    .env in the data directory silently override the key the app server was
+    configured with, which is the opposite of what an operator expects.
+    """
+    for name in KEY_NAMES:
+        value = os.environ.get(name)
+        if value and "YOUR_COMMON_REDASH_API_KEY" not in value:
+            return value.strip()
     dotenv = load_dotenv()
     for name in KEY_NAMES:
-        value = os.environ.get(name) or dotenv.get(name)
+        value = dotenv.get(name)
         if value and "YOUR_COMMON_REDASH_API_KEY" not in value:
             return value.strip()
     return None
