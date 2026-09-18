@@ -39,7 +39,11 @@ const indexToBase = (series) => {
   return { ...series, points: series.points.map((point) => (point == null ? null : (point / base) * 100)) };
 };
 
-export default function AgentView({ data, metric, setMetric, scale, setScale, sort, onSort }) {
+export default function AgentView({ data, metric, setMetric, scale, setScale, sort, onSort, limit, rankLabel }) {
+  /* The API caps only agent_dashboard.rows. The trend, the cohort comparisons
+     and the tiles are built from every agent in range, so each card has to say
+     which of the two it is rather than leaning on a shared filter chip. */
+  const ranked = `top ${limit} by ${String(rankLabel).toLowerCase()}`;
   const board = data.agent_dashboard;
   const daily = (board.daily || []).map(withRates);
   const totals = withRates(board.totals || {});
@@ -167,6 +171,8 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
                 ? `Each cohort's share of that day's total ${metricWord} — the bands add up to 100%`
                 : `${label} per day, New DIY against Old DIY`
           }
+          scopeNote="All agents in range, both cohorts"
+          
           span={12}
           controls={
             <>
@@ -253,6 +259,7 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
         <ChartCard
           title="Funnel volume by DIY type"
           subtitle="Same stages, both cohorts, one shared scale"
+          scopeNote="All agents in range"
           span={7}
           legend={cohortLegend}
           note={
@@ -309,6 +316,7 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
           <ChartCard
             title="Conversion rate comparison"
             subtitle="Percent of created reaching each stage"
+            scopeNote="All agents in range"
             span={12}
             legend={cohortLegend}
             table={{
@@ -345,6 +353,7 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
           <ChartCard
             title="Save rate spread"
             subtitle={rates.length ? `Median save rate ${formatRate(median(rates))} across ${formatNumber(rates.length)} agent rows` : "No agent rows in range"}
+            scopeNote={`Limited to the ${ranked}`}
             span={12}
             table={{
               rows: bins.map((bin) => ({ id: `${bin.from}`, band: `${bin.from}–${bin.to}%`, agents: bin.count })),
@@ -373,6 +382,7 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
         <ChartCard
           title="Volume against quality"
           subtitle={`${formatNumber(points.length)} agent rows · median guides split the coaching quadrants`}
+          scopeNote={`Limited to the ${ranked}`}
           span={12}
           legend={
             <Legend
@@ -415,7 +425,7 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
 
         <TableCard
           title="Agent leaderboard"
-          subtitle="Query 174655, one row per agent and DIY type"
+          subtitle={`Query 174655 · ${ranked}, one row per agent and DIY type`}
           span={12}
           rows={sortedAgents}
           sort={sort}

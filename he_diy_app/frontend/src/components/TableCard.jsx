@@ -4,7 +4,7 @@ import { downloadCsv, formatNumber, toCsv } from "../lib/util.js";
 
 /* A card whose point is the table: sortable headers, a row cap with a way out,
    and an export that always covers every row rather than the visible page. */
-export default function TableCard({ title, subtitle, span = 12, rows, columns, sort, onSort, note, pageSize = 25 }) {
+export default function TableCard({ title, subtitle, scopeNote = null, span = 12, rows, columns, sort, onSort, note, pageSize = 25 }) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? rows : rows.slice(0, pageSize);
   const hidden = rows.length - visible.length;
@@ -21,6 +21,7 @@ export default function TableCard({ title, subtitle, span = 12, rows, columns, s
         <div className="card__titles">
           <h3>{title}</h3>
           <p>{subtitle || ""}</p>
+          {scopeNote && <p className="card__scope">{scopeNote}</p>}
         </div>
         <div className="card__tools">
           <span className="card__count">{rows.length ? `${formatNumber(rows.length)} rows` : ""}</span>

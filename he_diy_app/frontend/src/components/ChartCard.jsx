@@ -9,6 +9,7 @@ import { downloadCsv, toCsv } from "../lib/util.js";
 export default function ChartCard({
   title,
   subtitle,
+  scopeNote = null,
   span = 12,
   controls = null,
   legend = null,
@@ -32,6 +33,9 @@ export default function ChartCard({
         <div className="card__titles">
           <h3>{title}</h3>
           <p>{subtitle || ""}</p>
+          {/* Which slice of the data this card actually covers. The row cap
+              reaches some cards and not others, so it is stated per card. */}
+          {scopeNote && <p className="card__scope">{scopeNote}</p>}
         </div>
         <div className="card__tools">
           {controls && <div className="card__controls">{controls}</div>}

@@ -366,11 +366,10 @@ export default function App() {
                 <button type="button" aria-label="Clear agent search" onClick={() => setFilters((current) => ({ ...current, agent: "" }))}>×</button>
               </span>
             )}
-            {view === "agent" && (
-              <span className="filter-chip">
-                Top {filters.limit} by {METRIC_LABELS[filters.sortBy] || RATE_LABELS[filters.sortBy] || filters.sortBy}
-              </span>
-            )}
+            {/* "Top N by X" deliberately does NOT appear here. This row sits above
+                every panel, so a chip in it reads as scoping all of them -- and the
+                row cap only reaches the leaderboard, the scatter and the spread.
+                Each of those cards states its own scope instead. */}
           </div>
         </div>
       </section>
@@ -408,7 +407,17 @@ export default function App() {
           </div>
         ) : (
           <div className="view">
-            <AgentView data={data} metric={agentMetric} setMetric={setAgentMetric} scale={scale} setScale={setScale} sort={sort.agent} onSort={onSort("agent")} />
+            <AgentView
+              data={data}
+              metric={agentMetric}
+              setMetric={setAgentMetric}
+              scale={scale}
+              setScale={setScale}
+              sort={sort.agent}
+              onSort={onSort("agent")}
+              limit={filters.limit}
+              rankLabel={METRIC_LABELS[filters.sortBy] || RATE_LABELS[filters.sortBy] || filters.sortBy}
+            />
           </div>
         )}
       </main>

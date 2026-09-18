@@ -650,6 +650,19 @@ h1, h2, h3, p, dl, dd, figure { margin: 0; }
 .card__titles h3 { font-size: 15.5px; font-weight: 640; letter-spacing: -0.01em; }
 .card__titles p { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; }
 .card__titles p:empty { display: none; }
+.card__scope {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.card__scope::before {
+  content: "◔";
+  font-size: 10px;
+  opacity: 0.8;
+}
 .card__tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-left: auto; }
 .card__count { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .card__body { padding: 0 12px 12px; flex: 1; min-width: 0; }

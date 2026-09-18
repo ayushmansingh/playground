@@ -246,7 +246,21 @@ scrolls inside its own container. **The page body never scrolls sideways.**
 
 - **Deltas compare the two latest days in range**, and every tile spells out which two ("19 Aug vs 18 Aug"). The newest day in a snapshot is usually partial, so a large negative delta there is normally a partial-day artefact rather than a collapse — the explicit dates make that checkable at a glance.
 - **Rate deltas are in percentage points**, not a percentage of a percentage.
-- **Agent panels describe the loaded slice.** The Show control caps how many agent rows the API returns, so the scatter, the spread histogram and the leaderboard all describe that top-N — which is why the ranking metric and the cap appear as filter chips.
+- **Scope is stated per card, not once at the top.** The Show control caps only
+  `agent_dashboard.rows`, so it reaches the leaderboard, the scatter and the
+  spread histogram. The stat tiles, the New vs Old trend and both cohort
+  comparisons are built from every agent in range and do not move when the cap
+  changes — verified by comparing the payload at `limit=25` and `limit=500`.
+
+  A "Top N by X" chip in the shared filter row therefore had to go: that row
+  sits above every panel, so a chip in it reads as scoping all of them. Each
+  card now carries its own line — *"Limited to the top 100 by created"* or
+  *"All agents in range"* — which is true wherever it appears.
+
+  The DIY-type filter is the same shape: it reaches the tiles, the leaderboard,
+  the scatter and the spread, but the trend and the cohort comparisons always
+  show both cohorts, because a New-vs-Old comparison that honoured the filter
+  would have nothing to compare. Those cards say so.
 - **PSM, checkout and booking-stage rates are derived in the browser** from counts the API returns; the API ships only save, send, download and booking rates.
 
 ## Refresh failures are explained, not dumped
