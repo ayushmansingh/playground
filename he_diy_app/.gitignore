@@ -5,3 +5,6 @@ __pycache__/
 *.pyc
 .venv/
 .env
+
+# Root npm shim artefacts
+/he_diy_app/node_modules/

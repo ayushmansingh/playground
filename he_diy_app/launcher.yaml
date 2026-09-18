@@ -5,6 +5,12 @@ description: Day-on-day and agent-level HE DIY funnel performance.
 # Components
 # ---------------------------------------------------------------------------
 
+# Both sets of commands are written so they work whether they are run from the
+# package root or from the component's own folder. The root carries a
+# package.json, a requirements.txt and a main.py that delegate into backend/
+# and frontend/, so "npm install", "npm run build", "pip install -r
+# requirements.txt" and "uvicorn main:app" all resolve correctly either way.
+
 backend:
   language: python
   directory: backend
@@ -19,7 +25,8 @@ frontend:
   directory: frontend
   install: npm install
   build: npm run build
-  output: dist
+  # Relative to the package root. Inside frontend/ the same folder is "dist".
+  output: frontend/dist
 
 # ---------------------------------------------------------------------------
 # Settings the app reads from the environment. Values are never in the ZIP.

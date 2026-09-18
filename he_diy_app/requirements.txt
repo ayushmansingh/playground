@@ -1,0 +1,4 @@
+# Root entry point. The pinned dependencies live in backend/requirements.txt;
+# this file exists so a launcher that installs from the package root picks
+# them up. pip resolves the path below relative to this file.
+-r backend/requirements.txt

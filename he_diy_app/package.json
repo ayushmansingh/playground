@@ -1,0 +1,11 @@
+{
+  "name": "he-diy-dashboard",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Root entry point. The app lives in frontend/; these scripts delegate there so a launcher that runs npm from the package root works too.",
+  "scripts": {
+    "postinstall": "npm --prefix frontend install --no-audit --no-fund",
+    "build": "npm --prefix frontend install --no-audit --no-fund && npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev"
+  }
+}

@@ -12,33 +12,30 @@ frontend/   React + Vite. npm run build -> frontend/dist
 
 ## How the launcher runs it
 
-`launcher.yaml` at the package root describes both components:
+The app lives in `backend/` and `frontend/`. The package root also carries
+`package.json`, `requirements.txt` and `main.py`, each of which delegates into
+those folders — so the same commands are correct whether a launcher runs them
+from the root or from a component's own directory:
 
-```yaml
-backend:
-  directory: backend
-  install: pip install -r requirements.txt
-  start: uvicorn main:app --host 0.0.0.0 --port 8000
-  port: 8000
-  health_check: /api/health
+| Command | From the root | From the component folder |
+| --- | --- | --- |
+| `pip install -r requirements.txt` | root file pulls in `backend/requirements.txt` | installs `backend/requirements.txt` |
+| `npm install` | root `postinstall` installs `frontend/` | installs `frontend/` |
+| `npm run build` | delegates to `frontend` | runs `vite build` |
+| `uvicorn main:app` | root `main.py` re-exports the app | imports `backend/main.py` |
 
-frontend:
-  directory: frontend
-  install: npm install
-  build: npm run build
-  output: dist
-```
+Nothing is duplicated: the root `main.py` loads the one real module from
+`backend/main.py` and re-exports `app`.
 
-The backend listens on `0.0.0.0:8000`. `python backend/main.py` binds the same
-address, so either way of starting it behaves identically.
+The build output is always `frontend/dist`, and the backend listens on
+`0.0.0.0:8000`. `python main.py` binds the same address.
 
-To do it by hand:
+By hand:
 
 ```bash
-pip install -r backend/requirements.txt
-cd backend && uvicorn main:app --host 0.0.0.0 --port 8000
-
-cd frontend && npm install && npm run build   # -> frontend/dist
+pip install -r requirements.txt
+npm install && npm run build          # -> frontend/dist
+uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 The app server serves `frontend/dist` and routes `/api` to the backend on the
