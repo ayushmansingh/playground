@@ -1,0 +1,41 @@
+# Settings the HE DIY Performance Console reads from the environment.
+#
+# Nothing here is required, so the app starts as soon as it is uploaded and
+# serves the snapshot bundled inside the ZIP. Adding the Redash key later
+# switches the Refresh button on; no other setting needs touching.
+
+settings:
+  # SECRET - named, never valued here. Deliberately not required: the
+  # dashboard is snapshot-first and fully usable without it, so marking it
+  # required would stop the app from starting for no good reason. Until it is
+  # set, the Refresh button is disabled and the UI explains why.
+  - name: REDASH_API_KEY
+    description: >-
+      Optional - Redash personal API key, from Profile on common-redash.
+      Without it the dashboard still works from the snapshot in the ZIP; only
+      the Refresh Redash button is disabled.
+    required: false
+
+  # APP'S OWN - values the app decides, each with a default, so nobody is
+  # asked for them. Safe to show in full: none of them is a credential.
+  - name: REDASH_HOST
+    description: Base URL of the Redash instance the Refresh button queries.
+    default: https://common-redash.mmt.live
+
+  - name: PAGE_SIZE
+    description: >-
+      Agent rows returned per request, and the starting value of the Show
+      control on the Agent tab. Between 1 and 500.
+    default: 100
+
+  - name: REDASH_TIMEOUT_SECONDS
+    description: >-
+      How long a refresh waits for a Redash query before giving up. Between
+      30 and 3600.
+    default: 900
+
+  - name: REDASH_VERIFY_TLS
+    description: >-
+      Verify the Redash TLS certificate. Leave as true. Set to false only for
+      an internal host with a private certificate chain.
+    default: "true"

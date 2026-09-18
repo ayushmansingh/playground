@@ -21,12 +21,45 @@ The rules this ZIP is built against, and how each is met.
 | Rule | How it is met |
 | --- | --- |
 | `backend/main.py` creates `app = FastAPI()` at module level | `app` is a module-level global; no factory, no `create_app()` |
-| `backend/requirements.txt` pinned to versions that exist | `fastapi==0.115.6`, `uvicorn[standard]==0.34.0`, both installed and resolved from PyPI during the build |
+| `backend/requirements.txt` pinned to versions that exist | `fastapi==0.115.6`, `uvicorn[standard]==0.34.0`, both resolved from PyPI during the build |
 | Every route starts with `/api` | All routes hang off one `APIRouter(prefix="/api")`; nothing is registered on `app` directly |
-| Starts with no `.env`, safe defaults, never needs a key to boot | `redash_key()` returns `None` instead of raising. A missing key disables live refresh and nothing else |
+| Every setting read from the environment | `os.environ.get` only. `load_dotenv` and all file-based config were removed |
+| No `.env` read from the project folder | No file is read for configuration anywhere in the codebase |
 | `if __name__ == "__main__"` unused, port chosen by the server | No such block; no host or port is hard-coded |
 
-Routes:
+## Settings
+
+Declared in `launcher.yaml` at the ZIP root, one entry per environment variable
+the app reads:
+
+| Setting | Kind | Declared as | Blocks startup? |
+| --- | --- | --- | --- |
+| `REDASH_API_KEY` | SECRET | `required: false`, no default | No |
+| `REDASH_HOST` | app's own | `default:` | No |
+| `PAGE_SIZE` | app's own | `default: 100` | No |
+| `REDASH_TIMEOUT_SECONDS` | app's own | `default: 900` | No |
+| `REDASH_VERIFY_TLS` | app's own | `default: "true"` | No |
+
+**No credential carries a default**, per the rule that a default travels inside
+the ZIP and is shown in full.
+
+**The key is optional on purpose.** The dashboard is snapshot-first: it ships
+with data and is fully usable with no key, and only the Refresh button needs
+one. Marking it required would mean the app refused to start until somebody
+found a Redash key — worse than the behaviour it replaced. It is declared
+`required: false` so the app starts on upload, and the UI disables Refresh and
+says why until a key appears.
+
+**`PAGE_SIZE` is wired through, not decorative.** It sets the API's default
+`limit`, and the frontend omits `limit` on its first request so it adopts
+whatever the server is configured with, folding that value into the Show
+control even when it is not one of the presets. A setting that changed nothing
+would be worse than no setting at all.
+
+**`APP_DATA_DIR` is not declared.** The app server supplies it; declaring it
+would invite someone to override the platform's own directory.
+
+Routes:Routes:
 
 ```
 GET  /api/health      liveness, data directory, whether live refresh is possible
@@ -91,29 +124,18 @@ Optional environment:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `APP_DATA_DIR` | `backend/data` | Where snapshots are written |
-| `COMMON_REDASH_API_KEY` | unset | Enables live refresh; unset is fine |
-| a `.env` file | none | Optional alternative to the variable — see below |
-| `REDASH_HOST` | `https://common-redash.mmt.live` | Redash base URL |
-| `REDASH_VERIFY_TLS` | `1` | Set `0` only for an internal private certificate chain |
+| `APP_DATA_DIR` | `backend/data` | Supplied by the app server; where snapshots are written |
+
+All other settings are in `launcher.yaml` and described above.
 
 ## Where the Redash key goes
 
-Preferred: the app server's own environment. If a file is easier, it is read
-from these, in order, and **the environment always wins over all of them** so a
-stale file cannot override a rotated key:
-
-| Location | Survives a redeploy? |
-| --- | --- |
-| `$APP_DATA_DIR/.env` | **Yes** |
-| `backend/.env` | No |
-| `<zip root>/.env` | No |
-
-Accepted names, first match used: `Common Dash`, `COMMON_DASH`,
-`COMMON_REDASH_API_KEY`, `REDASH_API_KEY`. A value left as the
-`YOUR_COMMON_REDASH_API_KEY` placeholder is treated as absent.
+Into the **app server's settings**, under `REDASH_API_KEY` — the server prompts
+for it because `launcher.yaml` declares it. There is no file to place and no
+`.env` to create; the app reads nothing from disk for configuration.
 
 Confirm it was picked up with `GET /api/health` → `live_refresh_available`.
+That endpoint reports whether the key is set, never its value.
 
 ---
 

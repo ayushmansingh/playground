@@ -23,40 +23,33 @@ why every call in the app is a relative `/api` path.
 
 ## Configuration
 
-Nothing is required. The app boots with no `.env` and serves the snapshot
-bundled in `backend/seed_data/`.
+Every setting comes from the **environment**. Nothing is read from a file on
+disk — no `.env`, no config file — because nobody is at the server to create
+one. Each setting is declared in [`launcher.yaml`](launcher.yaml) at the root
+of the package, so the server can prompt for what it needs.
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `APP_DATA_DIR` | `backend/data` | Where refreshed snapshots are written; survives a redeploy |
-| `COMMON_REDASH_API_KEY` | unset | Enables the Refresh Redash button; unset is fine |
-| `REDASH_HOST` | `https://common-redash.mmt.live` | Redash base URL |
-| `REDASH_VERIFY_TLS` | `1` | Set `0` only for an internal private certificate chain |
+**Nothing is required.** The app starts as soon as it is uploaded and serves
+the snapshot bundled in `backend/seed_data/`.
 
-Without a key the dashboard is fully usable; only live refresh is disabled, and
-the UI says so.
+| Setting | Kind | Default | Effect |
+| --- | --- | --- | --- |
+| `REDASH_API_KEY` | secret, optional | none | Enables the Refresh Redash button. Without it the dashboard still works from the snapshot |
+| `REDASH_HOST` | app's own | `https://common-redash.mmt.live` | Redash base URL |
+| `PAGE_SIZE` | app's own | `100` | Agent rows per request, and the starting value of the Show control |
+| `REDASH_TIMEOUT_SECONDS` | app's own | `900` | How long a refresh waits for a query |
+| `REDASH_VERIFY_TLS` | app's own | `true` | Set `false` only for an internal private certificate chain |
 
-### Where the Redash key goes
+`REDASH_API_KEY` is deliberately **not** marked required. The dashboard is
+snapshot-first and fully usable without it, so requiring it would stop the app
+from starting for no good reason. `COMMON_REDASH_API_KEY` is accepted as an
+alias if your platform already sets that name.
 
-Preferred: set `COMMON_REDASH_API_KEY` in the **app server's environment**. No
-file, nothing to lose on redeploy.
+`APP_DATA_DIR` is supplied by the app server itself and is not declared in
+`launcher.yaml` — declaring it would invite someone to override the platform's
+own directory.
 
-If you would rather use a file, copy `.env.example` and put it at one of these,
-checked in this order:
-
-| Location | Survives a redeploy? |
-| --- | --- |
-| `$APP_DATA_DIR/.env` | **Yes** — recommended if you use a file |
-| `backend/.env` | No — replaced with the next ZIP |
-| `<zip root>/.env` | No — replaced with the next ZIP |
-
-The environment always wins over a file, so a stale `.env` cannot override a
-rotated key. Accepted names, first match used: `Common Dash`, `COMMON_DASH`,
-`COMMON_REDASH_API_KEY`, `REDASH_API_KEY`. A value still set to the
-`YOUR_COMMON_REDASH_API_KEY` placeholder is ignored.
-
-`GET /api/health` reports `live_refresh_available`, so you can confirm the key
-was picked up without pressing anything.
+Confirm what the app picked up with `GET /api/health`, which reports every
+effective setting and whether the key is set — never its value.
 
 ## API
 

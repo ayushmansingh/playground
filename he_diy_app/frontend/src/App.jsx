@@ -21,7 +21,8 @@ const defaultFilters = () => ({
   flag: "all",
   agent: "",
   sortBy: "created",
-  limit: 100,
+  // null until the first payload reports the server's PAGE_SIZE setting.
+  limit: null,
 });
 
 export default function App() {
@@ -49,13 +50,15 @@ export default function App() {
     localStorage.setItem("hediy-theme", theme);
   }, [theme]);
 
-  /* Seed the date inputs from whatever the snapshot actually covers, once. */
+  /* Seed the date inputs from whatever the snapshot actually covers, and adopt
+     the server's configured page size, once. */
   useEffect(() => {
     if (!data || seeded.current) return;
     const available = data.available_dates || {};
     seeded.current = true;
     setFilters((current) => ({
       ...current,
+      limit: current.limit ?? data.selected?.limit ?? 100,
       ranges: {
         day: { start: available.day?.min || "", end: available.day?.max || "" },
         agent: { start: available.agent?.min || "", end: available.agent?.max || "" },
@@ -333,16 +336,23 @@ export default function App() {
 
                 <label className="field">
                   <span className="field__label">Show</span>
-                  <select value={filters.limit} onChange={(event) => setFilters((current) => ({ ...current, limit: num(event.target.value) || 100 }))}>
-                    {[25, 50, 100, 250, 500].map((value) => (
-                      <option key={value} value={value}>Top {value}</option>
-                    ))}
+                  <select
+                    value={filters.limit ?? ""}
+                    onChange={(event) => setFilters((current) => ({ ...current, limit: num(event.target.value) || current.limit }))}
+                  >
+                    {/* The configured PAGE_SIZE may not be one of the presets, so
+                        it is folded in rather than silently snapping to 100. */}
+                    {[...new Set([...(filters.limit ? [filters.limit] : []), 25, 50, 100, 250, 500])]
+                      .sort((a, b) => a - b)
+                      .map((value) => (
+                        <option key={value} value={value}>Top {value}</option>
+                      ))}
                   </select>
                 </label>
               </>
             )}
 
-            <button className="btn btn--ghost" type="button" onClick={() => { seeded.current = false; setFilters(defaultFilters()); }}>
+            <button className="btn btn--ghost" type="button" onClick={() => { seeded.current = false; setFilters({ ...defaultFilters(), limit: data?.selected?.limit ?? null }); }}>
               Reset
             </button>
           </div>

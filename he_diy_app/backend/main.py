@@ -6,10 +6,13 @@ Serves two Redash datasets:
 
 Design notes that matter for deployment:
 
+* Every setting is read from the environment. Nothing is read from a file on
+  disk, because nobody is at the server to put one there. Each setting is
+  declared in ``launcher.yaml`` at the root of the package.
 * The app is created at module level as ``app`` and boots with no
-  configuration at all. A missing ``.env``, a missing API key and an
-  unreachable Redash are all normal states: the dashboard falls back to the
-  most recent snapshot and reports why live refresh is unavailable.
+  configuration at all. A missing API key and an unreachable Redash are both
+  normal states: the dashboard falls back to the most recent snapshot and
+  reports why live refresh is unavailable.
 * Everything written at runtime goes under ``APP_DATA_DIR`` so it survives a
   redeploy. The bundled snapshot under ``seed_data`` is read-only and acts as
   the floor, so a fresh install has data on first load.
@@ -43,11 +46,33 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 # Shipped with the app, never written to.
 SEED_DIR = APP_ROOT / "seed_data"
 
-REDASH_HOST = os.environ.get("REDASH_HOST", "https://common-redash.mmt.live")
+# ---------------------------------------------------------------------------
+# Settings. Every one of these comes from the environment and is declared in
+# launcher.yaml. Nothing is read from a file: no .env, no config on disk.
+# ---------------------------------------------------------------------------
+
+def env_int(name: str, fallback: int, low: int, high: int) -> int:
+    """An int from the environment, clamped. A bad value never stops boot."""
+    try:
+        return max(low, min(high, int(str(os.environ.get(name, "")).strip() or fallback)))
+    except ValueError:
+        return fallback
+
+
+# Secret. Optional by design: without it the dashboard still serves snapshots,
+# and only the Refresh button is unavailable. It therefore must not be marked
+# required in launcher.yaml, or a missing key would stop the app from starting.
+REDASH_API_KEY = (os.environ.get("REDASH_API_KEY") or os.environ.get("COMMON_REDASH_API_KEY") or "").strip()
+
+# The app's own values, each with a default, so nobody is asked for them.
+REDASH_HOST = (os.environ.get("REDASH_HOST") or "https://common-redash.mmt.live").rstrip("/")
+REDASH_VERIFY_TLS = (os.environ.get("REDASH_VERIFY_TLS") or "true").strip().lower() not in ("0", "false", "no", "off")
+PAGE_SIZE = env_int("PAGE_SIZE", 100, 1, 500)
+REDASH_TIMEOUT_SECONDS = env_int("REDASH_TIMEOUT_SECONDS", 900, 30, 3600)
+
 QUERY_IDS = (172937, 174655)
 METRICS = ["created", "saved", "sent", "downloaded", "psm_detail", "psm_review", "checkout", "bookings"]
 FLAG_LABELS = {"0": "Old DIY", "1": "New DIY"}
-KEY_NAMES = ("Common Dash", "COMMON_DASH", "COMMON_REDASH_API_KEY", "REDASH_API_KEY")
 
 app = FastAPI(
     title="HE DIY Performance Dashboard",
@@ -63,42 +88,11 @@ api = APIRouter(prefix="/api")
 # configuration
 # --------------------------------------------------------------------------
 
-def load_dotenv() -> dict[str, str]:
-    """Read a .env if one happens to be there. Absence is a normal state."""
-    values: dict[str, str] = {}
-    for candidate in (DATA_DIR / ".env", APP_ROOT / ".env", APP_ROOT.parent / ".env"):
-        if not candidate.exists():
-            continue
-        try:
-            for raw in candidate.read_text(encoding="utf-8").splitlines():
-                line = raw.strip()
-                if not line or line.startswith("#") or "=" not in line:
-                    continue
-                key, value = line.split("=", 1)
-                values.setdefault(key.strip(), value.strip().strip('"').strip("'"))
-        except OSError:
-            continue
-    return values
-
-
 def redash_key() -> str | None:
-    """The API key, or None. Never raises, so a missing key cannot stop boot.
-
-    The environment wins over a file, and every environment name is checked
-    before any file is consulted. Doing it the other way round lets a stale
-    .env in the data directory silently override the key the app server was
-    configured with, which is the opposite of what an operator expects.
-    """
-    for name in KEY_NAMES:
-        value = os.environ.get(name)
-        if value and "YOUR_COMMON_REDASH_API_KEY" not in value:
-            return value.strip()
-    dotenv = load_dotenv()
-    for name in KEY_NAMES:
-        value = dotenv.get(name)
-        if value and "YOUR_COMMON_REDASH_API_KEY" not in value:
-            return value.strip()
-    return None
+    """The API key, or None. Never raises, so a missing key cannot stop boot."""
+    if not REDASH_API_KEY or "YOUR_" in REDASH_API_KEY:
+        return None
+    return REDASH_API_KEY
 
 
 # --------------------------------------------------------------------------
@@ -281,7 +275,7 @@ def json_request(method: str, url: str, headers: dict[str, str], body: dict[str,
     payload = None if body is None else json.dumps(body).encode("utf-8")
     request = urllib.request.Request(url, data=payload, method=method, headers=headers)
     context = ssl.create_default_context()
-    if os.environ.get("REDASH_VERIFY_TLS", "1") == "0":
+    if not REDASH_VERIFY_TLS:
         # Opt-in only, for an internal host with a private certificate chain.
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
@@ -293,7 +287,7 @@ def redash_headers(key: str) -> dict[str, str]:
     return {"Authorization": f"Key {key}", "X-Redash-API-Key": key, "Content-Type": "application/json"}
 
 
-def run_redash_sql(headers: dict[str, str], data_source_id: int, sql: str, max_wait_seconds: int = 900) -> dict[str, Any]:
+def run_redash_sql(headers: dict[str, str], data_source_id: int, sql: str, max_wait_seconds: int = REDASH_TIMEOUT_SECONDS) -> dict[str, Any]:
     submitted = json_request(
         "POST",
         f"{REDASH_HOST}/api/query_results",
@@ -330,7 +324,7 @@ def refresh_queries() -> dict[str, Any]:
             "attempted_at": datetime.now().isoformat(timespec="seconds"),
             "ok": False,
             "reason": "no_api_key",
-            "message": "No Redash API key is configured, so live refresh is unavailable. The dashboard is running on the last saved snapshot.",
+            "message": "No Redash API key is configured on the server, so live refresh is unavailable. The dashboard is running on the last saved snapshot.",
             "queries": [],
         }
 
@@ -464,6 +458,14 @@ def health() -> dict[str, Any]:
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "data_dir": str(DATA_DIR),
         "live_refresh_available": redash_key() is not None,
+        "settings": {
+            # The key's presence, never its value.
+            "REDASH_API_KEY": "set" if redash_key() else "not set",
+            "REDASH_HOST": REDASH_HOST,
+            "REDASH_VERIFY_TLS": REDASH_VERIFY_TLS,
+            "PAGE_SIZE": PAGE_SIZE,
+            "REDASH_TIMEOUT_SECONDS": REDASH_TIMEOUT_SECONDS,
+        },
         "snapshots": {str(query_id): str(snapshot_path(query_id) or "") for query_id in QUERY_IDS},
     }
 
@@ -477,7 +479,7 @@ def dashboard(
     flag: str = Query("all", pattern="^(all|0|1)$"),
     agent: str = Query(""),
     sort_by: str = Query("created"),
-    limit: int = Query(100, ge=1, le=500),
+    limit: int = Query(PAGE_SIZE, ge=1, le=500, description="Agent rows returned; defaults to the PAGE_SIZE setting"),
 ) -> dict[str, Any]:
     return build_dashboard(day_start, day_end, agent_start, agent_end, flag, agent, sort_by, limit)
 

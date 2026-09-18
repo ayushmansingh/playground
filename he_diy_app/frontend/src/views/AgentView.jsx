@@ -43,7 +43,7 @@ export default function AgentView({ data, metric, setMetric, scale, setScale, so
   /* The API caps only agent_dashboard.rows. The trend, the cohort comparisons
      and the tiles are built from every agent in range, so each card has to say
      which of the two it is rather than leaning on a shared filter chip. */
-  const ranked = `top ${limit} by ${String(rankLabel).toLowerCase()}`;
+  const ranked = `top ${limit ?? data.selected?.limit ?? "—"} by ${String(rankLabel).toLowerCase()}`;
   const board = data.agent_dashboard;
   const daily = (board.daily || []).map(withRates);
   const totals = withRates(board.totals || {});

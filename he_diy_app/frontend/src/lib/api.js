@@ -27,7 +27,9 @@ export function fetchDashboard(filters, signal) {
   params.set("flag", filters.flag);
   params.set("agent", filters.agent.trim());
   params.set("sort_by", filters.sortBy);
-  params.set("limit", String(filters.limit));
+  // Omitted until the server has told us its PAGE_SIZE, so the first request
+  // adopts the configured default rather than overriding it with our own.
+  if (filters.limit != null) params.set("limit", String(filters.limit));
   return request(`/api/dashboard?${params.toString()}`, { signal });
 }
 
