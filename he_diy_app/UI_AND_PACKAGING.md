@@ -13,8 +13,10 @@ The rules this ZIP is built against, and how each is met.
 
 | Rule | How it is met |
 | --- | --- |
-| Two folders at the ZIP root: `backend/` and `frontend/` | Exactly those two, plus this file and a README |
+| Two folders at the ZIP root: `backend/` and `frontend/` | Exactly those two, plus `launcher.yaml` and the docs |
 | No `node_modules`, `.venv`, or build output | Excluded at package time; `frontend/dist` is never shipped, the server builds it |
+| `launcher.yaml` describes a backend and a frontend | Top-level `backend:` and `frontend:` sections give directory, install, build/start and port. A first attempt shipped only `settings:` and the deploy was rejected with *"does not describe a backend or a frontend"* |
+| Backend listens on `0.0.0.0:8000` | `start:` runs `uvicorn main:app --host 0.0.0.0 --port 8000`, and the `__main__` block binds the same address so `python main.py` matches |
 
 ## Backend
 

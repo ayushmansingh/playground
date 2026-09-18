@@ -1,8 +1,33 @@
-# Settings the HE DIY Performance Console reads from the environment.
+name: he-diy-dashboard
+description: Day-on-day and agent-level HE DIY funnel performance.
+
+# ---------------------------------------------------------------------------
+# Components
+# ---------------------------------------------------------------------------
+
+backend:
+  language: python
+  directory: backend
+  install: pip install -r requirements.txt
+  start: uvicorn main:app --host 0.0.0.0 --port 8000
+  host: 0.0.0.0
+  port: 8000
+  health_check: /api/health
+
+frontend:
+  framework: vite
+  directory: frontend
+  install: npm install
+  build: npm run build
+  output: dist
+
+# ---------------------------------------------------------------------------
+# Settings the app reads from the environment. Values are never in the ZIP.
 #
 # Nothing here is required, so the app starts as soon as it is uploaded and
-# serves the snapshot bundled inside the ZIP. Adding the Redash key later
+# serves the snapshot bundled inside the package. Adding the Redash key later
 # switches the Refresh button on; no other setting needs touching.
+# ---------------------------------------------------------------------------
 
 settings:
   # SECRET - named, never valued here. Deliberately not required: the
@@ -12,8 +37,8 @@ settings:
   - name: REDASH_API_KEY
     description: >-
       Optional - Redash personal API key, from Profile on common-redash.
-      Without it the dashboard still works from the snapshot in the ZIP; only
-      the Refresh Redash button is disabled.
+      Without it the dashboard still works from the snapshot in the package;
+      only the Refresh Redash button is disabled.
     required: false
 
   # APP'S OWN - values the app decides, each with a default, so nobody is

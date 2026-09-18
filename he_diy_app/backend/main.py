@@ -17,6 +17,9 @@ Design notes that matter for deployment:
   redeploy. The bundled snapshot under ``seed_data`` is read-only and acts as
   the floor, so a fresh install has data on first load.
 * Every route lives under ``/api``.
+* The service listens on ``0.0.0.0:8000``. launcher.yaml starts it with
+  ``uvicorn main:app --host 0.0.0.0 --port 8000``; the ``__main__`` block
+  below binds the same address so ``python main.py`` behaves identically.
 """
 
 from __future__ import annotations
@@ -518,3 +521,16 @@ def snapshots() -> dict[str, Any]:
 
 
 app.include_router(api)
+
+
+if __name__ == "__main__":
+    # launcher.yaml starts the app with uvicorn directly. This block exists so
+    # `python main.py` binds the same address rather than doing nothing, and it
+    # honours PORT if the platform injects one.
+    import uvicorn
+
+    uvicorn.run(
+        app,
+        host=os.environ.get("HOST", "0.0.0.0"),
+        port=env_int("PORT", 8000, 1, 65535),
+    )

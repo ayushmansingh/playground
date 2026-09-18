@@ -10,16 +10,39 @@ backend/    FastAPI. app = FastAPI() at module level in main.py. All routes /api
 frontend/   React + Vite. npm run build -> frontend/dist
 ```
 
-## Build
+## How the launcher runs it
+
+`launcher.yaml` at the package root describes both components:
+
+```yaml
+backend:
+  directory: backend
+  install: pip install -r requirements.txt
+  start: uvicorn main:app --host 0.0.0.0 --port 8000
+  port: 8000
+  health_check: /api/health
+
+frontend:
+  directory: frontend
+  install: npm install
+  build: npm run build
+  output: dist
+```
+
+The backend listens on `0.0.0.0:8000`. `python backend/main.py` binds the same
+address, so either way of starting it behaves identically.
+
+To do it by hand:
 
 ```bash
 pip install -r backend/requirements.txt
-cd frontend && npm install && npm run build
+cd backend && uvicorn main:app --host 0.0.0.0 --port 8000
+
+cd frontend && npm install && npm run build   # -> frontend/dist
 ```
 
-The app server imports `backend.main:app` and chooses the port. It serves
-`frontend/dist` and routes `/api` to the backend on the same origin, which is
-why every call in the app is a relative `/api` path.
+The app server serves `frontend/dist` and routes `/api` to the backend on the
+same origin, which is why every call in the app is a relative `/api` path.
 
 ## Configuration
 
