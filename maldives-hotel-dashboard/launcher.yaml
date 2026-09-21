@@ -1,0 +1,15 @@
+backend:
+  path: backend
+frontend:
+  path: frontend
+  build: npm run build
+  output: dist
+settings:
+  - name: REDASH_API_KEY
+    description: Personal API key from Holiday Dash Redash, available under Profile
+  - name: PAGE_SIZE
+    description: Rows per page returned by the query endpoints
+    default: 50
+  - name: LOG_LEVEL
+    description: Python log level for the backend (DEBUG, INFO, WARNING, ERROR)
+    default: INFO

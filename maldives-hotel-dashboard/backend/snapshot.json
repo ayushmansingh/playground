@@ -1,0 +1,3879 @@
+{
+  "id": "dashboard:e4c1e780-e171-4bfa-a862-4ea50cca36ad",
+  "surface": "dashboard",
+  "title": "Maldives Hotel Dashboard",
+  "generatedAt": "2026-09-18T10:30:49.208Z",
+  "status": "reviewed",
+  "buildStatus": "complete",
+  "filters": [],
+  "queries": {
+    "maldives_q2o": {
+      "rows": [
+        {
+          "date": "2026-08-09",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 1,
+          "quotesSent": 65,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.045454545454545456,
+          "quoteQ2O": 0.015384615384615385
+        },
+        {
+          "date": "2026-08-09",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 40,
+          "ticketOrders": 3,
+          "quotesSent": 110,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.075,
+          "quoteQ2O": 0.00909090909090909
+        },
+        {
+          "date": "2026-08-09",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 20,
+          "ticketOrders": 1,
+          "quotesSent": 45,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.05,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-09",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 136,
+          "ticketOrders": 10,
+          "quotesSent": 280,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.07352941176470588,
+          "quoteQ2O": 0.02142857142857143
+        },
+        {
+          "date": "2026-08-09",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 217,
+          "ticketOrders": 19,
+          "quotesSent": 528,
+          "quoteOrders": 9,
+          "ticketQ2O": 0.08755760368663594,
+          "quoteQ2O": 0.017045454545454544
+        },
+        {
+          "date": "2026-08-09",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 101,
+          "ticketOrders": 4,
+          "quotesSent": 248,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.039603960396039604,
+          "quoteQ2O": 0.012096774193548387
+        },
+        {
+          "date": "2026-08-10",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 17,
+          "ticketOrders": 3,
+          "quotesSent": 43,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.17647058823529413,
+          "quoteQ2O": 0.06976744186046512
+        },
+        {
+          "date": "2026-08-10",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 49,
+          "ticketOrders": 7,
+          "quotesSent": 176,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.14285714285714285,
+          "quoteQ2O": 0.028409090909090908
+        },
+        {
+          "date": "2026-08-10",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 37,
+          "ticketOrders": 4,
+          "quotesSent": 133,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.10810810810810811,
+          "quoteQ2O": 0.015037593984962405
+        },
+        {
+          "date": "2026-08-10",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 123,
+          "ticketOrders": 8,
+          "quotesSent": 300,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.06504065040650407,
+          "quoteQ2O": 0.02
+        },
+        {
+          "date": "2026-08-10",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 216,
+          "ticketOrders": 15,
+          "quotesSent": 712,
+          "quoteOrders": 10,
+          "ticketQ2O": 0.06944444444444445,
+          "quoteQ2O": 0.014044943820224719
+        },
+        {
+          "date": "2026-08-10",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 129,
+          "ticketOrders": 8,
+          "quotesSent": 412,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.06201550387596899,
+          "quoteQ2O": 0.009708737864077669
+        },
+        {
+          "date": "2026-08-11",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 30,
+          "ticketOrders": 3,
+          "quotesSent": 75,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.1,
+          "quoteQ2O": 0.02666666666666667
+        },
+        {
+          "date": "2026-08-11",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 49,
+          "ticketOrders": 6,
+          "quotesSent": 138,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.12244897959183673,
+          "quoteQ2O": 0.028985507246376812
+        },
+        {
+          "date": "2026-08-11",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 24,
+          "ticketOrders": 3,
+          "quotesSent": 63,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.125,
+          "quoteQ2O": 0.031746031746031744
+        },
+        {
+          "date": "2026-08-11",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 106,
+          "ticketOrders": 11,
+          "quotesSent": 282,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.10377358490566038,
+          "quoteQ2O": 0.028368794326241134
+        },
+        {
+          "date": "2026-08-11",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 161,
+          "ticketOrders": 16,
+          "quotesSent": 502,
+          "quoteOrders": 11,
+          "ticketQ2O": 0.09937888198757763,
+          "quoteQ2O": 0.021912350597609563
+        },
+        {
+          "date": "2026-08-11",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 75,
+          "ticketOrders": 5,
+          "quotesSent": 220,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.06666666666666667,
+          "quoteQ2O": 0.013636363636363636
+        },
+        {
+          "date": "2026-08-12",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 28,
+          "ticketOrders": 0,
+          "quotesSent": 70,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.014285714285714285
+        },
+        {
+          "date": "2026-08-12",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 44,
+          "ticketOrders": 1,
+          "quotesSent": 145,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.022727272727272728,
+          "quoteQ2O": 0.013793103448275862
+        },
+        {
+          "date": "2026-08-12",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 22,
+          "ticketOrders": 0,
+          "quotesSent": 75,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.013333333333333334
+        },
+        {
+          "date": "2026-08-12",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 108,
+          "ticketOrders": 5,
+          "quotesSent": 294,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.046296296296296294,
+          "quoteQ2O": 0.027210884353741496
+        },
+        {
+          "date": "2026-08-12",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 167,
+          "ticketOrders": 7,
+          "quotesSent": 562,
+          "quoteOrders": 10,
+          "ticketQ2O": 0.041916167664670656,
+          "quoteQ2O": 0.017793594306049824
+        },
+        {
+          "date": "2026-08-12",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 84,
+          "ticketOrders": 1,
+          "quotesSent": 268,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.011904761904761904,
+          "quoteQ2O": 0.007462686567164179
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 28,
+          "ticketOrders": 2,
+          "quotesSent": 104,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07142857142857142,
+          "quoteQ2O": 0.019230769230769232
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 52,
+          "ticketOrders": 3,
+          "quotesSent": 181,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.057692307692307696,
+          "quoteQ2O": 0.027624309392265192
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 27,
+          "ticketOrders": 1,
+          "quotesSent": 77,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.037037037037037035,
+          "quoteQ2O": 0.03896103896103896
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 1,
+          "ticketOrders": 0,
+          "quotesSent": 1,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 1,
+          "ticketOrders": 0,
+          "quotesSent": 1,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 123,
+          "ticketOrders": 8,
+          "quotesSent": 339,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.06504065040650407,
+          "quoteQ2O": 0.02359882005899705
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 203,
+          "ticketOrders": 13,
+          "quotesSent": 683,
+          "quoteOrders": 14,
+          "ticketQ2O": 0.06403940886699508,
+          "quoteQ2O": 0.020497803806734993
+        },
+        {
+          "date": "2026-08-13",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 120,
+          "ticketOrders": 4,
+          "quotesSent": 344,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.03333333333333333,
+          "quoteQ2O": 0.01744186046511628
+        },
+        {
+          "date": "2026-08-14",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 38,
+          "ticketOrders": 2,
+          "quotesSent": 72,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.05263157894736842,
+          "quoteQ2O": 0.027777777777777776
+        },
+        {
+          "date": "2026-08-14",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 54,
+          "ticketOrders": 3,
+          "quotesSent": 149,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.05555555555555555,
+          "quoteQ2O": 0.013422818791946308
+        },
+        {
+          "date": "2026-08-14",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 22,
+          "ticketOrders": 1,
+          "quotesSent": 77,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.045454545454545456,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-14",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 110,
+          "ticketOrders": 7,
+          "quotesSent": 273,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.06363636363636363,
+          "quoteQ2O": 0.014652014652014652
+        },
+        {
+          "date": "2026-08-14",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 172,
+          "ticketOrders": 9,
+          "quotesSent": 545,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.05232558139534884,
+          "quoteQ2O": 0.007339449541284404
+        },
+        {
+          "date": "2026-08-14",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 91,
+          "ticketOrders": 3,
+          "quotesSent": 272,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.03296703296703297,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-15",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 17,
+          "ticketOrders": 1,
+          "quotesSent": 60,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.058823529411764705,
+          "quoteQ2O": 0.016666666666666666
+        },
+        {
+          "date": "2026-08-15",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 27,
+          "ticketOrders": 2,
+          "quotesSent": 103,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07407407407407407,
+          "quoteQ2O": 0.019417475728155338
+        },
+        {
+          "date": "2026-08-15",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 11,
+          "ticketOrders": 1,
+          "quotesSent": 43,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.023255813953488372
+        },
+        {
+          "date": "2026-08-15",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 95,
+          "ticketOrders": 3,
+          "quotesSent": 255,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.031578947368421054,
+          "quoteQ2O": 0.0196078431372549
+        },
+        {
+          "date": "2026-08-15",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 130,
+          "ticketOrders": 2,
+          "quotesSent": 397,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.015384615384615385,
+          "quoteQ2O": 0.020151133501259445
+        },
+        {
+          "date": "2026-08-15",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 46,
+          "ticketOrders": 0,
+          "quotesSent": 142,
+          "quoteOrders": 3,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.02112676056338028
+        },
+        {
+          "date": "2026-08-16",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 13,
+          "ticketOrders": 0,
+          "quotesSent": 36,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-16",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 28,
+          "ticketOrders": 3,
+          "quotesSent": 99,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.10714285714285714,
+          "quoteQ2O": 0.030303030303030304
+        },
+        {
+          "date": "2026-08-16",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 21,
+          "ticketOrders": 3,
+          "quotesSent": 63,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.14285714285714285,
+          "quoteQ2O": 0.047619047619047616
+        },
+        {
+          "date": "2026-08-16",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 74,
+          "ticketOrders": 3,
+          "quotesSent": 203,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.04054054054054054,
+          "quoteQ2O": 0.0049261083743842365
+        },
+        {
+          "date": "2026-08-16",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 116,
+          "ticketOrders": 8,
+          "quotesSent": 426,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.06896551724137931,
+          "quoteQ2O": 0.014084507042253521
+        },
+        {
+          "date": "2026-08-16",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 66,
+          "ticketOrders": 5,
+          "quotesSent": 223,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.07575757575757576,
+          "quoteQ2O": 0.02242152466367713
+        },
+        {
+          "date": "2026-08-17",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 23,
+          "ticketOrders": 2,
+          "quotesSent": 92,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.08695652173913043,
+          "quoteQ2O": 0.021739130434782608
+        },
+        {
+          "date": "2026-08-17",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 42,
+          "ticketOrders": 2,
+          "quotesSent": 173,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.047619047619047616,
+          "quoteQ2O": 0.017341040462427744
+        },
+        {
+          "date": "2026-08-17",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 25,
+          "ticketOrders": 1,
+          "quotesSent": 81,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.04,
+          "quoteQ2O": 0.012345679012345678
+        },
+        {
+          "date": "2026-08-17",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 116,
+          "ticketOrders": 5,
+          "quotesSent": 388,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.04310344827586207,
+          "quoteQ2O": 0.015463917525773196
+        },
+        {
+          "date": "2026-08-17",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 201,
+          "ticketOrders": 11,
+          "quotesSent": 791,
+          "quoteOrders": 9,
+          "ticketQ2O": 0.05472636815920398,
+          "quoteQ2O": 0.011378002528445006
+        },
+        {
+          "date": "2026-08-17",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 123,
+          "ticketOrders": 5,
+          "quotesSent": 403,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.04065040650406504,
+          "quoteQ2O": 0.007444168734491315
+        },
+        {
+          "date": "2026-08-18",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 2,
+          "quotesSent": 67,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.014925373134328358
+        },
+        {
+          "date": "2026-08-18",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 47,
+          "ticketOrders": 3,
+          "quotesSent": 170,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.06382978723404255,
+          "quoteQ2O": 0.011764705882352941
+        },
+        {
+          "date": "2026-08-18",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 31,
+          "ticketOrders": 1,
+          "quotesSent": 103,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.03225806451612903,
+          "quoteQ2O": 0.009708737864077669
+        },
+        {
+          "date": "2026-08-18",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 89,
+          "ticketOrders": 4,
+          "quotesSent": 299,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.0449438202247191,
+          "quoteQ2O": 0.020066889632107024
+        },
+        {
+          "date": "2026-08-18",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 150,
+          "ticketOrders": 7,
+          "quotesSent": 603,
+          "quoteOrders": 7,
+          "ticketQ2O": 0.04666666666666667,
+          "quoteQ2O": 0.011608623548922056
+        },
+        {
+          "date": "2026-08-18",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 87,
+          "ticketOrders": 2,
+          "quotesSent": 304,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.022988505747126436,
+          "quoteQ2O": 0.003289473684210526
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 27,
+          "ticketOrders": 3,
+          "quotesSent": 120,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.1111111111111111,
+          "quoteQ2O": 0.016666666666666666
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 50,
+          "ticketOrders": 3,
+          "quotesSent": 221,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.06,
+          "quoteQ2O": 0.00904977375565611
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 31,
+          "ticketOrders": 0,
+          "quotesSent": 101,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 1,
+          "quotesSent": 31,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.045454545454545456,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 71,
+          "ticketOrders": 2,
+          "quotesSent": 85,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.028169014084507043,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 49,
+          "ticketOrders": 0,
+          "quotesSent": 54,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 130,
+          "ticketOrders": 8,
+          "quotesSent": 496,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.06153846153846154,
+          "quoteQ2O": 0.004032258064516129
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 233,
+          "ticketOrders": 10,
+          "quotesSent": 925,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.04291845493562232,
+          "quoteQ2O": 0.004324324324324324
+        },
+        {
+          "date": "2026-08-19",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 143,
+          "ticketOrders": 2,
+          "quotesSent": 429,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.013986013986013986,
+          "quoteQ2O": 0.004662004662004662
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 26,
+          "ticketOrders": 0,
+          "quotesSent": 84,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.011904761904761904
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 39,
+          "ticketOrders": 2,
+          "quotesSent": 146,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05128205128205128,
+          "quoteQ2O": 0.00684931506849315
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 17,
+          "ticketOrders": 2,
+          "quotesSent": 62,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.11764705882352941,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 40,
+          "ticketOrders": 3,
+          "quotesSent": 70,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.075,
+          "quoteQ2O": 0.04285714285714286
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 65,
+          "ticketOrders": 3,
+          "quotesSent": 116,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.046153846153846156,
+          "quoteQ2O": 0.02586206896551724
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 31,
+          "ticketOrders": 0,
+          "quotesSent": 46,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 88,
+          "ticketOrders": 9,
+          "quotesSent": 352,
+          "quoteOrders": 11,
+          "ticketQ2O": 0.10227272727272728,
+          "quoteQ2O": 0.03125
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 135,
+          "ticketOrders": 9,
+          "quotesSent": 612,
+          "quoteOrders": 13,
+          "ticketQ2O": 0.06666666666666667,
+          "quoteQ2O": 0.021241830065359478
+        },
+        {
+          "date": "2026-08-20",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 70,
+          "ticketOrders": 2,
+          "quotesSent": 260,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.02857142857142857,
+          "quoteQ2O": 0.007692307692307693
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 23,
+          "ticketOrders": 1,
+          "quotesSent": 84,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.043478260869565216,
+          "quoteQ2O": 0.023809523809523808
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 25,
+          "ticketOrders": 2,
+          "quotesSent": 115,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.08,
+          "quoteQ2O": 0.043478260869565216
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 8,
+          "ticketOrders": 1,
+          "quotesSent": 31,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.125,
+          "quoteQ2O": 0.0967741935483871
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 48,
+          "ticketOrders": 1,
+          "quotesSent": 77,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.020833333333333332,
+          "quoteQ2O": 0.012987012987012988
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 77,
+          "ticketOrders": 1,
+          "quotesSent": 114,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.012987012987012988,
+          "quoteQ2O": 0.008771929824561403
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 31,
+          "ticketOrders": 0,
+          "quotesSent": 37,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 103,
+          "ticketOrders": 6,
+          "quotesSent": 385,
+          "quoteOrders": 9,
+          "ticketQ2O": 0.05825242718446602,
+          "quoteQ2O": 0.023376623376623377
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 146,
+          "ticketOrders": 6,
+          "quotesSent": 549,
+          "quoteOrders": 12,
+          "ticketQ2O": 0.0410958904109589,
+          "quoteQ2O": 0.02185792349726776
+        },
+        {
+          "date": "2026-08-21",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 68,
+          "ticketOrders": 2,
+          "quotesSent": 164,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.029411764705882353,
+          "quoteQ2O": 0.018292682926829267
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 2,
+          "quotesSent": 50,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.04
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 29,
+          "ticketOrders": 3,
+          "quotesSent": 82,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.10344827586206896,
+          "quoteQ2O": 0.036585365853658534
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 10,
+          "ticketOrders": 1,
+          "quotesSent": 32,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.1,
+          "quoteQ2O": 0.03125
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 50,
+          "ticketOrders": 4,
+          "quotesSent": 93,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.08,
+          "quoteQ2O": 0.043010752688172046
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 67,
+          "ticketOrders": 3,
+          "quotesSent": 126,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.04477611940298507,
+          "quoteQ2O": 0.031746031746031744
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 23,
+          "ticketOrders": 0,
+          "quotesSent": 33,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 88,
+          "ticketOrders": 6,
+          "quotesSent": 279,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.06818181818181818,
+          "quoteQ2O": 0.02867383512544803
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 128,
+          "ticketOrders": 8,
+          "quotesSent": 446,
+          "quoteOrders": 9,
+          "ticketQ2O": 0.0625,
+          "quoteQ2O": 0.020179372197309416
+        },
+        {
+          "date": "2026-08-22",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 59,
+          "ticketOrders": 1,
+          "quotesSent": 167,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.01694915254237288,
+          "quoteQ2O": 0.005988023952095809
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 18,
+          "ticketOrders": 5,
+          "quotesSent": 58,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.2777777777777778,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 28,
+          "ticketOrders": 5,
+          "quotesSent": 93,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.17857142857142858,
+          "quoteQ2O": 0.010752688172043012
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 12,
+          "ticketOrders": 0,
+          "quotesSent": 35,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.02857142857142857
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 31,
+          "ticketOrders": 1,
+          "quotesSent": 45,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.03225806451612903,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 44,
+          "ticketOrders": 1,
+          "quotesSent": 65,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.022727272727272728,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 15,
+          "ticketOrders": 0,
+          "quotesSent": 20,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 93,
+          "ticketOrders": 8,
+          "quotesSent": 268,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.08602150537634409,
+          "quoteQ2O": 0.007462686567164179
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 138,
+          "ticketOrders": 7,
+          "quotesSent": 452,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.050724637681159424,
+          "quoteQ2O": 0.00663716814159292
+        },
+        {
+          "date": "2026-08-23",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 56,
+          "ticketOrders": 0,
+          "quotesSent": 184,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.005434782608695652
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 3,
+          "quotesSent": 73,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.13636363636363635,
+          "quoteQ2O": 0.0410958904109589
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 43,
+          "ticketOrders": 3,
+          "quotesSent": 121,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.06976744186046512,
+          "quoteQ2O": 0.024793388429752067
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 24,
+          "ticketOrders": 0,
+          "quotesSent": 48,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 39,
+          "ticketOrders": 2,
+          "quotesSent": 62,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05128205128205128,
+          "quoteQ2O": 0.016129032258064516
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 57,
+          "ticketOrders": 3,
+          "quotesSent": 82,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05263157894736842,
+          "quoteQ2O": 0.012195121951219513
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 18,
+          "ticketOrders": 0,
+          "quotesSent": 20,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 101,
+          "ticketOrders": 7,
+          "quotesSent": 320,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.06930693069306931,
+          "quoteQ2O": 0.01875
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 171,
+          "ticketOrders": 8,
+          "quotesSent": 535,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.04678362573099415,
+          "quoteQ2O": 0.011214953271028037
+        },
+        {
+          "date": "2026-08-24",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 92,
+          "ticketOrders": 0,
+          "quotesSent": 215,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 26,
+          "ticketOrders": 2,
+          "quotesSent": 94,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0.031914893617021274
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 44,
+          "ticketOrders": 3,
+          "quotesSent": 173,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.06818181818181818,
+          "quoteQ2O": 0.017341040462427744
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 31,
+          "ticketOrders": 1,
+          "quotesSent": 79,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.03225806451612903,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 38,
+          "ticketOrders": 2,
+          "quotesSent": 52,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05263157894736842,
+          "quoteQ2O": 0.019230769230769232
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 46,
+          "ticketOrders": 1,
+          "quotesSent": 73,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.021739130434782608,
+          "quoteQ2O": 0.0136986301369863
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 15,
+          "ticketOrders": 0,
+          "quotesSent": 21,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 81,
+          "ticketOrders": 3,
+          "quotesSent": 302,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.037037037037037035,
+          "quoteQ2O": 0.016556291390728478
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 129,
+          "ticketOrders": 4,
+          "quotesSent": 557,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.031007751937984496,
+          "quoteQ2O": 0.010771992818671455
+        },
+        {
+          "date": "2026-08-25",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 85,
+          "ticketOrders": 2,
+          "quotesSent": 255,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.023529411764705882,
+          "quoteQ2O": 0.00392156862745098
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 19,
+          "ticketOrders": 0,
+          "quotesSent": 61,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.01639344262295082
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 22,
+          "ticketOrders": 1,
+          "quotesSent": 100,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.045454545454545456,
+          "quoteQ2O": 0.02
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 8,
+          "ticketOrders": 1,
+          "quotesSent": 39,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.125,
+          "quoteQ2O": 0.02564102564102564
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 10,
+          "ticketOrders": 1,
+          "quotesSent": 19,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.1,
+          "quoteQ2O": 0.05263157894736842
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 10,
+          "ticketOrders": 1,
+          "quotesSent": 22,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.1,
+          "quoteQ2O": 0.045454545454545456
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 0,
+          "ticketOrders": 0,
+          "quotesSent": 3,
+          "quoteOrders": 0,
+          "ticketQ2O": null,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 93,
+          "ticketOrders": 3,
+          "quotesSent": 280,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.03225806451612903,
+          "quoteQ2O": 0.010714285714285714
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 137,
+          "ticketOrders": 5,
+          "quotesSent": 521,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.0364963503649635,
+          "quoteQ2O": 0.011516314779270634
+        },
+        {
+          "date": "2026-08-26",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 78,
+          "ticketOrders": 2,
+          "quotesSent": 241,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.02564102564102564,
+          "quoteQ2O": 0.012448132780082987
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 13,
+          "ticketOrders": 1,
+          "quotesSent": 28,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0.07142857142857142
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 20,
+          "ticketOrders": 1,
+          "quotesSent": 57,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.05,
+          "quoteQ2O": 0.03508771929824561
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 11,
+          "ticketOrders": 0,
+          "quotesSent": 29,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 2,
+          "ticketOrders": 0,
+          "quotesSent": 6,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 3,
+          "ticketOrders": 0,
+          "quotesSent": 8,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 1,
+          "ticketOrders": 0,
+          "quotesSent": 2,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 77,
+          "ticketOrders": 2,
+          "quotesSent": 192,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.025974025974025976,
+          "quoteQ2O": 0.020833333333333332
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 117,
+          "ticketOrders": 4,
+          "quotesSent": 365,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.03418803418803419,
+          "quoteQ2O": 0.010958904109589041
+        },
+        {
+          "date": "2026-08-27",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 59,
+          "ticketOrders": 1,
+          "quotesSent": 173,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.01694915254237288,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 12,
+          "ticketOrders": 1,
+          "quotesSent": 27,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.08333333333333333,
+          "quoteQ2O": 0.07407407407407407
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 15,
+          "ticketOrders": 1,
+          "quotesSent": 45,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.06666666666666667,
+          "quoteQ2O": 0.044444444444444446
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 5,
+          "ticketOrders": 0,
+          "quotesSent": 18,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 1,
+          "ticketOrders": 0,
+          "quotesSent": 3,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 1,
+          "ticketOrders": 0,
+          "quotesSent": 4,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 0,
+          "ticketOrders": 0,
+          "quotesSent": 1,
+          "quoteOrders": 0,
+          "ticketQ2O": null,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 35,
+          "ticketOrders": 2,
+          "quotesSent": 108,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.05714285714285714,
+          "quoteQ2O": 0.027777777777777776
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 63,
+          "ticketOrders": 1,
+          "quotesSent": 217,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.015873015873015872,
+          "quoteQ2O": 0.013824884792626729
+        },
+        {
+          "date": "2026-08-28",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 38,
+          "ticketOrders": 0,
+          "quotesSent": 109,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 5,
+          "ticketOrders": 1,
+          "quotesSent": 21,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.2,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 23,
+          "ticketOrders": 0,
+          "quotesSent": 85,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 20,
+          "ticketOrders": 0,
+          "quotesSent": 64,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 4,
+          "ticketOrders": 0,
+          "quotesSent": 10,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 8,
+          "ticketOrders": 0,
+          "quotesSent": 17,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 4,
+          "ticketOrders": 0,
+          "quotesSent": 7,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 79,
+          "ticketOrders": 1,
+          "quotesSent": 166,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.012658227848101266,
+          "quoteQ2O": 0.006024096385542169
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 118,
+          "ticketOrders": 1,
+          "quotesSent": 353,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.00847457627118644,
+          "quoteQ2O": 0.0028328611898017
+        },
+        {
+          "date": "2026-08-29",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 57,
+          "ticketOrders": 0,
+          "quotesSent": 187,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 13,
+          "ticketOrders": 1,
+          "quotesSent": 41,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0.024390243902439025
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 29,
+          "ticketOrders": 3,
+          "quotesSent": 137,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.10344827586206896,
+          "quoteQ2O": 0.021897810218978103
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 20,
+          "ticketOrders": 2,
+          "quotesSent": 96,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.1,
+          "quoteQ2O": 0.020833333333333332
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 6,
+          "ticketOrders": 0,
+          "quotesSent": 25,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 8,
+          "ticketOrders": 0,
+          "quotesSent": 30,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 2,
+          "ticketOrders": 0,
+          "quotesSent": 5,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 72,
+          "ticketOrders": 1,
+          "quotesSent": 248,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.013888888888888888,
+          "quoteQ2O": 0.008064516129032258
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 104,
+          "ticketOrders": 5,
+          "quotesSent": 506,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.04807692307692308,
+          "quoteQ2O": 0.009881422924901186
+        },
+        {
+          "date": "2026-08-30",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 51,
+          "ticketOrders": 4,
+          "quotesSent": 258,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.0784313725490196,
+          "quoteQ2O": 0.011627906976744186
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 19,
+          "ticketOrders": 3,
+          "quotesSent": 77,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.15789473684210525,
+          "quoteQ2O": 0.025974025974025976
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 39,
+          "ticketOrders": 5,
+          "quotesSent": 178,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.1282051282051282,
+          "quoteQ2O": 0.016853932584269662
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 26,
+          "ticketOrders": 1,
+          "quotesSent": 101,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.038461538461538464,
+          "quoteQ2O": 0.009900990099009901
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 4,
+          "ticketOrders": 0,
+          "quotesSent": 13,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.07692307692307693
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 8,
+          "ticketOrders": 0,
+          "quotesSent": 19,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.05263157894736842
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 4,
+          "ticketOrders": 0,
+          "quotesSent": 6,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 73,
+          "ticketOrders": 6,
+          "quotesSent": 236,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.0821917808219178,
+          "quoteQ2O": 0.0211864406779661
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 123,
+          "ticketOrders": 8,
+          "quotesSent": 505,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.06504065040650407,
+          "quoteQ2O": 0.015841584158415842
+        },
+        {
+          "date": "2026-08-31",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 67,
+          "ticketOrders": 2,
+          "quotesSent": 269,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.029850746268656716,
+          "quoteQ2O": 0.011152416356877323
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 18,
+          "ticketOrders": 1,
+          "quotesSent": 63,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.05555555555555555,
+          "quoteQ2O": 0.031746031746031744
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 36,
+          "ticketOrders": 1,
+          "quotesSent": 126,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.027777777777777776,
+          "quoteQ2O": 0.023809523809523808
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 24,
+          "ticketOrders": 0,
+          "quotesSent": 63,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.015873015873015872
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 19,
+          "ticketOrders": 5,
+          "quotesSent": 34,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.2631578947368421,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 29,
+          "ticketOrders": 6,
+          "quotesSent": 54,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.20689655172413793,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 13,
+          "ticketOrders": 0,
+          "quotesSent": 20,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 98,
+          "ticketOrders": 7,
+          "quotesSent": 280,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07142857142857142,
+          "quoteQ2O": 0.007142857142857143
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 155,
+          "ticketOrders": 9,
+          "quotesSent": 553,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.05806451612903226,
+          "quoteQ2O": 0.009041591320072333
+        },
+        {
+          "date": "2026-09-01",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 90,
+          "ticketOrders": 3,
+          "quotesSent": 273,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.03333333333333333,
+          "quoteQ2O": 0.01098901098901099
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 7,
+          "ticketOrders": 0,
+          "quotesSent": 42,
+          "quoteOrders": 2,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.047619047619047616
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 36,
+          "ticketOrders": 1,
+          "quotesSent": 117,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.027777777777777776,
+          "quoteQ2O": 0.017094017094017096
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 29,
+          "ticketOrders": 0,
+          "quotesSent": 75,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 3,
+          "quotesSent": 57,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.13636363636363635,
+          "quoteQ2O": 0.07017543859649122
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 28,
+          "ticketOrders": 2,
+          "quotesSent": 75,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.07142857142857142,
+          "quoteQ2O": 0.05333333333333334
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 11,
+          "ticketOrders": 0,
+          "quotesSent": 18,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 97,
+          "ticketOrders": 5,
+          "quotesSent": 281,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.05154639175257732,
+          "quoteQ2O": 0.028469750889679714
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 151,
+          "ticketOrders": 6,
+          "quotesSent": 555,
+          "quoteOrders": 12,
+          "ticketQ2O": 0.039735099337748346,
+          "quoteQ2O": 0.021621621621621623
+        },
+        {
+          "date": "2026-09-02",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 79,
+          "ticketOrders": 1,
+          "quotesSent": 274,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.012658227848101266,
+          "quoteQ2O": 0.014598540145985401
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 21,
+          "ticketOrders": 3,
+          "quotesSent": 42,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.14285714285714285,
+          "quoteQ2O": 0.07142857142857142
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 46,
+          "ticketOrders": 4,
+          "quotesSent": 151,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.08695652173913043,
+          "quoteQ2O": 0.026490066225165563
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 33,
+          "ticketOrders": 2,
+          "quotesSent": 109,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.06060606060606061,
+          "quoteQ2O": 0.009174311926605505
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 17,
+          "ticketOrders": 3,
+          "quotesSent": 34,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.17647058823529413,
+          "quoteQ2O": 0.11764705882352941
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 26,
+          "ticketOrders": 4,
+          "quotesSent": 52,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.15384615384615385,
+          "quoteQ2O": 0.07692307692307693
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 11,
+          "ticketOrders": 0,
+          "quotesSent": 18,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 91,
+          "ticketOrders": 9,
+          "quotesSent": 276,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.0989010989010989,
+          "quoteQ2O": 0.028985507246376812
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 158,
+          "ticketOrders": 13,
+          "quotesSent": 599,
+          "quoteOrders": 9,
+          "ticketQ2O": 0.08227848101265822,
+          "quoteQ2O": 0.015025041736227046
+        },
+        {
+          "date": "2026-09-03",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 97,
+          "ticketOrders": 3,
+          "quotesSent": 323,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.030927835051546393,
+          "quoteQ2O": 0.0030959752321981426
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 20,
+          "ticketOrders": 1,
+          "quotesSent": 52,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05,
+          "quoteQ2O": 0.019230769230769232
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 37,
+          "ticketOrders": 2,
+          "quotesSent": 137,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.05405405405405406,
+          "quoteQ2O": 0.029197080291970802
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 24,
+          "ticketOrders": 1,
+          "quotesSent": 85,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.041666666666666664,
+          "quoteQ2O": 0.03529411764705882
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 13,
+          "ticketOrders": 1,
+          "quotesSent": 28,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0.07142857142857142
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 24,
+          "ticketOrders": 1,
+          "quotesSent": 54,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.041666666666666664,
+          "quoteQ2O": 0.05555555555555555
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 16,
+          "ticketOrders": 1,
+          "quotesSent": 26,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.0625,
+          "quoteQ2O": 0.038461538461538464
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 67,
+          "ticketOrders": 4,
+          "quotesSent": 220,
+          "quoteOrders": 7,
+          "ticketQ2O": 0.05970149253731343,
+          "quoteQ2O": 0.031818181818181815
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 125,
+          "ticketOrders": 5,
+          "quotesSent": 524,
+          "quoteOrders": 11,
+          "ticketQ2O": 0.04,
+          "quoteQ2O": 0.02099236641221374
+        },
+        {
+          "date": "2026-09-04",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 81,
+          "ticketOrders": 2,
+          "quotesSent": 304,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.024691358024691357,
+          "quoteQ2O": 0.013157894736842105
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 2,
+          "quotesSent": 70,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.02857142857142857
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 42,
+          "ticketOrders": 2,
+          "quotesSent": 136,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.047619047619047616,
+          "quoteQ2O": 0.014705882352941176
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 22,
+          "ticketOrders": 0,
+          "quotesSent": 66,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 13,
+          "ticketOrders": 1,
+          "quotesSent": 28,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 22,
+          "ticketOrders": 1,
+          "quotesSent": 44,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.045454545454545456,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 9,
+          "ticketOrders": 0,
+          "quotesSent": 16,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 100,
+          "ticketOrders": 5,
+          "quotesSent": 306,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.05,
+          "quoteQ2O": 0.016339869281045753
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 159,
+          "ticketOrders": 8,
+          "quotesSent": 544,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.050314465408805034,
+          "quoteQ2O": 0.009191176470588236
+        },
+        {
+          "date": "2026-09-05",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 84,
+          "ticketOrders": 0,
+          "quotesSent": 238,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 13,
+          "ticketOrders": 1,
+          "quotesSent": 55,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 26,
+          "ticketOrders": 1,
+          "quotesSent": 102,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.038461538461538464,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 13,
+          "ticketOrders": 0,
+          "quotesSent": 47,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 5,
+          "ticketOrders": 0,
+          "quotesSent": 18,
+          "quoteOrders": 3,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.16666666666666666
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 14,
+          "ticketOrders": 0,
+          "quotesSent": 31,
+          "quoteOrders": 3,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.0967741935483871
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 9,
+          "ticketOrders": 0,
+          "quotesSent": 13,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 66,
+          "ticketOrders": 3,
+          "quotesSent": 166,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.045454545454545456,
+          "quoteQ2O": 0.030120481927710843
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 108,
+          "ticketOrders": 6,
+          "quotesSent": 354,
+          "quoteOrders": 9,
+          "ticketQ2O": 0.05555555555555555,
+          "quoteQ2O": 0.025423728813559324
+        },
+        {
+          "date": "2026-09-06",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 55,
+          "ticketOrders": 4,
+          "quotesSent": 188,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.07272727272727272,
+          "quoteQ2O": 0.02127659574468085
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 26,
+          "ticketOrders": 2,
+          "quotesSent": 53,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07692307692307693,
+          "quoteQ2O": 0.03773584905660377
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 53,
+          "ticketOrders": 4,
+          "quotesSent": 149,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.07547169811320754,
+          "quoteQ2O": 0.020134228187919462
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 35,
+          "ticketOrders": 2,
+          "quotesSent": 96,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05714285714285714,
+          "quoteQ2O": 0.010416666666666666
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 20,
+          "ticketOrders": 4,
+          "quotesSent": 34,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.2,
+          "quoteQ2O": 0.11764705882352941
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 33,
+          "ticketOrders": 4,
+          "quotesSent": 54,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.12121212121212122,
+          "quoteQ2O": 0.07407407407407407
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 14,
+          "ticketOrders": 0,
+          "quotesSent": 20,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 103,
+          "ticketOrders": 7,
+          "quotesSent": 300,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.06796116504854369,
+          "quoteQ2O": 0.02666666666666667
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 178,
+          "ticketOrders": 9,
+          "quotesSent": 618,
+          "quoteOrders": 10,
+          "ticketQ2O": 0.05056179775280899,
+          "quoteQ2O": 0.016181229773462782
+        },
+        {
+          "date": "2026-09-07",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 102,
+          "ticketOrders": 2,
+          "quotesSent": 318,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.0196078431372549,
+          "quoteQ2O": 0.006289308176100629
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 31,
+          "ticketOrders": 1,
+          "quotesSent": 97,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.03225806451612903,
+          "quoteQ2O": 0.010309278350515464
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 46,
+          "ticketOrders": 1,
+          "quotesSent": 168,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.021739130434782608,
+          "quoteQ2O": 0.005952380952380952
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 23,
+          "ticketOrders": 0,
+          "quotesSent": 71,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 19,
+          "ticketOrders": 4,
+          "quotesSent": 27,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.21052631578947367,
+          "quoteQ2O": 0.037037037037037035
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 24,
+          "ticketOrders": 4,
+          "quotesSent": 36,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.16666666666666666,
+          "quoteQ2O": 0.027777777777777776
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 6,
+          "ticketOrders": 0,
+          "quotesSent": 9,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 121,
+          "ticketOrders": 11,
+          "quotesSent": 368,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.005434782608695652
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 178,
+          "ticketOrders": 10,
+          "quotesSent": 599,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.056179775280898875,
+          "quoteQ2O": 0.00333889816360601
+        },
+        {
+          "date": "2026-09-08",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 87,
+          "ticketOrders": 0,
+          "quotesSent": 231,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 41,
+          "ticketOrders": 4,
+          "quotesSent": 146,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.0975609756097561,
+          "quoteQ2O": 0.03424657534246575
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 55,
+          "ticketOrders": 4,
+          "quotesSent": 234,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.07272727272727272,
+          "quoteQ2O": 0.02564102564102564
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 25,
+          "ticketOrders": 1,
+          "quotesSent": 88,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.04,
+          "quoteQ2O": 0.011363636363636364
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 33,
+          "ticketOrders": 3,
+          "quotesSent": 96,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.041666666666666664
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 42,
+          "ticketOrders": 3,
+          "quotesSent": 117,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.07142857142857142,
+          "quoteQ2O": 0.03418803418803419
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 12,
+          "ticketOrders": 0,
+          "quotesSent": 21,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 109,
+          "ticketOrders": 9,
+          "quotesSent": 448,
+          "quoteOrders": 11,
+          "ticketQ2O": 0.08256880733944955,
+          "quoteQ2O": 0.024553571428571428
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 158,
+          "ticketOrders": 10,
+          "quotesSent": 745,
+          "quoteOrders": 12,
+          "ticketQ2O": 0.06329113924050633,
+          "quoteQ2O": 0.016107382550335572
+        },
+        {
+          "date": "2026-09-09",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 79,
+          "ticketOrders": 0,
+          "quotesSent": 297,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.003367003367003367
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 25,
+          "ticketOrders": 1,
+          "quotesSent": 78,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.04,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 51,
+          "ticketOrders": 3,
+          "quotesSent": 168,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.058823529411764705,
+          "quoteQ2O": 0.011904761904761904
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 30,
+          "ticketOrders": 2,
+          "quotesSent": 90,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.06666666666666667,
+          "quoteQ2O": 0.022222222222222223
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 26,
+          "ticketOrders": 4,
+          "quotesSent": 56,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.15384615384615385,
+          "quoteQ2O": 0.07142857142857142
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 34,
+          "ticketOrders": 4,
+          "quotesSent": 78,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.11764705882352941,
+          "quoteQ2O": 0.05128205128205128
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 11,
+          "ticketOrders": 0,
+          "quotesSent": 22,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 117,
+          "ticketOrders": 10,
+          "quotesSent": 353,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.08547008547008547,
+          "quoteQ2O": 0.014164305949008499
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 165,
+          "ticketOrders": 11,
+          "quotesSent": 651,
+          "quoteOrders": 7,
+          "ticketQ2O": 0.06666666666666667,
+          "quoteQ2O": 0.010752688172043012
+        },
+        {
+          "date": "2026-09-10",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 77,
+          "ticketOrders": 3,
+          "quotesSent": 298,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.03896103896103896,
+          "quoteQ2O": 0.006711409395973154
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 30,
+          "ticketOrders": 1,
+          "quotesSent": 83,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.03333333333333333,
+          "quoteQ2O": 0.024096385542168676
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 54,
+          "ticketOrders": 2,
+          "quotesSent": 160,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.037037037037037035,
+          "quoteQ2O": 0.01875
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 28,
+          "ticketOrders": 1,
+          "quotesSent": 77,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.03571428571428571,
+          "quoteQ2O": 0.012987012987012988
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 34,
+          "ticketOrders": 3,
+          "quotesSent": 77,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.08823529411764706,
+          "quoteQ2O": 0.06493506493506493
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 43,
+          "ticketOrders": 3,
+          "quotesSent": 108,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.06976744186046512,
+          "quoteQ2O": 0.046296296296296294
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 16,
+          "ticketOrders": 0,
+          "quotesSent": 31,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 125,
+          "ticketOrders": 7,
+          "quotesSent": 382,
+          "quoteOrders": 11,
+          "ticketQ2O": 0.056,
+          "quoteQ2O": 0.028795811518324606
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 183,
+          "ticketOrders": 10,
+          "quotesSent": 643,
+          "quoteOrders": 15,
+          "ticketQ2O": 0.0546448087431694,
+          "quoteQ2O": 0.02332814930015552
+        },
+        {
+          "date": "2026-09-11",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 84,
+          "ticketOrders": 3,
+          "quotesSent": 261,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.03571428571428571,
+          "quoteQ2O": 0.01532567049808429
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 22,
+          "ticketOrders": 3,
+          "quotesSent": 98,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.13636363636363635,
+          "quoteQ2O": 0.030612244897959183
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 33,
+          "ticketOrders": 3,
+          "quotesSent": 211,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.09090909090909091,
+          "quoteQ2O": 0.018957345971563982
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 24,
+          "ticketOrders": 0,
+          "quotesSent": 113,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.008849557522123894
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 26,
+          "ticketOrders": 4,
+          "quotesSent": 84,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.15384615384615385,
+          "quoteQ2O": 0.07142857142857142
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 32,
+          "ticketOrders": 4,
+          "quotesSent": 96,
+          "quoteOrders": 6,
+          "ticketQ2O": 0.125,
+          "quoteQ2O": 0.0625
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 9,
+          "ticketOrders": 0,
+          "quotesSent": 12,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 101,
+          "ticketOrders": 5,
+          "quotesSent": 423,
+          "quoteOrders": 13,
+          "ticketQ2O": 0.04950495049504951,
+          "quoteQ2O": 0.030732860520094562
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 153,
+          "ticketOrders": 6,
+          "quotesSent": 703,
+          "quoteOrders": 14,
+          "ticketQ2O": 0.0392156862745098,
+          "quoteQ2O": 0.01991465149359886
+        },
+        {
+          "date": "2026-09-12",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 81,
+          "ticketOrders": 1,
+          "quotesSent": 280,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.012345679012345678,
+          "quoteQ2O": 0.0035714285714285713
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 23,
+          "ticketOrders": 0,
+          "quotesSent": 67,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 29,
+          "ticketOrders": 0,
+          "quotesSent": 125,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 12,
+          "ticketOrders": 0,
+          "quotesSent": 58,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 7,
+          "ticketOrders": 0,
+          "quotesSent": 16,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 14,
+          "ticketOrders": 0,
+          "quotesSent": 29,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 8,
+          "ticketOrders": 0,
+          "quotesSent": 13,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 83,
+          "ticketOrders": 0,
+          "quotesSent": 221,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 106,
+          "ticketOrders": 1,
+          "quotesSent": 392,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.009433962264150943,
+          "quoteQ2O": 0.00510204081632653
+        },
+        {
+          "date": "2026-09-13",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 39,
+          "ticketOrders": 1,
+          "quotesSent": 171,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.02564102564102564,
+          "quoteQ2O": 0.011695906432748537
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 19,
+          "ticketOrders": 1,
+          "quotesSent": 60,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05263157894736842,
+          "quoteQ2O": 0.016666666666666666
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 29,
+          "ticketOrders": 1,
+          "quotesSent": 127,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.034482758620689655,
+          "quoteQ2O": 0.007874015748031496
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 16,
+          "ticketOrders": 0,
+          "quotesSent": 67,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 15,
+          "ticketOrders": 2,
+          "quotesSent": 31,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.13333333333333333,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 23,
+          "ticketOrders": 2,
+          "quotesSent": 56,
+          "quoteOrders": 0,
+          "ticketQ2O": 0.08695652173913043,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 10,
+          "ticketOrders": 0,
+          "quotesSent": 25,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 93,
+          "ticketOrders": 3,
+          "quotesSent": 246,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.03225806451612903,
+          "quoteQ2O": 0.008130081300813009
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 134,
+          "ticketOrders": 5,
+          "quotesSent": 517,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.03731343283582089,
+          "quoteQ2O": 0.007736943907156673
+        },
+        {
+          "date": "2026-09-14",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 64,
+          "ticketOrders": 2,
+          "quotesSent": 271,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.03125,
+          "quoteQ2O": 0.007380073800738007
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 20,
+          "ticketOrders": 2,
+          "quotesSent": 70,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.1,
+          "quoteQ2O": 0.02857142857142857
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 35,
+          "ticketOrders": 3,
+          "quotesSent": 148,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.08571428571428572,
+          "quoteQ2O": 0.02027027027027027
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 20,
+          "ticketOrders": 1,
+          "quotesSent": 78,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.05,
+          "quoteQ2O": 0.01282051282051282
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 34,
+          "ticketOrders": 0,
+          "quotesSent": 55,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.01818181818181818
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 47,
+          "ticketOrders": 0,
+          "quotesSent": 86,
+          "quoteOrders": 1,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0.011627906976744186
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 17,
+          "ticketOrders": 0,
+          "quotesSent": 31,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 106,
+          "ticketOrders": 5,
+          "quotesSent": 307,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.04716981132075472,
+          "quoteQ2O": 0.016286644951140065
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 172,
+          "ticketOrders": 10,
+          "quotesSent": 593,
+          "quoteOrders": 8,
+          "ticketQ2O": 0.05813953488372093,
+          "quoteQ2O": 0.013490725126475547
+        },
+        {
+          "date": "2026-09-15",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 95,
+          "ticketOrders": 5,
+          "quotesSent": 286,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.05263157894736842,
+          "quoteQ2O": 0.01048951048951049
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 23,
+          "ticketOrders": 0,
+          "quotesSent": 66,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 57,
+          "ticketOrders": 4,
+          "quotesSent": 207,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.07017543859649122,
+          "quoteQ2O": 0.00966183574879227
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 43,
+          "ticketOrders": 4,
+          "quotesSent": 141,
+          "quoteOrders": 2,
+          "ticketQ2O": 0.09302325581395349,
+          "quoteQ2O": 0.014184397163120567
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 53,
+          "ticketOrders": 3,
+          "quotesSent": 84,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.05660377358490566,
+          "quoteQ2O": 0.047619047619047616
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 70,
+          "ticketOrders": 5,
+          "quotesSent": 116,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.07142857142857142,
+          "quoteQ2O": 0.04310344827586207
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 21,
+          "ticketOrders": 2,
+          "quotesSent": 32,
+          "quoteOrders": 1,
+          "ticketQ2O": 0.09523809523809523,
+          "quoteQ2O": 0.03125
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 111,
+          "ticketOrders": 3,
+          "quotesSent": 339,
+          "quoteOrders": 7,
+          "ticketQ2O": 0.02702702702702703,
+          "quoteQ2O": 0.02064896755162242
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 184,
+          "ticketOrders": 8,
+          "quotesSent": 726,
+          "quoteOrders": 11,
+          "ticketQ2O": 0.043478260869565216,
+          "quoteQ2O": 0.015151515151515152
+        },
+        {
+          "date": "2026-09-16",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 110,
+          "ticketOrders": 6,
+          "quotesSent": 387,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.05454545454545454,
+          "quoteQ2O": 0.0103359173126615
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "DIY Maldives",
+          "setup": "Land only",
+          "ticketQueries": 31,
+          "ticketOrders": 0,
+          "quotesSent": 85,
+          "quoteOrders": 0,
+          "ticketQ2O": 0,
+          "quoteQ2O": 0
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "DIY Maldives",
+          "setup": "Overall",
+          "ticketQueries": 59,
+          "ticketOrders": 3,
+          "quotesSent": 179,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.05084745762711865,
+          "quoteQ2O": 0.027932960893854747
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "DIY Maldives",
+          "setup": "With flight",
+          "ticketQueries": 37,
+          "ticketOrders": 3,
+          "quotesSent": 94,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.08108108108108109,
+          "quoteQ2O": 0.05319148936170213
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "Hotel config",
+          "setup": "Land only",
+          "ticketQueries": 51,
+          "ticketOrders": 2,
+          "quotesSent": 99,
+          "quoteOrders": 3,
+          "ticketQ2O": 0.0392156862745098,
+          "quoteQ2O": 0.030303030303030304
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "Hotel config",
+          "setup": "Overall",
+          "ticketQueries": 48,
+          "ticketOrders": 2,
+          "quotesSent": 104,
+          "quoteOrders": 4,
+          "ticketQ2O": 0.041666666666666664,
+          "quoteQ2O": 0.038461538461538464
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "Hotel config",
+          "setup": "With flight",
+          "ticketQueries": 0,
+          "ticketOrders": 0,
+          "quotesSent": 5,
+          "quoteOrders": 1,
+          "ticketQ2O": null,
+          "quoteQ2O": 0.2
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "Overall Maldives",
+          "setup": "Land only",
+          "ticketQueries": 135,
+          "ticketOrders": 4,
+          "quotesSent": 389,
+          "quoteOrders": 5,
+          "ticketQ2O": 0.02962962962962963,
+          "quoteQ2O": 0.012853470437017995
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "Overall Maldives",
+          "setup": "Overall",
+          "ticketQueries": 186,
+          "ticketOrders": 7,
+          "quotesSent": 660,
+          "quoteOrders": 12,
+          "ticketQ2O": 0.03763440860215054,
+          "quoteQ2O": 0.01818181818181818
+        },
+        {
+          "date": "2026-09-17",
+          "cohort": "Overall Maldives",
+          "setup": "With flight",
+          "ticketQueries": 86,
+          "ticketOrders": 3,
+          "quotesSent": 271,
+          "quoteOrders": 7,
+          "ticketQ2O": 0.03488372093023256,
+          "quoteQ2O": 0.025830258302583026
+        }
+      ],
+      "methods": [
+        {
+          "language": "JavaScript",
+          "code": "The app first filters daily rows to the selected month (or all available months), then selects Overall, Land only, or With flight rows for Hotel config, DIY Maldives, and Overall Maldives. Land-only and with-flight views also retain the explicit Overall Maldives / Overall rows as the common benchmark. For each Q2O point, divide the selected numerator by its denominator. For each trailing seven-calendar-day point d, sum numerator and denominator from d-6 through d and divide the sums; missing cohort-day rows contribute neither numerator nor denominator. The first six dates in the selected period are omitted."
+        }
+      ],
+      "source": {
+        "label": "Holiday Dash Maldives ticket and quote conversion aggregate",
+        "href": "http://holiday-dash.mmt.com/queries/4952/source",
+        "queryUrl": "http://holiday-dash.mmt.com/queries/4952/source",
+        "sql": "{\n  \"collection\": \"userQuotePackage\",\n  \"fields\": {\n    \"date\": 1,\n    \"ticketId\": 2,\n    \"quoteId\": 3,\n    \"isBookedQuote\": 4,\n    \"packageId\": 5,\n    \"taggedDestination\": 6,\n    \"flightComponent\": 7\n  },\n  \"aggregate\": [\n    {\n      \"$match\": {\n        \"_id\": {\n          \"$gte\": {\n            \"$oid\": \"6a7775a80000000000000000\"\n          },\n          \"$lt\": {\n            \"$oid\": \"6aad83280000000000000000\"\n          }\n        },\n        \"$or\": [\n          {\n            \"packageDetail.id\": {\n              \"$in\": [\n                63747,\n                63748,\n                63861,\n                63862\n              ]\n            }\n          },\n          {\n            \"packageDetail.tagDestination.name\": \"Maldives\"\n          }\n        ]\n      }\n    },\n    {\n      \"$project\": {\n        \"_id\": 0,\n        \"date\": {\n          \"$dateToString\": {\n            \"format\": \"%Y-%m-%d\",\n            \"date\": {\n              \"$toDate\": \"$_id\"\n            },\n            \"timezone\": \"+05:30\"\n          }\n        },\n        \"ticketId\": {\n          \"$toString\": \"$ticketId\"\n        },\n        \"quoteId\": {\n          \"$toString\": \"$quoteId\"\n        },\n        \"isBookedQuote\": {\n          \"$cond\": [\n            \"$isBookedQuote\",\n            1,\n            0\n          ]\n        },\n        \"packageId\": \"$packageDetail.id\",\n        \"taggedDestination\": \"$packageDetail.tagDestination.name\",\n        \"flightComponent\": \"$packageDetail.flightDetail.component\"\n      }\n    }\n  ]\n}",
+        "tables": [
+          {
+            "name": "userQuotePackage",
+            "href": "http://holiday-dash.mmt.com/queries/4941/source"
+          }
+        ],
+        "filters": [
+          "First observed quote date: 2026-08-09 00:00 IST through 2026-09-17 23:59 IST",
+          "Configured Hotel package IDs: 63747, 63748, 63861, 63862",
+          "Overall Maldives: packageDetail.tagDestination.name = Maldives",
+          "DIY Maldives: packageDetail.tagDestination.name = Maldives and packageDetail.id = 0",
+          "With flight: packageDetail.flightDetail.component = FLIGHT; all remaining rows are Land only",
+          "Overall: independently deduplicated across Land only and With flight for each cohort; distinct tickets are not added across setups",
+          "Rows missing ticketId or quoteId are excluded from both conversion denominators"
+        ],
+        "coverage": {
+          "startDate": "2026-08-09",
+          "endDate": "2026-09-17",
+          "timezone": "Asia/Kolkata",
+          "grain": "day × cohort × setup"
+        },
+        "metricDefinitions": [
+          {
+            "label": "Ticket Q2O",
+            "definition": "Unique booked ticket IDs divided by unique ticket IDs for the same cohort and setup. A ticket is booked when any of its quotes has isBookedQuote true, and is assigned to its first observed quote date in the reporting window.",
+            "formula": "ticketOrders / ticketQueries",
+            "dependencies": [
+              "ticketOrders",
+              "ticketQueries"
+            ],
+            "numerator": {
+              "field": "ticketOrders",
+              "label": "Booked tickets"
+            },
+            "denominator": {
+              "field": "ticketQueries",
+              "label": "Unique tickets"
+            },
+            "componentIds": [
+              "q2o-headline",
+              "seven-day-q2o-trend",
+              "daily-q2o-trend",
+              "quotes-sent-trend",
+              "bookings-made-trend",
+              "cohort-scorecard",
+              "benchmark-context",
+              "daily-performance"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Quote Q2O",
+            "definition": "Distinct booked quote IDs divided by distinct quote IDs for the same cohort and setup. A quote is booked when isBookedQuote is true, and is assigned to its first observed date in the reporting window.",
+            "formula": "quoteOrders / quotesSent",
+            "dependencies": [
+              "quoteOrders",
+              "quotesSent"
+            ],
+            "numerator": {
+              "field": "quoteOrders",
+              "label": "Booked quotes"
+            },
+            "denominator": {
+              "field": "quotesSent",
+              "label": "Quotes sent"
+            },
+            "componentIds": [
+              "q2o-headline",
+              "seven-day-q2o-trend",
+              "daily-q2o-trend",
+              "quotes-sent-trend",
+              "bookings-made-trend",
+              "cohort-scorecard",
+              "benchmark-context",
+              "daily-performance"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Unique tickets",
+            "definition": "Distinct non-empty ticketId values. Each ticket is counted once within a cohort and setup and assigned to its first observed quote date.",
+            "variable": "ticketQueries",
+            "componentIds": [
+              "queries-headline",
+              "cohort-scorecard",
+              "daily-performance"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Booked tickets",
+            "definition": "Distinct ticketId values with at least one isBookedQuote = true.",
+            "variable": "ticketOrders",
+            "componentIds": [
+              "orders-headline",
+              "bookings-made-trend",
+              "cohort-scorecard",
+              "daily-performance"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Quotes sent",
+            "definition": "Distinct non-empty quoteId values assigned to their first observed date.",
+            "variable": "quotesSent",
+            "componentIds": [
+              "queries-headline",
+              "quotes-sent-trend",
+              "cohort-scorecard",
+              "daily-performance"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Booked quotes",
+            "definition": "Distinct quoteId values with isBookedQuote = true.",
+            "variable": "quoteOrders",
+            "componentIds": [
+              "orders-headline",
+              "cohort-scorecard",
+              "daily-performance"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "7-day rolling Q2O",
+            "definition": "Trailing seven-calendar-day numerator divided by trailing seven-calendar-day denominator for the selected Ticket or Quote Q2O view. This is a weighted conversion rate, not an arithmetic mean of daily percentages.",
+            "formula": "SUM(numerator, trailing 7 days) / SUM(denominator, trailing 7 days)",
+            "dependencies": [
+              "ticketOrders",
+              "ticketQueries",
+              "quoteOrders",
+              "quotesSent"
+            ],
+            "componentIds": [
+              "seven-day-q2o-trend"
+            ],
+            "sourceLineage": [
+              {
+                "tables": [
+                  "userQuotePackage"
+                ]
+              }
+            ]
+          }
+        ],
+        "method": "The custom Mongo aggregate filters the reporting window, creates Hotel config, DIY Maldives, and Overall Maldives memberships for Land only, With flight, and an independently deduplicated Overall setup, then deduplicates quoteId and ticketId within each membership. Tickets and quotes are assigned to their first observed date; booking status is the maximum isBookedQuote flag. The month selector filters these reviewed daily rows before every dashboard rollup.",
+        "evidenceFlow": [
+          {
+            "title": "Source schema",
+            "detail": "Holiday Dash query 4941 confirmed ticketId, quoteId, isBookedQuote, packageDetail.id, tag destination, and flight component fields in userQuotePackage."
+          },
+          {
+            "title": "Custom aggregate",
+            "detail": "Executed on Holiday Dash data source 18 with max_age 0; saved as query 4952."
+          },
+          {
+            "title": "Reviewed output",
+            "detail": "Result 6131807,6131813,6131819,6131828,6131834,6131840 returned 340 daily cohort-setup rows in 609.047860383988 seconds."
+          }
+        ],
+        "retrievedAt": "2026-09-18T10:30:49.208Z",
+        "runtimeSeconds": 609.047860383988,
+        "resultId": "6131807,6131813,6131819,6131828,6131834,6131840"
+      }
+    }
+  }
+}

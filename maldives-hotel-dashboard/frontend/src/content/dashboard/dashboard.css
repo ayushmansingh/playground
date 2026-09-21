@@ -1,0 +1,169 @@
+.maldives-dashboard {
+  --data-app-content-width: var(--data-app-dashboard-content-width);
+  --data-app-layout-intent: standard;
+  --data-app-layout-gutter: var(--data-app-dashboard-gutter);
+  max-width: calc(var(--data-app-content-width) + 2 * var(--data-app-layout-gutter));
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.maldives-hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 34px 0 26px;
+  border-bottom: 1px solid var(--border);
+}
+
+.maldives-kicker {
+  margin: 0 0 8px;
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.maldives-hero h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 650;
+  letter-spacing: -.055em;
+  line-height: 1;
+}
+
+.maldives-subtitle {
+  max-width: 700px;
+  margin: 14px 0 0;
+  color: var(--secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.maldives-period {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 5px;
+  min-width: 205px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--data-card-radius);
+  background: color-mix(in srgb, var(--card-surface) 86%, var(--muted));
+}
+
+.maldives-period span, .maldives-period small { color: var(--secondary); font-size: 12px; }
+.maldives-period strong { color: var(--text); font-size: 13px; font-variant-numeric: tabular-nums; }
+.maldives-empty { margin: 20px 0; color: var(--secondary); font-size: 13px; line-height: 1.5; }
+
+.maldives-control-group {
+  display: grid;
+  gap: 6px;
+  min-width: min(100%, 280px);
+}
+
+.maldives-control-group > span {
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .02em;
+}
+
+.maldives-benchmark-list { display: grid; gap: 20px; margin: 0; }
+
+.maldives-benchmark-list div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.maldives-benchmark-list div:last-child { padding-bottom: 0; border-bottom: 0; }
+.maldives-benchmark-list dt { color: var(--text); font-size: 14px; }
+.maldives-benchmark-list dd { margin: 0; color: var(--text); font-size: 18px; font-variant-numeric: tabular-nums; }
+.maldives-benchmark-list small { grid-column: 1 / -1; color: var(--secondary); font-size: 12px; }
+
+.maldives-method {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.maldives-method > div { min-width: 0; }
+.maldives-method span { display: block; margin-bottom: 7px; color: var(--secondary); font-size: 12px; }
+.maldives-method strong { color: var(--text); font-size: 14px; font-weight: 600; }
+.maldives-method p { margin: 7px 0 0; color: var(--secondary); font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 760px) {
+  .maldives-hero { align-items: stretch; flex-direction: column; gap: 20px; padding-top: 24px; }
+  .maldives-period { min-width: 0; }
+  .maldives-dashboard .filters.filter-bar {
+    align-items: stretch;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .maldives-control-group { min-width: 100%; }
+  .maldives-method { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .maldives-method { grid-template-columns: 1fr; }
+}
+.maldives-refresh-strip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 36px;
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+.maldives-refresh-button {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--primary);
+  padding: 7px 12px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.maldives-refresh-button:hover:not(:disabled) {
+  background: var(--surface-muted);
+}
+
+.maldives-refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.maldives-refresh-message {
+  max-width: 420px;
+}
+
+.maldives-refresh-message.is-failed {
+  color: var(--negative);
+}
+
+.maldives-stale-notice {
+  max-width: 460px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--negative) 35%, var(--border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--negative) 8%, var(--surface));
+  color: var(--negative);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .maldives-refresh-strip {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
