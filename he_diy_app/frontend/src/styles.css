@@ -234,6 +234,7 @@ h1, h2, h3, p, dl, dd, figure { margin: 0; }
 }
 .freshness.is-stale .freshness__dot { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
 .freshness__caret { font-size: 10px; color: var(--ink-3); }
+.freshness__sync { font-style: normal; color: var(--ink-3); }
 
 .source-panel { border-top: 1px solid var(--line); background: var(--surface-2); }
 .source-panel__inner {

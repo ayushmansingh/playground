@@ -35,3 +35,4 @@ export function fetchDashboard(filters, signal) {
 
 export const refreshRedash = () => request("/api/refresh", { method: "POST" });
 export const fetchHealth = () => request("/api/health");
+export const fetchSync = () => request("/api/sync");

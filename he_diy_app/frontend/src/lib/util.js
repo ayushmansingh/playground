@@ -118,10 +118,25 @@ export function shiftDays(value, days) {
   return date.toISOString().slice(0, 10);
 }
 
+/* Future-aware: a scheduled next-attempt time is ahead of now, and the past
+   tense wording would read as "just now" for something an hour away. */
+export function relativeFuture(value) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  const seconds = Math.round((parsed.getTime() - Date.now()) / 1000);
+  if (seconds <= 0) return "due now";
+  if (seconds < 90) return "in under a minute";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `in ${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  return hours === 1 ? "in about an hour" : `in about ${hours} hr`;
+}
+
 export function relativeTime(value) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return null;
   const seconds = Math.round((Date.now() - parsed.getTime()) / 1000);
+  if (seconds < 0) return relativeFuture(value);
   if (seconds < 90) return "just now";
   const minutes = Math.round(seconds / 60);
   if (minutes < 60) return `${minutes} min ago`;

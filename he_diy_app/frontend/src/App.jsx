@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DayView from "./views/DayView.jsx";
 import AgentView from "./views/AgentView.jsx";
 import { useDashboard } from "./hooks/useDashboard.js";
-import { refreshRedash } from "./lib/api.js";
+import { fetchSync, refreshRedash } from "./lib/api.js";
 import { describeRefreshFailure } from "./lib/diagnose.js";
 import { hideTooltip } from "./lib/charts.js";
-import { METRIC_LABELS, RATE_LABELS, formatDayShort, num, relativeTime, shiftDays } from "./lib/util.js";
+import { METRIC_LABELS, RATE_LABELS, formatDayShort, num, relativeFuture, relativeTime, shiftDays } from "./lib/util.js";
 
 const THEMES = ["system", "light", "dark"];
 const THEME_ICON = { system: "◐", light: "☀", dark: "☾" };
@@ -65,6 +65,26 @@ export default function App() {
       },
     }));
   }, [data]);
+
+  /* The server refreshes on a timer, so the page has to notice when new data
+     lands. A small poll of /api/sync is enough: if the last success moves, the
+     dashboard is reloaded. Deliberately not a socket -- this is one tiny JSON
+     request every couple of minutes, and it stops while the tab is hidden. */
+  const lastSuccess = data?.sync?.last_success ?? null;
+  useEffect(() => {
+    if (!data?.sync?.enabled) return undefined;
+    const tick = async () => {
+      if (document.hidden) return;
+      try {
+        const state = await fetchSync();
+        if (state.last_success && state.last_success !== lastSuccess) reload();
+      } catch {
+        /* a failed poll is not worth surfacing; the next one will do */
+      }
+    };
+    const timer = setInterval(tick, 120000);
+    return () => clearInterval(timer);
+  }, [data?.sync?.enabled, lastSuccess, reload]);
 
   useEffect(() => {
     const onKey = (event) => {
@@ -161,6 +181,8 @@ export default function App() {
   const retrieved = sources["172937"]?.metadata?.retrieved_at;
   const stale = !retrieved || Number.isNaN(new Date(retrieved).getTime()) || Date.now() - new Date(retrieved).getTime() > 24 * 3600 * 1000;
   const sourceErrors = [sources["172937"]?.error, sources["174655"]?.error].filter(Boolean);
+  const sync = data?.sync;
+  const syncFailing = Boolean(sync?.enabled && sync.consecutive_failures > 0);
   const banner = notice || (error ? { tone: "error", message: error, steps: [], raw: "" } : sourceErrors.length ? { tone: "warn", message: sourceErrors.join(" "), steps: [], raw: "" } : null);
 
   return (
@@ -181,8 +203,17 @@ export default function App() {
 
           <div className="appbar__meta">
             <button className="freshness" type="button" aria-expanded={sourcesOpen} onClick={() => setSourcesOpen((open) => !open)}>
-              <span className={`freshness__dot${stale ? " is-stale" : ""}`} aria-hidden="true" />
-              <span>{retrieved ? `Snapshot · ${relativeTime(retrieved) || "loaded"}` : "Snapshot loaded"}</span>
+              <span className={`freshness__dot${stale || syncFailing ? " is-stale" : ""}`} aria-hidden="true" />
+              <span>
+                {retrieved ? `Snapshot · ${relativeTime(retrieved) || "loaded"}` : "Snapshot loaded"}
+                {sync?.enabled && (
+                  <em className="freshness__sync">
+                    {syncFailing
+                      ? ` · sync failing (${sync.consecutive_failures})`
+                      : ` · auto every ${sync.interval_minutes}m`}
+                  </em>
+                )}
+              </span>
               <span className="freshness__caret" aria-hidden="true">▾</span>
             </button>
           </div>
@@ -214,6 +245,32 @@ export default function App() {
         {sourcesOpen && (
           <div className="source-panel">
             <div className="source-panel__inner">
+              {sync && (
+                <div className="source-card">
+                  <div className="source-card__head">
+                    <strong>Automatic refresh</strong>
+                    <span className="source-card__badge">
+                      {!sync.enabled ? (sync.reason === "disabled" ? "off" : "no key") : syncFailing ? "failing" : "on"}
+                    </span>
+                  </div>
+                  <dl>
+                    <div><dt>Every</dt><dd>{sync.enabled ? `${sync.interval_minutes} minutes` : "—"}</dd></div>
+                    <div><dt>Last success</dt><dd>{sync.last_success ? `${relativeTime(sync.last_success) || sync.last_success}` : "never"}</dd></div>
+                    <div><dt>Last attempt</dt><dd>{sync.last_attempt ? `${relativeTime(sync.last_attempt) || sync.last_attempt}` : "none yet"}</dd></div>
+                    {sync.enabled && (
+                      <div>
+                        <dt>Next attempt</dt>
+                        <dd>
+                          {sync.next_attempt ? relativeFuture(sync.next_attempt) || sync.next_attempt : `within ${sync.next_interval_minutes}m`}
+                          {sync.backing_off ? ` (backed off to ${sync.next_interval_minutes}m)` : ""}
+                        </dd>
+                      </div>
+                    )}
+                    <div><dt>Snapshots kept</dt><dd>{sync.retention}</dd></div>
+                  </dl>
+                  {sync.last_error && <p className="source-card__error">{sync.last_error}</p>}
+                </div>
+              )}
               {["172937", "174655"].map((id) => {
                 const source = sources[id] || {};
                 const meta = source.metadata || {};

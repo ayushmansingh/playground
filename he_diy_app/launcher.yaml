@@ -66,6 +66,33 @@ settings:
       30 and 3600.
     default: 900
 
+  - name: SYNC_ENABLED
+    description: >-
+      Refresh the data automatically on a timer. Needs a Redash key; without
+      one the schedule stays idle whatever this is set to. Set to false to
+      leave refreshing to the button.
+    default: "true"
+
+  - name: SYNC_INTERVAL_MINUTES
+    description: >-
+      Minutes between automatic refreshes. Between 5 and 1440. After a failed
+      attempt the wait doubles, up to six times this, and resets on success,
+      so a broken upstream is not queried every interval forever.
+    default: 60
+
+  - name: SYNC_ON_STARTUP
+    description: >-
+      Also refresh immediately when the app starts. Left off so a redeploy
+      does not fire a query every time; the first scheduled run happens one
+      interval later.
+    default: "false"
+
+  - name: SNAPSHOT_RETENTION
+    description: >-
+      How many refreshed snapshots to keep in the data directory. Older ones
+      are deleted after each successful refresh. Between 2 and 500.
+    default: 48
+
   - name: REDASH_VERIFY_TLS
     description: >-
       Verify the Redash TLS certificate. Leave as true. Set to false only for

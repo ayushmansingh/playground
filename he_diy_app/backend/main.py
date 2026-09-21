@@ -24,20 +24,28 @@ Design notes that matter for deployment:
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 import csv
 import json
+import logging
 import os
+import shutil
 import ssl
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, FastAPI, Query
 from fastapi.middleware.gzip import GZipMiddleware
+
+# A child of uvicorn's logger, so sync activity lands in the server log the
+# operator is already reading rather than vanishing into an unhandled logger.
+log = logging.getLogger("uvicorn.error").getChild("sync")
 
 APP_ROOT = Path(__file__).resolve().parent
 
@@ -73,14 +81,60 @@ REDASH_VERIFY_TLS = (os.environ.get("REDASH_VERIFY_TLS") or "true").strip().lowe
 PAGE_SIZE = env_int("PAGE_SIZE", 100, 1, 500)
 REDASH_TIMEOUT_SECONDS = env_int("REDASH_TIMEOUT_SECONDS", 900, 30, 3600)
 
+
+def env_flag(name: str, fallback: bool) -> bool:
+    raw = str(os.environ.get(name, "")).strip().lower()
+    if not raw:
+        return fallback
+    return raw not in ("0", "false", "no", "off")
+
+
+# Background sync. Without a key the loop never starts, since there is nothing
+# it could do.
+SYNC_ENABLED = env_flag("SYNC_ENABLED", True)
+SYNC_INTERVAL_MINUTES = env_int("SYNC_INTERVAL_MINUTES", 60, 5, 1440)
+SYNC_ON_STARTUP = env_flag("SYNC_ON_STARTUP", False)
+SNAPSHOT_RETENTION = env_int("SNAPSHOT_RETENTION", 48, 2, 500)
+
+# A failing refresh costs a Redash query every time it runs. When the upstream
+# tables are broken that failure repeats indefinitely, so the wait doubles on
+# each consecutive failure up to this many intervals, and resets on success.
+SYNC_BACKOFF_MAX_MULTIPLIER = 6
+
+SYNC_STATE_PATH = DATA_DIR / "sync_state.json"
+SYNC_LOCK_PATH = DATA_DIR / "sync.lock"
+
 QUERY_IDS = (172937, 174655)
 METRICS = ["created", "saved", "sent", "downloaded", "psm_detail", "psm_review", "checkout", "bookings"]
 FLAG_LABELS = {"0": "Old DIY", "1": "New DIY"}
 
+@contextlib.asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Start the background sync, and stop it cleanly on shutdown."""
+    task = None
+    if SYNC_ENABLED and redash_key():
+        task = asyncio.create_task(sync_loop())
+        log.info("Background sync every %s minutes.", SYNC_INTERVAL_MINUTES)
+    elif SYNC_ENABLED:
+        log.info("Background sync idle: no Redash API key configured.")
+    else:
+        log.info("Background sync disabled by SYNC_ENABLED.")
+    try:
+        yield
+    finally:
+        if task:
+            task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
+            # Never leave a lock behind for the next process to wait out.
+            SYNC_LOCK_PATH.unlink(missing_ok=True)
+
+
 app = FastAPI(
     title="HE DIY Performance Dashboard",
-    version="2.0.0",
+    version="2.1.0",
     description="Day-on-day and agent-level HE DIY funnel performance.",
+    lifespan=lifespan,
 )
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 
@@ -319,8 +373,35 @@ def run_redash_sql(headers: dict[str, str], data_source_id: int, sql: str, max_w
     raise TimeoutError(f"Timed out waiting for Redash job {job_id}: {last_job}")
 
 
+def prune_snapshots(keep: int) -> list[str]:
+    """Keep the newest `keep` saved runs, delete the rest.
+
+    Only touches APP_DATA_DIR. The snapshot bundled with the app is in a
+    different tree and is never removed, so there is always a floor to fall
+    back to.
+    """
+    base = DATA_DIR / "snapshots"
+    if not base.is_dir():
+        return []
+    runs = sorted((d for d in base.iterdir() if d.is_dir() and d.name.startswith("run_")), key=lambda d: d.name)
+    removed = []
+    for stale in runs[:-keep] if keep < len(runs) else []:
+        try:
+            shutil.rmtree(stale)
+            removed.append(stale.name)
+        except OSError as exc:
+            log.warning("Could not remove old snapshot %s: %s", stale.name, exc)
+    return removed
+
+
 def refresh_queries() -> dict[str, Any]:
-    """Pull both queries live. Snapshots land in APP_DATA_DIR so they persist."""
+    """Pull both queries live. Snapshots land in APP_DATA_DIR so they persist.
+
+    The run is assembled in a `.partial` directory and only published if at
+    least one query produced rows. An attempt that fetches nothing leaves no
+    directory at all, which matters once this runs on a timer: a broken
+    upstream would otherwise deposit an empty run every interval forever.
+    """
     key = redash_key()
     if not key:
         return {
@@ -333,8 +414,9 @@ def refresh_queries() -> dict[str, Any]:
 
     headers = redash_headers(key)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_dir = DATA_DIR / "snapshots" / f"run_{stamp}"
-    out_dir.mkdir(parents=True, exist_ok=True)
+    snapshots = DATA_DIR / "snapshots"
+    staging = snapshots / f"run_{stamp}.partial"
+    staging.mkdir(parents=True, exist_ok=True)
 
     summaries: list[dict[str, Any]] = []
     for query_id in QUERY_IDS:
@@ -342,7 +424,7 @@ def refresh_queries() -> dict[str, Any]:
         try:
             query = json_request("GET", f"{REDASH_HOST}/api/queries/{query_id}", headers, timeout=120)
             sql = query.get("query") or ""
-            (out_dir / f"query_{query_id}_source.sql").write_text(sql, encoding="utf-8")
+            (staging / f"query_{query_id}_source.sql").write_text(sql, encoding="utf-8")
             summary.update({
                 "name": query.get("name"),
                 "data_source_id": query.get("data_source_id"),
@@ -353,8 +435,7 @@ def refresh_queries() -> dict[str, Any]:
             data = result.get("data") or {}
             rows = data.get("rows") or []
             columns = [column.get("name") for column in data.get("columns", []) if column.get("name")]
-            result_path = out_dir / f"query_{query_id}_result.csv"
-            write_rows(result_path, columns, rows)
+            write_rows(staging / f"query_{query_id}_result.csv", columns, rows)
             summary.update({
                 "status": "success",
                 "retrieved_at": result.get("retrieved_at"),
@@ -362,23 +443,147 @@ def refresh_queries() -> dict[str, Any]:
                 "elapsed_seconds": round(time.perf_counter() - started, 2),
                 "row_count": len(rows),
                 "column_count": len(columns),
-                "result_path": str(result_path),
             })
         except Exception as exc:  # noqa: BLE001 - every failure is reported, never raised
             summary.update({"status": "failed", "error": str(exc)})
         summaries.append(summary)
-        (out_dir / f"query_{query_id}_summary.json").write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")
 
+    succeeded = [item for item in summaries if item.get("status") == "success"]
     failed = [item for item in summaries if item.get("status") != "success"]
-    payload = {
+    payload: dict[str, Any] = {
         "attempted_at": datetime.now().isoformat(timespec="seconds"),
         "ok": not failed,
         "reason": None if not failed else "query_failed",
-        "snapshot_dir": str(out_dir),
         "queries": summaries,
     }
-    (out_dir / "refresh_summary.json").write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+
+    if not succeeded:
+        # Nothing worth keeping. Leave the data directory exactly as it was.
+        shutil.rmtree(staging, ignore_errors=True)
+        payload["snapshot_dir"] = None
+        payload["kept"] = False
+        return payload
+
+    for item in summaries:
+        (staging / f"query_{item['id']}_summary.json").write_text(json.dumps(item, indent=2, default=str), encoding="utf-8")
+    (staging / "refresh_summary.json").write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+
+    final = snapshots / f"run_{stamp}"
+    shutil.rmtree(final, ignore_errors=True)
+    staging.rename(final)
+    payload["snapshot_dir"] = str(final)
+    payload["kept"] = True
+    payload["pruned"] = prune_snapshots(SNAPSHOT_RETENTION)
     return payload
+
+
+# --------------------------------------------------------------------------
+# background sync
+# --------------------------------------------------------------------------
+
+def read_sync_state() -> dict[str, Any]:
+    try:
+        return json.loads(SYNC_STATE_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def write_sync_state(state: dict[str, Any]) -> None:
+    try:
+        SYNC_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        # Written via a temp file so a crash mid-write cannot leave the state
+        # file truncated and unreadable.
+        temp = SYNC_STATE_PATH.with_suffix(".json.tmp")
+        temp.write_text(json.dumps(state, indent=2, default=str), encoding="utf-8")
+        temp.replace(SYNC_STATE_PATH)
+    except OSError as exc:
+        log.warning("Could not write sync state: %s", exc)
+
+
+@contextlib.contextmanager
+def sync_lock(stale_after_seconds: int = 3600):
+    """Only one process syncs at a time.
+
+    The app server may run more than one worker, and each would start its own
+    scheduler. An exclusive lock file keeps them from running the same Redash
+    query concurrently. A lock older than the staleness window is treated as
+    abandoned, so a killed process cannot block syncing forever.
+    """
+    try:
+        if SYNC_LOCK_PATH.exists():
+            age = time.time() - SYNC_LOCK_PATH.stat().st_mtime
+            if age > stale_after_seconds:
+                log.warning("Clearing a stale sync lock (%.0fs old)", age)
+                SYNC_LOCK_PATH.unlink(missing_ok=True)
+        handle = os.open(SYNC_LOCK_PATH, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        yield False
+        return
+    except OSError as exc:
+        log.warning("Could not take the sync lock: %s", exc)
+        yield False
+        return
+
+    try:
+        os.write(handle, f"{os.getpid()} {datetime.now().isoformat(timespec='seconds')}".encode())
+        os.close(handle)
+        yield True
+    finally:
+        SYNC_LOCK_PATH.unlink(missing_ok=True)
+
+
+def run_sync_once(trigger: str) -> dict[str, Any]:
+    """One sync attempt, recording the outcome for the UI and the next delay."""
+    state = read_sync_state()
+    started = datetime.now()
+    with sync_lock() as acquired:
+        if not acquired:
+            log.info("Another process is already syncing; skipping this tick.")
+            return {**state, "skipped": "another process holds the lock"}
+        payload = refresh_queries()
+
+    failures = 0 if payload.get("ok") else int(state.get("consecutive_failures", 0)) + 1
+    state = {
+        "last_attempt": started.isoformat(timespec="seconds"),
+        "last_trigger": trigger,
+        "last_ok": bool(payload.get("ok")),
+        "consecutive_failures": failures,
+        "last_success": (
+            started.isoformat(timespec="seconds") if payload.get("ok") else state.get("last_success")
+        ),
+        "last_snapshot": payload.get("snapshot_dir") or state.get("last_snapshot"),
+        "last_error": None if payload.get("ok") else (
+            next((q.get("error") for q in payload.get("queries", []) if q.get("error")), payload.get("message"))
+        ),
+        "last_reason": payload.get("reason"),
+    }
+    write_sync_state(state)
+    if payload.get("ok"):
+        log.info("Sync succeeded (%s). Snapshot: %s", trigger, payload.get("snapshot_dir"))
+    else:
+        log.warning("Sync failed (%s), attempt %s: %s", trigger, failures, state["last_error"])
+    return state
+
+
+def next_delay_seconds(state: dict[str, Any]) -> int:
+    base = SYNC_INTERVAL_MINUTES * 60
+    failures = int(state.get("consecutive_failures", 0))
+    if failures <= 0:
+        return base
+    return base * min(2 ** (failures - 1), SYNC_BACKOFF_MAX_MULTIPLIER)
+
+
+async def sync_loop() -> None:
+    """Refresh on a timer, backing off while the upstream stays broken."""
+    if SYNC_ON_STARTUP:
+        await asyncio.to_thread(run_sync_once, "startup")
+    while True:
+        delay = next_delay_seconds(read_sync_state())
+        await asyncio.sleep(delay)
+        try:
+            await asyncio.to_thread(run_sync_once, "schedule")
+        except Exception as exc:  # noqa: BLE001 - the loop must outlive any one failure
+            log.exception("Sync loop iteration failed: %s", exc)
 
 
 # --------------------------------------------------------------------------
@@ -416,6 +621,7 @@ def build_dashboard(
     return {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "live_refresh_available": redash_key() is not None,
+        "sync": sync_status(),
         "selected": {
             "day_start": day_start,
             "day_end": day_end,
@@ -454,6 +660,43 @@ def build_dashboard(
 # routes - every one under /api
 # --------------------------------------------------------------------------
 
+def sync_status() -> dict[str, Any]:
+    state = read_sync_state()
+    enabled = SYNC_ENABLED and redash_key() is not None
+    status = {
+        "enabled": enabled,
+        "interval_minutes": SYNC_INTERVAL_MINUTES,
+        "retention": SNAPSHOT_RETENTION,
+        "last_attempt": state.get("last_attempt"),
+        "last_success": state.get("last_success"),
+        "last_ok": state.get("last_ok"),
+        "consecutive_failures": int(state.get("consecutive_failures", 0)),
+        "last_error": state.get("last_error"),
+        "last_trigger": state.get("last_trigger"),
+    }
+    if not enabled:
+        status["reason"] = "disabled" if not SYNC_ENABLED else "no_api_key"
+        return status
+    # Reported so the UI can say when the next attempt is due, including the
+    # stretched wait while a failure repeats.
+    delay = next_delay_seconds(state)
+    status["next_interval_minutes"] = round(delay / 60)
+    status["backing_off"] = delay > SYNC_INTERVAL_MINUTES * 60
+    last = state.get("last_attempt")
+    if last:
+        try:
+            status["next_attempt"] = (datetime.fromisoformat(last) + timedelta(seconds=delay)).isoformat(timespec="seconds")
+        except ValueError:
+            status["next_attempt"] = None
+    return status
+
+
+@api.get("/sync")
+def sync() -> dict[str, Any]:
+    """State of the background refresh. Cheap enough for the UI to poll."""
+    return sync_status()
+
+
 @api.get("/health")
 def health() -> dict[str, Any]:
     return {
@@ -468,7 +711,12 @@ def health() -> dict[str, Any]:
             "REDASH_VERIFY_TLS": REDASH_VERIFY_TLS,
             "PAGE_SIZE": PAGE_SIZE,
             "REDASH_TIMEOUT_SECONDS": REDASH_TIMEOUT_SECONDS,
+            "SYNC_ENABLED": SYNC_ENABLED,
+            "SYNC_INTERVAL_MINUTES": SYNC_INTERVAL_MINUTES,
+            "SYNC_ON_STARTUP": SYNC_ON_STARTUP,
+            "SNAPSHOT_RETENTION": SNAPSHOT_RETENTION,
         },
+        "sync": sync_status(),
         "snapshots": {str(query_id): str(snapshot_path(query_id) or "") for query_id in QUERY_IDS},
     }
 
@@ -489,9 +737,30 @@ def dashboard(
 
 @api.post("/refresh")
 def refresh() -> dict[str, Any]:
-    """Always 200. A failure is data the UI renders, not an HTTP error."""
+    """Always 200. A failure is data the UI renders, not an HTTP error.
+
+    Recorded in the same state the scheduler uses, so a manual refresh resets
+    the backoff and the two share one history rather than disagreeing.
+    """
     try:
-        return refresh_queries()
+        state = run_sync_once("manual")
+        if state.get("skipped"):
+            return {
+                "attempted_at": datetime.now().isoformat(timespec="seconds"),
+                "ok": False,
+                "reason": "busy",
+                "message": "A scheduled refresh is already running. Try again in a moment.",
+                "queries": [],
+                "sync": sync_status(),
+            }
+        return {
+            "attempted_at": state.get("last_attempt"),
+            "ok": bool(state.get("last_ok")),
+            "reason": state.get("last_reason"),
+            "message": state.get("last_error"),
+            "queries": [] if state.get("last_ok") else [{"id": "refresh", "status": "failed", "error": state.get("last_error")}],
+            "sync": sync_status(),
+        }
     except Exception as exc:  # noqa: BLE001
         return {
             "attempted_at": datetime.now().isoformat(timespec="seconds"),

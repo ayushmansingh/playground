@@ -42,6 +42,10 @@ the app reads:
 | `PAGE_SIZE` | app's own | `default: 100` | No |
 | `REDASH_TIMEOUT_SECONDS` | app's own | `default: 900` | No |
 | `REDASH_VERIFY_TLS` | app's own | `default: "true"` | No |
+| `SYNC_ENABLED` | app's own | `default: "true"` | No |
+| `SYNC_INTERVAL_MINUTES` | app's own | `default: 60` | No |
+| `SYNC_ON_STARTUP` | app's own | `default: "false"` | No |
+| `SNAPSHOT_RETENTION` | app's own | `default: 48` | No |
 
 **No credential carries a default**, per the rule that a default travels inside
 the ZIP and is shown in full.
@@ -65,11 +69,43 @@ would invite someone to override the platform's own directory.
 Routes:Routes:
 
 ```
-GET  /api/health      liveness, data directory, whether live refresh is possible
+GET  /api/health      liveness, data directory, effective settings
 GET  /api/dashboard   the whole payload for both tabs, filtered
 POST /api/refresh     pull both queries from Redash; always 200
 GET  /api/snapshots   every snapshot the app can see, saved and bundled
+GET  /api/sync        state of the automatic refresh
 ```
+
+## Automatic refresh
+
+An asyncio task started from the FastAPI lifespan, not a scheduler dependency
+and not a socket — one `await asyncio.sleep`, and the blocking Redash call is
+handed to a thread so the event loop keeps serving.
+
+Three failure modes were designed out before it was allowed to run unattended:
+
+- **Junk accumulation.** The original refresh created a run directory and wrote
+  summaries even when every query failed. Hourly against the current
+  `INVALID_GLUE_SCHEMA` break, that is ~8,700 empty directories a year in a
+  data directory that survives every redeploy. A run is now assembled in a
+  `.partial` directory and only published if something came back; a failure
+  removes it and records one line in a single rolling state file.
+- **Unbounded growth on success.** ~340 kB a run, hourly, is roughly 3 GB a
+  year. After a successful refresh only the newest `SNAPSHOT_RETENTION` runs
+  survive. The bundled snapshot lives in a different tree and is never pruned,
+  so there is always a floor.
+- **Hammering a broken upstream.** The wait doubles per consecutive failure to
+  a cap of six intervals, resetting on success.
+
+Concurrency is handled with an exclusive lock file in the data directory, since
+the app server may run more than one worker and each starts its own scheduler.
+A lock older than an hour is treated as abandoned so a killed process cannot
+block syncing permanently.
+
+The page notices new data by polling `/api/sync` every two minutes — a few
+hundred bytes, paused while the tab is hidden, and it reloads the dashboard only
+when the last success timestamp moves. Deliberately not a socket, which the
+platform does not support anyway.
 
 `POST /api/refresh` deliberately returns **200 with a failure body** rather than
 a 5xx. A failed refresh is an expected state, not a server error, and the UI

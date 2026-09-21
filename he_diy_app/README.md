@@ -57,6 +57,10 @@ the snapshot bundled in `backend/seed_data/`.
 | `REDASH_HOST` | app's own | `https://common-redash.mmt.live` | Redash base URL |
 | `PAGE_SIZE` | app's own | `100` | Agent rows per request, and the starting value of the Show control |
 | `REDASH_TIMEOUT_SECONDS` | app's own | `900` | How long a refresh waits for a query |
+| `SYNC_ENABLED` | app's own | `true` | Refresh automatically on a timer |
+| `SYNC_INTERVAL_MINUTES` | app's own | `60` | Minutes between automatic refreshes |
+| `SYNC_ON_STARTUP` | app's own | `false` | Also refresh the moment the app starts |
+| `SNAPSHOT_RETENTION` | app's own | `48` | Refreshed snapshots kept in the data directory |
 | `REDASH_VERIFY_TLS` | app's own | `true` | Set `false` only for an internal private certificate chain |
 
 `REDASH_API_KEY` is deliberately **not** marked required. The dashboard is
@@ -71,6 +75,32 @@ own directory.
 Confirm what the app picked up with `GET /api/health`, which reports every
 effective setting and whether the key is set — never its value.
 
+## Automatic refresh
+
+With a Redash key configured the app refreshes itself every `SYNC_INTERVAL_MINUTES`
+(60 by default). The Refresh button still works and shares the same history.
+
+Three things make it safe to leave running unattended:
+
+- **A failed attempt leaves nothing behind.** Each run is assembled in a
+  `.partial` directory and only published if at least one query returned rows.
+  Without this, a broken upstream would deposit an empty run every hour — about
+  8,700 dead directories a year.
+- **Failures back off.** The wait doubles after each consecutive failure, up to
+  six times the interval, and resets on the first success. A Redash outage costs
+  a handful of queries a day rather than one an hour.
+- **Old snapshots are pruned.** After a successful refresh only the newest
+  `SNAPSHOT_RETENTION` runs are kept. At hourly with the default of 48 that is
+  two days of history in roughly 16 MB, instead of ~3 GB a year.
+
+Only one process syncs at a time, guarded by a lock file in the data directory,
+so extra workers cannot run the same query concurrently. A lock older than an
+hour is treated as abandoned.
+
+`GET /api/sync` reports the state — last success, consecutive failures, when the
+next attempt is due and whether it is backing off. The dashboard shows the same
+in the freshness panel, and reloads itself when a sync brings in new data.
+
 ## API
 
 ```
@@ -78,6 +108,7 @@ GET  /api/health      liveness, data directory, whether live refresh is possible
 GET  /api/dashboard   both tabs' data, filtered
 POST /api/refresh     pull both queries from Redash; always 200
 GET  /api/snapshots   every snapshot the app can see
+GET  /api/sync        state of the automatic refresh
 ```
 
 `/api/refresh` returns 200 with a failure body rather than a 5xx: a failed
