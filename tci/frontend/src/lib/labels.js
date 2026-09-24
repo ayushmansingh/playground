@@ -2,24 +2,14 @@ import { createContext, useContext } from "react";
 
 export const KPI_LABELS = {
     conversations: "Conversations",
-    profiled: "AI profiles ready",
     reviewed: "Manually reviewed",
     negative_percent: "Negative sentiment %",
     dissatisfaction_percent: "Conversations with dissatisfaction %",
-    coupon_seeking_percent: "Coupon-seeking conversations %",
     budget_conscious_percent: "Budget-sensitive conversations %",
     high_willingness_percent: "High booking readiness %",
 };
 
-export const FACT_TYPE_LABELS = {
-    destination_city: "City",
-    destination_country: "Country",
-    intent: "Intent",
-    dissatisfaction: "Dissatisfaction",
-    cash_payment_interest: "Cash payment",
-};
-
-// Which /api/filters option list labels each profile or filter field.
+// Which option list labels each profile or filter field.
 const FIELD_OPTION_KEYS = {
     travel_intent: "travel_intents",
     travel_intent_primary: "travel_intents",
@@ -28,7 +18,6 @@ const FIELD_OPTION_KEYS = {
     travel_cohort: "travel_cohorts",
     discount_readiness: "discount_levels",
     coupon_seeking: "coupon_options",
-    cash_payment_interest: "cash_payment_options",
     sentiment: "sentiments",
     overall_customer_sentiment: "sentiments",
     dissatisfaction_reason: "dissatisfaction_reasons",
@@ -59,14 +48,6 @@ export function humanizeValue(value) {
         .join(" ");
 }
 
-export function senderScopeLabel(value) {
-    return {
-        customer: "Customer",
-        he: "HE",
-        all: "Any sender",
-    }[String(value || "").toLowerCase()] || humanizeValue(value);
-}
-
 export function sampleQualityLabel(value) {
     return {
         strong: "Strong enough for confident analysis",
@@ -74,21 +55,6 @@ export function sampleQualityLabel(value) {
         small: "Small sample, use with care",
         tiny: "Very small sample, inspect conversations directly",
     }[String(value || "").toLowerCase()] || humanizeValue(value);
-}
-
-export function importStatusLabel(status) {
-    return {
-        queued: "Queued",
-        running: "Fetching chats",
-        cancel_requested: "Stopping safely",
-        cancelled: "Cancelled",
-        interrupted: "Interrupted",
-        merging: "Deduplicating messages",
-        indexing: "Refreshing analysis indexes",
-        completed: "Completed",
-        completed_with_errors: "Completed with errors",
-        failed: "Failed",
-    }[status] || humanizeValue(status);
 }
 
 export function toneForValue(fieldKey, value) {
@@ -110,7 +76,6 @@ export function toneForValue(fieldKey, value) {
         case "discount_readiness":
             return normalized === "high" ? "warm" : normalized === "medium" ? "accent" : normalized === "low" ? "good" : "neutral";
         case "coupon_seeking":
-        case "cash_payment_interest":
             return normalized === "yes" ? "accent" : normalized === "no" ? "good" : "neutral";
         case "profile_status":
             return normalized === "complete" ? "good" : normalized === "insufficient_signal" ? "warm" : "neutral";
@@ -122,7 +87,7 @@ export function toneForValue(fieldKey, value) {
     }
 }
 
-// The option lists from /api/filters, shared app-wide once loaded.
+// The option lists from /api/insights/options, shared app-wide once loaded.
 export const FilterOptionsContext = createContext(null);
 
 export function useFilterOptions() {
