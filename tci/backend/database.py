@@ -1,70 +1,94 @@
-"""SQLite storage: schema, seed promotion, and the per-conversation index.
+"""SQLite storage for lead-keyed WhatsApp chats and their AI profiles.
 
-The app needs four things from the database: the cleaned `messages`, a
-full-text index over them (`message_search`), one summary row per
-conversation (`conversation_index`), and the AI profiles plus human reviews
-layered on top. Databases built by older versions carry extra tables
-(keyword-rule features, destination catalog); they are left untouched and
-simply no longer read.
+One conversation is one HolidayCRM lead: `conversation_id` holds the leadId
+everywhere. The nightly job (`sync_closed_leads.py`) is the only writer of
+chats; the API only reads them.
+
+Tables:
+- `conversations`: one row per synced lead, with its CRM state and message
+  counters kept current by `refresh_conversations()`.
+- `messages`: cleaned chat messages. They point at their conversation by its
+  integer `id` rather than the 24-character lead id, and are deduplicated on
+  an 8-byte hash of the WhatsApp message id (unique within the conversation)
+  rather than the 40-80 character id itself; together that keeps the largest
+  table and its indexes roughly 40% smaller.
+- `message_search`: FTS5 index over `messages.content`. It is an external
+  content table kept in step by triggers, so the text is stored once and
+  nothing is ever rebuilt wholesale. `columnsize=0` drops the per-row size
+  table that only BM25 ranking needs; search orders by recency instead.
+- `conversation_profiles`: the current AI profile per conversation.
+- `sync_runs`: one row per synced time window; the newest succeeded window
+  is where the next nightly run resumes.
+
+The database runs in WAL mode so the nightly write never blocks the app.
 """
 
 from __future__ import annotations
 
+import json
 import os
-import shutil
 import sqlite3
-import threading
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Iterable
 
 DATA = Path(os.environ.get("APP_DATA_DIR", "data"))
 DATA.mkdir(parents=True, exist_ok=True)
-DB_PATH = Path(os.environ.get("CHAT_SEARCH_DB_PATH", str(DATA / "filtered_messages_p0.sqlite3")))
-# The launcher copies this versioned file from backend/data into APP_DATA_DIR
-# once. A new filename allows a fixed seed to arrive alongside an old empty DB.
-BUNDLED_DB_PATH = DATA / "conversation_seed_20260909.sqlite3"
+# A new file name: databases built by the phone-number-keyed version are a
+# different shape and are left alone.
+DB_PATH = Path(os.environ.get("CHAT_SEARCH_DB_PATH", str(DATA / "tci.sqlite3")))
 
-_BOOTSTRAP_LOCK = threading.Lock()
+SCHEMA_VERSION = 2
 
 SCHEMA_SQL = """
+CREATE TABLE IF NOT EXISTS conversations (
+    id INTEGER PRIMARY KEY,                     -- compact key messages point at
+    conversation_id TEXT NOT NULL UNIQUE,       -- HolidayCRM leads._id
+    lead_state TEXT,                            -- leads.state when last synced
+    he_id TEXT,                                 -- leads.assignedHeId (current owner)
+    lead_updated_at INTEGER,                    -- leads.updatedAt, epoch seconds
+    synced_at INTEGER NOT NULL,
+    total_messages INTEGER NOT NULL DEFAULT 0,
+    customer_message_count INTEGER NOT NULL DEFAULT 0,
+    he_message_count INTEGER NOT NULL DEFAULT 0,
+    signal_quality TEXT NOT NULL DEFAULT 'weak',
+    latest_message_id INTEGER,
+    latest_message_at INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_latest
+ON conversations (latest_message_at DESC) WHERE total_messages > 0;
+
 CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    conversation_id TEXT NOT NULL,
-    message_timestamp INTEGER NOT NULL,
-    message_datetime TEXT NOT NULL,
-    he_number TEXT NOT NULL,
-    customer_number TEXT NOT NULL,
-    sender_number TEXT,
-    sender_type TEXT,
-    message_type TEXT,
-    message_content TEXT NOT NULL,
-    message_content_lower TEXT NOT NULL,
-    message_content_normalized TEXT NOT NULL,
-    source_file TEXT NOT NULL
+    id INTEGER PRIMARY KEY,                     -- FTS rowid and AI evidence id
+    conversation_key INTEGER NOT NULL,          -- conversations.id
+    source_hash INTEGER NOT NULL,               -- ingest.message_hash(messageId)
+    sent_at INTEGER NOT NULL,                   -- epoch seconds, UTC
+    sender_type TEXT NOT NULL CHECK (sender_type IN ('customer', 'he')),
+    message_type TEXT NOT NULL,
+    he_id TEXT,
+    content TEXT NOT NULL,
+    -- Deduplicates, and doubles as the per-conversation index (a lead's few
+    -- dozen messages are sorted by time after the lookup).
+    UNIQUE (conversation_key, source_hash)
 );
 
-CREATE TABLE IF NOT EXISTS metadata (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
+CREATE INDEX IF NOT EXISTS idx_messages_sent_at ON messages (sent_at);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS message_search USING fts5(
+    content, content='messages', content_rowid='id', columnsize=0, tokenize='porter unicode61'
 );
 
-CREATE VIRTUAL TABLE IF NOT EXISTS message_search
-USING fts5(message_content, tokenize='porter unicode61');
+CREATE TRIGGER IF NOT EXISTS messages_search_insert AFTER INSERT ON messages BEGIN
+    INSERT INTO message_search (rowid, content) VALUES (new.id, new.content);
+END;
 
-CREATE TABLE IF NOT EXISTS conversation_index (
-    conversation_id TEXT PRIMARY KEY,
-    latest_message_timestamp INTEGER NOT NULL,
-    latest_message_id INTEGER NOT NULL,
-    latest_message_datetime TEXT NOT NULL,
-    latest_message_content TEXT NOT NULL,
-    he_number TEXT NOT NULL,
-    customer_number TEXT NOT NULL,
-    total_messages INTEGER NOT NULL,
-    customer_message_count INTEGER NOT NULL,
-    he_message_count INTEGER NOT NULL
-);
+CREATE TRIGGER IF NOT EXISTS messages_search_delete AFTER DELETE ON messages BEGIN
+    INSERT INTO message_search (message_search, rowid, content) VALUES ('delete', old.id, old.content);
+END;
 
 CREATE TABLE IF NOT EXISTS conversation_profiles (
-    conversation_id TEXT NOT NULL,
+    conversation_id TEXT PRIMARY KEY,
     model_name TEXT NOT NULL,
     prompt_version TEXT NOT NULL,
     schema_version TEXT NOT NULL,
@@ -87,150 +111,94 @@ CREATE TABLE IF NOT EXISTS conversation_profiles (
     confidence_by_field_json TEXT,
     evidence_by_field_json TEXT,
     profile_status TEXT NOT NULL DEFAULT 'pending',
-    status TEXT NOT NULL DEFAULT 'pending',
+    status TEXT NOT NULL DEFAULT 'pending',     -- 'complete' rows are shown
     error TEXT,
-    enriched_at TEXT,
-    PRIMARY KEY (conversation_id, model_name, prompt_version, schema_version)
+    enriched_at TEXT
+) WITHOUT ROWID;
+
+CREATE TABLE IF NOT EXISTS sync_runs (
+    id INTEGER PRIMARY KEY,
+    window_from INTEGER NOT NULL,               -- leads closed in [from, to)
+    window_to INTEGER NOT NULL,
+    started_at INTEGER NOT NULL,
+    finished_at INTEGER,
+    status TEXT NOT NULL,                       -- running | succeeded | failed
+    leads_closed INTEGER NOT NULL DEFAULT 0,
+    messages_inserted INTEGER NOT NULL DEFAULT 0,
+    error TEXT
 );
 
-CREATE TABLE IF NOT EXISTS conversation_reviews (
-    conversation_id TEXT PRIMARY KEY,
-    review_status TEXT NOT NULL DEFAULT 'unreviewed',
-    corrected_profile_json TEXT,
-    reviewer_note TEXT,
-    reviewed_by TEXT,
-    reviewed_at TEXT
-);
-
-CREATE INDEX IF NOT EXISTS idx_messages_conversation_timestamp
-ON messages (conversation_id, message_timestamp, id);
-
-CREATE INDEX IF NOT EXISTS idx_messages_timestamp
-ON messages (message_timestamp DESC, id DESC);
-
-CREATE INDEX IF NOT EXISTS idx_conversation_index_latest_timestamp
-ON conversation_index (latest_message_timestamp DESC, conversation_id);
-
-CREATE INDEX IF NOT EXISTS idx_conversation_profiles_status
-ON conversation_profiles (status, enriched_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_conversation_reviews_status
-ON conversation_reviews (review_status, reviewed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sync_runs_succeeded
+ON sync_runs (window_to) WHERE status = 'succeeded';
 """
-
-# Columns added to conversation_profiles after its first release.
-_LATE_PROFILE_COLUMNS = ["travel_cohort", "discount_readiness", "coupon_seeking"]
 
 
 def get_connection(db_path: Path = DB_PATH) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA synchronous = NORMAL")
     return conn
 
 
-def _message_count(db_path: Path) -> int:
-    """Return zero for an absent or unreadable database."""
-    if not db_path.exists() or db_path.stat().st_size == 0:
-        return 0
-    try:
-        with sqlite3.connect(db_path) as conn:
-            return int(conn.execute("SELECT COUNT(*) FROM messages").fetchone()[0])
-    except sqlite3.Error:
-        return 0
-
-
-def _promote_seed(db_path: Path) -> None:
-    """Copy the bundled seed over an absent, empty, or less complete live DB."""
-    # The first page load calls several APIs at once. Serialize the copy so an
-    # empty persistent volume can never be observed midway through seeding.
-    with _BOOTSTRAP_LOCK:
-        if not BUNDLED_DB_PATH.exists():
-            return
-        if _message_count(db_path) >= max(1, _message_count(BUNDLED_DB_PATH)):
-            return
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        temporary_path = db_path.with_name(
-            f".{db_path.name}.{os.getpid()}.{threading.get_ident()}.bootstrap"
-        )
-        try:
-            shutil.copy2(BUNDLED_DB_PATH, temporary_path)
-            os.replace(temporary_path, db_path)
-        finally:
-            if temporary_path.exists():
-                temporary_path.unlink()
-
-
-def rebuild_derived_tables(conn: sqlite3.Connection) -> None:
-    """Recompute the search index and per-conversation summaries from messages."""
-    conn.executescript(
-        """
-        DELETE FROM message_search;
-        INSERT INTO message_search(rowid, message_content)
-        SELECT id, message_content FROM messages;
-
-        DELETE FROM conversation_index;
-        INSERT INTO conversation_index (
-            conversation_id, latest_message_timestamp, latest_message_id,
-            latest_message_datetime, latest_message_content, he_number,
-            customer_number, total_messages, customer_message_count, he_message_count
-        )
-        SELECT
-            ranked.conversation_id,
-            ranked.message_timestamp,
-            ranked.id,
-            ranked.message_datetime,
-            ranked.message_content,
-            ranked.he_number,
-            ranked.customer_number,
-            counts.total_messages,
-            counts.customer_message_count,
-            counts.he_message_count
-        FROM (
-            SELECT
-                messages.*,
-                ROW_NUMBER() OVER (
-                    PARTITION BY conversation_id
-                    ORDER BY message_timestamp DESC, id DESC
-                ) AS position
-            FROM messages
-        ) AS ranked
-        JOIN (
-            SELECT
-                conversation_id,
-                COUNT(*) AS total_messages,
-                SUM(LOWER(COALESCE(sender_type, '')) = 'customer') AS customer_message_count,
-                -- Anything not from the customer counts as the agent (HE) side.
-                SUM(LOWER(COALESCE(sender_type, '')) != 'customer') AS he_message_count
-            FROM messages
-            GROUP BY conversation_id
-        ) AS counts ON counts.conversation_id = ranked.conversation_id
-        WHERE ranked.position = 1;
-        """
-    )
-    conn.commit()
-
-
-def _derived_tables_stale(conn: sqlite3.Connection) -> bool:
-    message_count = conn.execute("SELECT COUNT(*) FROM messages").fetchone()[0]
-    indexed_count = conn.execute("SELECT COUNT(*) FROM message_search").fetchone()[0]
-    conversation_count = conn.execute(
-        "SELECT COUNT(DISTINCT conversation_id) FROM messages"
-    ).fetchone()[0]
-    summary_count = conn.execute("SELECT COUNT(*) FROM conversation_index").fetchone()[0]
-    return message_count != indexed_count or conversation_count != summary_count
-
-
 def ensure_database(db_path: Path = DB_PATH) -> Path:
-    """Promote the seed if needed, then make sure every runtime table is ready."""
-    _promote_seed(db_path)
+    """Create the schema if needed; refuse a database from the old version."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with get_connection(db_path) as conn:
+        version = conn.execute("PRAGMA user_version").fetchone()[0]
+        if version == 0 and conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE name = 'conversation_index'"
+        ).fetchone():
+            raise RuntimeError(
+                f"{db_path} was built by the phone-number-keyed version. "
+                "Point CHAT_SEARCH_DB_PATH at a new file; the nightly sync fills it."
+            )
+        if version > SCHEMA_VERSION:
+            raise RuntimeError(f"{db_path} has schema {version}; this code knows {SCHEMA_VERSION}.")
+        conn.execute("PRAGMA journal_mode = WAL")
         conn.executescript(SCHEMA_SQL)
-        existing = {row["name"] for row in conn.execute("PRAGMA table_info(conversation_profiles)")}
-        for column in _LATE_PROFILE_COLUMNS:
-            if column not in existing:
-                conn.execute(f"ALTER TABLE conversation_profiles ADD COLUMN {column} TEXT")
-        conn.commit()
-        if _derived_tables_stale(conn):
-            rebuild_derived_tables(conn)
+        conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
     return db_path
+
+
+def refresh_conversations(conn: sqlite3.Connection, conversation_keys: Iterable[int]) -> None:
+    """Recompute message counters and signal quality for the given conversations (by `id`)."""
+    keys = json.dumps(sorted(set(conversation_keys)))
+    conn.execute(
+        """
+        UPDATE conversations AS c SET
+            total_messages = (SELECT COUNT(*) FROM messages m WHERE m.conversation_key = c.id),
+            customer_message_count = (
+                SELECT COUNT(*) FROM messages m
+                WHERE m.conversation_key = c.id AND m.sender_type = 'customer'
+            ),
+            he_message_count = (
+                SELECT COUNT(*) FROM messages m
+                WHERE m.conversation_key = c.id AND m.sender_type = 'he'
+            ),
+            latest_message_id = (
+                SELECT m.id FROM messages m WHERE m.conversation_key = c.id
+                ORDER BY m.sent_at DESC, m.id DESC LIMIT 1
+            ),
+            latest_message_at = (SELECT MAX(m.sent_at) FROM messages m WHERE m.conversation_key = c.id)
+        WHERE c.id IN (SELECT value FROM json_each(?))
+        """,
+        (keys,),
+    )
+    # How much a conversation says; "weak" ones rarely support a reliable profile.
+    conn.execute(
+        """
+        UPDATE conversations SET signal_quality = CASE
+            WHEN customer_message_count >= 3 AND he_message_count >= 1 AND total_messages >= 6 THEN 'strong'
+            WHEN customer_message_count >= 2 AND total_messages >= 4 THEN 'moderate'
+            ELSE 'weak'
+        END
+        WHERE id IN (SELECT value FROM json_each(?))
+        """,
+        (keys,),
+    )
+
+
+def format_timestamp(epoch: int | None) -> str | None:
+    if epoch is None:
+        return None
+    return datetime.fromtimestamp(epoch, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

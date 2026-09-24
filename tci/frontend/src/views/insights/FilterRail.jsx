@@ -20,7 +20,6 @@ const MORE_FILTERS = [
     ["next_best_action", "Recommended next step", "next_actions", "Any"],
     ["confidence", "Profile confidence (at least)", "confidence_levels", "Any"],
     ["signal_quality", "Conversation signal", "signal_qualities", "Any"],
-    ["review_status", "Review status", "review_statuses", "Any"],
     ["profile_status", "Profile quality", "profile_statuses", "Any"],
 ];
 

@@ -5,7 +5,6 @@ const COUNTERS = [
     ["conversation_count", "Conversations"],
     ["message_count", "Messages"],
     ["profile_count", "AI profiles"],
-    ["reviewed_count", "Reviewed"],
 ];
 
 export default function Header({ meta, views, activeView, onViewChange }) {
@@ -38,6 +37,11 @@ export default function Header({ meta, views, activeView, onViewChange }) {
                         <dd>{meta ? formatNumber(meta[key]) : "..."}</dd>
                     </div>
                 ))}
+                <div className="counter">
+                    <dt>Synced to</dt>
+                    {/* The end of the newest nightly window, in UTC. */}
+                    <dd title={meta?.synced_to || undefined}>{meta ? (meta.synced_to || "never").slice(0, 10) : "..."}</dd>
+                </div>
             </dl>
         </header>
     );

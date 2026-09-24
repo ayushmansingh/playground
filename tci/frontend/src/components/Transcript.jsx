@@ -63,14 +63,17 @@ export default function Transcript({ messages, focusId, evidenceIds = [], term =
                 const isFocus = Number(message.id) === Number(focusId);
                 const classes = [
                     "bubble",
-                    String(message.sender_type).toLowerCase() === "customer" ? "customer" : "he",
+                    message.sender_type === "customer" ? "customer" : "he",
                     isFocus && "selected",
                     evidence.has(Number(message.id)) && "evidence",
                 ].filter(Boolean).join(" ");
                 return (
                     <article key={message.id} ref={isFocus ? focusRef : undefined} className={classes}>
                         <div className="bubble-meta">
-                            <span>{message.sender_type}</span>
+                            <span>
+                                {message.sender_type === "customer" ? "Customer" : "Agent"}
+                                {message.message_type && message.message_type !== "TEXT" && ` · ${message.message_type.toLowerCase()}`}
+                            </span>
                             <span>{message.message_datetime}</span>
                         </div>
                         <MessageBody content={message.message_content} term={term} />

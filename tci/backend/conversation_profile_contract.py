@@ -122,12 +122,6 @@ PROFILE_STATUS_OPTIONS = [
     ("insufficient_signal", "Insufficient signal"),
 ]
 
-REVIEW_STATUS_OPTIONS = [
-    ("unreviewed", "Unreviewed"),
-    ("approved", "Approved"),
-    ("corrected", "Corrected"),
-]
-
 CONFIDENCE_FIELD_KEYS = [
     "intent",
     "cohort",
@@ -172,25 +166,6 @@ PROFILE_FIELD_KEYS = [
     "confidence_overall",
     "confidence_by_field",
     "evidence_by_field",
-    "profile_status",
-]
-
-EDITABLE_PROFILE_FIELDS = [
-    "summary",
-    "travel_intent_primary",
-    "travel_intent_secondary",
-    "travel_intent_other_text",
-    "destination_primary",
-    "travel_cohort",
-    "budget_conscious",
-    "discount_readiness",
-    "coupon_seeking",
-    "overall_customer_sentiment",
-    "dissatisfaction_reasons",
-    "severity",
-    "conversion_willingness",
-    "primary_blocker",
-    "next_best_action",
     "profile_status",
 ]
 
@@ -502,61 +477,3 @@ def sanitize_profile_result(raw: Any, allowed_message_ids: set[int]) -> dict[str
         result["next_best_action"] = "unclear"
 
     return result
-
-
-def sanitize_review_corrections(raw: Any) -> dict[str, Any]:
-    if not isinstance(raw, dict):
-        return {}
-
-    cleaned: dict[str, Any] = {}
-    for key in EDITABLE_PROFILE_FIELDS:
-        if key not in raw:
-            continue
-        value = raw.get(key)
-        if key == "summary":
-            cleaned[key] = normalize_short_text(value)
-        elif key == "travel_intent_primary":
-            cleaned[key] = normalize_enum(value, TRAVEL_INTENT_OPTIONS, "unclear")
-        elif key == "travel_intent_secondary":
-            if value in (None, "", "null"):
-                cleaned[key] = None
-            else:
-                normalized_secondary = normalize_enum(value, TRAVEL_INTENT_OPTIONS, "unclear")
-                cleaned[key] = None if normalized_secondary == "unclear" else normalized_secondary
-        elif key == "travel_intent_other_text":
-            cleaned[key] = normalize_short_text(value) or None
-        elif key == "destination_primary":
-            cleaned[key] = normalize_short_text(value, fallback="unclear") or "unclear"
-        elif key == "travel_cohort":
-            cleaned[key] = normalize_enum(value, TRAVEL_COHORT_OPTIONS, "unclear")
-        elif key == "budget_conscious":
-            cleaned[key] = normalize_enum(value, BUDGET_CONSCIOUS_OPTIONS, "unclear")
-        elif key == "discount_readiness":
-            cleaned[key] = normalize_enum(value, DISCOUNT_READINESS_OPTIONS, "unclear")
-        elif key == "coupon_seeking":
-            cleaned[key] = normalize_enum(value, COUPON_SEEKING_OPTIONS, "unclear")
-        elif key == "overall_customer_sentiment":
-            cleaned[key] = normalize_enum(value, SENTIMENT_OPTIONS, "unclear")
-        elif key == "dissatisfaction_reasons":
-            cleaned[key] = normalize_reason_list(value)
-        elif key == "severity":
-            cleaned[key] = normalize_enum(value, SEVERITY_OPTIONS, "unclear")
-        elif key == "conversion_willingness":
-            cleaned[key] = normalize_enum(value, WILLINGNESS_OPTIONS, "unclear")
-        elif key == "primary_blocker":
-            cleaned[key] = normalize_enum(value, PRIMARY_BLOCKER_OPTIONS, "unclear")
-        elif key == "next_best_action":
-            cleaned[key] = normalize_enum(value, NEXT_ACTION_OPTIONS, "unclear")
-        elif key == "profile_status":
-            cleaned[key] = normalize_enum(value, PROFILE_STATUS_OPTIONS, "unclear")
-    return cleaned
-
-
-def merge_profile_overrides(base: dict[str, Any] | None, overrides: dict[str, Any] | None) -> dict[str, Any] | None:
-    if base is None and not overrides:
-        return None
-    merged = dict(base or empty_profile_result(profile_status="unclear"))
-    for key, value in (overrides or {}).items():
-        if key in EDITABLE_PROFILE_FIELDS:
-            merged[key] = value
-    return merged

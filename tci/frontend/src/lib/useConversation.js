@@ -24,10 +24,5 @@ export default function useConversation() {
         }
     }, []);
 
-    const reload = useCallback(
-        () => conversation.conversationId && open(conversation.conversationId, conversation.messageId),
-        [conversation.conversationId, conversation.messageId, open],
-    );
-
-    return { conversation, open, reload };
+    return { conversation, open };
 }

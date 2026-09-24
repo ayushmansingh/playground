@@ -2,7 +2,6 @@ import { createContext, useContext } from "react";
 
 export const KPI_LABELS = {
     conversations: "Conversations",
-    reviewed: "Manually reviewed",
     negative_percent: "Negative sentiment %",
     dissatisfaction_percent: "Conversations with dissatisfaction %",
     budget_conscious_percent: "Budget-sensitive conversations %",
@@ -29,7 +28,6 @@ const FIELD_OPTION_KEYS = {
     confidence: "confidence_levels",
     confidence_overall: "confidence_levels",
     profile_status: "profile_statuses",
-    review_status: "review_statuses",
     signal_quality: "signal_qualities",
 };
 
@@ -62,8 +60,6 @@ export function toneForValue(fieldKey, value) {
     switch (fieldKey) {
         case "signal_quality":
             return normalized === "strong" ? "good" : normalized === "moderate" ? "accent" : normalized === "weak" ? "warm" : "neutral";
-        case "review_status":
-            return normalized === "corrected" ? "accent" : normalized === "approved" ? "good" : "neutral";
         case "overall_customer_sentiment":
         case "sentiment":
             return normalized === "negative" ? "warm" : normalized === "positive" ? "good" : normalized === "mixed" ? "accent" : "neutral";

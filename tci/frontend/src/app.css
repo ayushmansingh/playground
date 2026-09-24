@@ -97,7 +97,7 @@ body {
 
 h1, h2, h3 { margin: 0; font-weight: 600; }
 
-button, input, select, textarea { font: inherit; color: inherit; }
+button, input, select { font: inherit; color: inherit; }
 
 ::selection { background: var(--primary); color: var(--surface); }
 
@@ -323,7 +323,6 @@ mark {
 
 .field input,
 .field select,
-.field textarea,
 .search-bar input {
   width: 100%;
   background: var(--card);
@@ -336,34 +335,14 @@ mark {
 
 .field input:hover,
 .field select:hover,
-.field textarea:hover,
 .search-bar input:hover { border-color: var(--ink-40); }
 
 .field input:focus,
 .field select:focus,
-.field textarea:focus,
 .search-bar input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px var(--primary-wash);
   outline: none;
-}
-
-.field textarea { resize: vertical; line-height: 1.5; }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: var(--s3);
-}
-
-.form-actions { display: flex; flex-wrap: wrap; gap: var(--s2); }
-
-.form-error {
-  font-size: var(--t2);
-  color: var(--danger);
-  background: var(--danger-wash);
-  border-radius: var(--r-sm);
-  padding: var(--s2) var(--s3);
 }
 
 .more-filters {
@@ -680,8 +659,6 @@ mark {
 .profile-grid > div { display: flex; flex-direction: column; gap: var(--s0); min-width: 0; }
 .profile-grid .label { color: var(--ink-40); }
 .profile-grid strong { font-size: var(--t2); font-weight: 500; word-break: break-word; }
-
-.review-form { margin-top: var(--s2); }
 
 /* ------------------------------------------------------------ transcript -- */
 

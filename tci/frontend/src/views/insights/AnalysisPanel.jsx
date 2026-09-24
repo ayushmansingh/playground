@@ -25,7 +25,7 @@ function formatKpi(key, value) {
     return formatNumber(value);
 }
 
-export default function AnalysisPanel({ query, dataVersion }) {
+export default function AnalysisPanel({ query }) {
     const display = useDisplayValue();
     const [data, setData] = useState(null);
     const [message, setMessage] = useState("");
@@ -46,7 +46,7 @@ export default function AnalysisPanel({ query, dataVersion }) {
                     setMessage(error.message);
                 }
             });
-    }, [query, dataVersion]);
+    }, [query]);
 
     return (
         <>

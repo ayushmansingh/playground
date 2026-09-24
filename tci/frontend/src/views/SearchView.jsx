@@ -5,19 +5,19 @@ import useConversation from "../lib/useConversation.js";
 import Transcript, { Highlight } from "../components/Transcript.jsx";
 import { PanelHeader, Pagination, Pill } from "../components/ui.jsx";
 
-const EMPTY_SEARCH = { q: "", sender: "", date_from: "", date_to: "", he_number: "", customer_number: "" };
+const EMPTY_SEARCH = { q: "", sender: "", date_from: "", date_to: "", lead_id: "", he_id: "" };
 
 function ResultItem({ result, term, selected, onSelect }) {
     const { snippet } = result;
     return (
         <article className={`result-item${selected ? " selected" : ""}`} onClick={() => onSelect(result.conversation_id, snippet.message_id)}>
             <div className="result-head">
-                <strong>{result.customer_number}</strong>
-                <span className="subtle">{`Agent ${result.he_number}`}</span>
+                <strong>{`Lead ${result.conversation_id}`}</strong>
+                {result.he_id && <span className="subtle">{`Agent ${result.he_id}`}</span>}
                 <span className="result-date">{snippet.message_datetime}</span>
             </div>
             <p className="result-snippet">
-                {snippet.sender_type && <span className="result-sender">{snippet.sender_type}: </span>}
+                {snippet.sender_type && <span className="result-sender">{snippet.sender_type === "customer" ? "Customer" : "Agent"}: </span>}
                 <Highlight text={String(snippet.message_content).slice(0, 280)} term={term} />
             </p>
             <div className="pill-row">
@@ -106,12 +106,12 @@ export default function SearchView() {
                             <input type="date" value={draft.date_to} onChange={setField("date_to")} />
                         </label>
                         <label className="field">
-                            <span>Customer number</span>
-                            <input inputMode="numeric" placeholder="Any" value={draft.customer_number} onChange={setField("customer_number")} />
+                            <span>Lead ID</span>
+                            <input placeholder="Any" value={draft.lead_id} onChange={setField("lead_id")} />
                         </label>
                         <label className="field">
-                            <span>Agent number</span>
-                            <input inputMode="numeric" placeholder="Any" value={draft.he_number} onChange={setField("he_number")} />
+                            <span>Agent ID</span>
+                            <input placeholder="Any" value={draft.he_id} onChange={setField("he_id")} />
                         </label>
                         <button type="button" className="ghost-button" onClick={clear}>Clear</button>
                     </div>
@@ -142,11 +142,11 @@ export default function SearchView() {
             <aside className="side-card detail-panel">
                 <PanelHeader
                     eyebrow="Conversation"
-                    title={data ? data.customer_number : "Select a conversation"}
+                    title={data ? `Lead ${data.conversation_id}` : "Select a conversation"}
                     subtitle={
                         <p className="subtle">
                             {data
-                                ? `Agent ${data.he_number} | ${formatNumber(data.total_messages)} messages`
+                                ? `Agent ${data.he_id || "unknown"} | ${formatNumber(data.total_messages)} messages`
                                 : "Pick a result to read the full chat."}
                         </p>
                     }

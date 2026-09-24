@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import Body, FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request
 
-from conversation_service import fetch_conversation, save_review
-from database import BUNDLED_DB_PATH, DB_PATH, ensure_database
+from conversation_service import fetch_conversation
+from database import DB_PATH, ensure_database
 from insights_service import analyze_insights, fetch_filter_options, fetch_meta, list_insights
 from search_service import search_chats
 
@@ -20,7 +20,7 @@ app.router.routes[:] = [
     if getattr(route, "path", "").startswith("/api")
 ]
 
-# Seed APP_DATA_DIR before the server accepts any frontend requests.
+# Create the schema before the server accepts any frontend requests.
 ensure_database(DB_PATH)
 _meta = fetch_meta()
 print(
@@ -37,13 +37,12 @@ def health() -> dict[str, Any]:
         "status": "ok",
         "database_exists": DB_PATH.exists(),
         "database_bytes": DB_PATH.stat().st_size if DB_PATH.exists() else 0,
-        "seed_database_exists": BUNDLED_DB_PATH.exists(),
-        "seed_database_bytes": BUNDLED_DB_PATH.stat().st_size if BUNDLED_DB_PATH.exists() else 0,
+        "synced_to": fetch_meta()["synced_to"],
     }
 
 
 @app.get("/api/meta")
-def api_meta() -> dict[str, int]:
+def api_meta() -> dict[str, Any]:
     return fetch_meta()
 
 
@@ -78,11 +77,3 @@ def api_conversation(conversation_id: str = "") -> dict[str, Any]:
     if payload is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return payload
-
-
-@app.post("/api/review/save")
-def api_review_save(payload: dict[str, Any] = Body(default_factory=dict)) -> dict[str, Any]:
-    try:
-        return {"review": save_review(payload)}
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc

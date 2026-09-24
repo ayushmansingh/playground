@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./app.css";
 import { fetchJson } from "./lib/api.js";
 import { FilterOptionsContext } from "./lib/labels.js";
@@ -16,14 +16,10 @@ export default function App() {
     const [meta, setMeta] = useState(null);
     const [options, setOptions] = useState(null);
 
-    const loadMeta = useCallback(() => {
-        fetchJson("/api/meta").then(setMeta).catch(console.error);
-    }, []);
-
     useEffect(() => {
-        loadMeta();
+        fetchJson("/api/meta").then(setMeta).catch(console.error);
         fetchJson("/api/insights/options").then(setOptions).catch(console.error);
-    }, [loadMeta]);
+    }, []);
 
     return (
         <FilterOptionsContext.Provider value={options}>
@@ -35,7 +31,7 @@ export default function App() {
                         <SearchView />
                     </section>
                     <section className={`view-panel${activeView === "insights" ? " active" : ""}`}>
-                        <InsightsView onReviewSaved={loadMeta} />
+                        <InsightsView />
                     </section>
                 </main>
             </div>

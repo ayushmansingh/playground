@@ -11,7 +11,7 @@ import re
 from datetime import date, datetime, time, timezone
 from typing import Any
 
-from database import DB_PATH, get_connection
+from database import DB_PATH, format_timestamp, get_connection
 
 DEFAULT_PAGE_SIZE = 50
 MAX_PAGE_SIZE = 200
@@ -58,17 +58,27 @@ def search_chats(args) -> dict[str, Any]:
     """Conversations with at least one message matching every given criterion.
 
     Criteria: q (text, matched as a phrase), sender (customer|he), date_from and
-    date_to (YYYY-MM-DD, on message dates), he_number and customer_number
-    (substring match). With no message-level criteria, every conversation
-    matching the number filters is listed, newest first.
+    date_to (YYYY-MM-DD, on message dates), lead_id and he_id (substring
+    match). With no message-level criteria, every conversation matching the
+    id filters is listed, newest first.
     """
     query = (args.get("q") or "").strip()
     sender = SENDER_TYPES.get((args.get("sender") or "").strip().lower())
     date_from = day_bound(args.get("date_from"), end=False)
     date_to = day_bound(args.get("date_to"), end=True)
-    he_number = (args.get("he_number") or "").strip()
-    customer_number = (args.get("customer_number") or "").strip()
+    lead_id = (args.get("lead_id") or "").strip()
+    he_id = (args.get("he_id") or "").strip()
     page, page_size, offset = page_args(args)
+
+    conversation_where = ["c.total_messages > 0"]
+    conversation_params: list[Any] = []
+    if lead_id:
+        conversation_where.append("c.conversation_id LIKE ? ESCAPE '\\'")
+        conversation_params.append(f"%{escape_like(lead_id)}%")
+    if he_id:
+        conversation_where.append("c.he_id LIKE ? ESCAPE '\\'")
+        conversation_params.append(f"%{escape_like(he_id)}%")
+    conversation_sql = " AND ".join(conversation_where)
 
     message_where: list[str] = []
     message_params: list[Any] = []
@@ -79,104 +89,90 @@ def search_chats(args) -> dict[str, Any]:
             source = "message_search JOIN messages AS m ON m.id = message_search.rowid"
             message_where.append("message_search MATCH ?")
             message_params.append(phrase)
-        # FTS stems words ("prices" matches "price"); the LIKE keeps the exact
-        # text the user typed, punctuation included.
-        message_where.append("m.message_content_lower LIKE ? ESCAPE '\\'")
-        message_params.append(f"%{escape_like(query.lower())}%")
+        # FTS stems words ("prices" matches "price"); the LIKE (case-insensitive
+        # for ASCII) keeps the exact text the user typed, punctuation included.
+        message_where.append("m.content LIKE ? ESCAPE '\\'")
+        message_params.append(f"%{escape_like(query)}%")
     if sender:
-        # Anything not from the customer counts as the agent (HE) side.
-        operator = "=" if sender == "customer" else "!="
-        message_where.append(f"LOWER(COALESCE(m.sender_type, '')) {operator} 'customer'")
+        message_where.append("m.sender_type = ?")
+        message_params.append(sender)
     if date_from is not None:
-        message_where.append("m.message_timestamp >= ?")
+        message_where.append("m.sent_at >= ?")
         message_params.append(date_from)
     if date_to is not None:
-        message_where.append("m.message_timestamp <= ?")
+        message_where.append("m.sent_at <= ?")
         message_params.append(date_to)
 
-    conversation_where: list[str] = []
-    conversation_params: list[Any] = []
-    if he_number:
-        conversation_where.append("ci.he_number LIKE ? ESCAPE '\\'")
-        conversation_params.append(f"%{escape_like(he_number)}%")
-    if customer_number:
-        conversation_where.append("ci.customer_number LIKE ? ESCAPE '\\'")
-        conversation_params.append(f"%{escape_like(customer_number)}%")
-    conversation_sql = " AND ".join(conversation_where) or "1 = 1"
-
+    has_profile_sql = """
+        EXISTS (
+            SELECT 1 FROM conversation_profiles p
+            WHERE p.conversation_id = c.conversation_id AND p.status = 'complete'
+        ) AS has_profile
+    """
     if message_where:
-        # One row per conversation: its newest matching message plus a hit count.
+        if len(conversation_where) > 1:
+            # Narrow to the matching leads first so only their messages are scanned.
+            message_where.append(
+                f"m.conversation_key IN (SELECT c.id FROM conversations c WHERE {conversation_sql})"
+            )
+            message_params.extend(conversation_params)
+        # One row per conversation: its hit count and newest matching message.
+        # (SQLite fills the bare columns from the row that supplied MAX().)
         sql = f"""
             WITH hits AS (
                 SELECT
-                    m.id, m.conversation_id, m.message_timestamp, m.message_datetime,
-                    m.message_content, m.sender_type,
-                    COUNT(*) OVER (PARTITION BY m.conversation_id) AS hit_count,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY m.conversation_id
-                        ORDER BY m.message_timestamp DESC, m.id DESC
-                    ) AS position
+                    m.conversation_key, COUNT(*) AS hit_count, MAX(m.sent_at) AS snippet_at,
+                    m.id AS snippet_id, m.content AS snippet_content, m.sender_type AS snippet_sender_type
                 FROM {source}
                 WHERE {" AND ".join(message_where)}
+                GROUP BY m.conversation_key
             )
-            SELECT
-                COUNT(*) OVER () AS total,
-                ci.*,
-                hits.hit_count,
-                hits.id AS match_id,
-                hits.message_datetime AS match_datetime,
-                hits.message_content AS match_content,
-                hits.sender_type AS match_sender_type
+            SELECT COUNT(*) OVER () AS total, c.*, {has_profile_sql}, hits.*
             FROM hits
-            JOIN conversation_index AS ci ON ci.conversation_id = hits.conversation_id
-            WHERE hits.position = 1 AND {conversation_sql}
-            ORDER BY hits.message_timestamp DESC, hits.id DESC
+            JOIN conversations AS c ON c.id = hits.conversation_key
+            ORDER BY hits.snippet_at DESC, hits.snippet_id DESC
             LIMIT ? OFFSET ?
         """
-        params = [*message_params, *conversation_params, page_size, offset]
+        with get_connection(DB_PATH) as conn:
+            rows = [dict(row) for row in conn.execute(sql, [*message_params, page_size, offset])]
+        total = rows[0]["total"] if rows else 0
     else:
+        # The page walks idx_conversations_latest; the total is a separate count.
         sql = f"""
-            SELECT COUNT(*) OVER () AS total, ci.*
-            FROM conversation_index AS ci
+            SELECT
+                c.*, {has_profile_sql},
+                0 AS hit_count, m.id AS snippet_id, m.sent_at AS snippet_at,
+                m.content AS snippet_content, NULL AS snippet_sender_type
+            FROM conversations AS c
+            JOIN messages AS m ON m.id = c.latest_message_id
             WHERE {conversation_sql}
-            ORDER BY ci.latest_message_timestamp DESC
+            ORDER BY c.latest_message_at DESC
             LIMIT ? OFFSET ?
         """
-        params = [*conversation_params, page_size, offset]
+        with get_connection(DB_PATH) as conn:
+            rows = [dict(row) for row in conn.execute(sql, [*conversation_params, page_size, offset])]
+            total = conn.execute(
+                f"SELECT COUNT(*) FROM conversations AS c WHERE {conversation_sql}", conversation_params
+            ).fetchone()[0]
 
-    with get_connection(DB_PATH) as conn:
-        rows = [dict(row) for row in conn.execute(sql, params)]
-        profiled = {
-            row["conversation_id"]
-            for row in conn.execute(
-                f"""
-                SELECT DISTINCT conversation_id FROM conversation_profiles
-                WHERE status = 'complete' AND conversation_id IN ({",".join("?" for _ in rows)})
-                """,
-                [row["conversation_id"] for row in rows],
-            )
-        } if rows else set()
-
-    total = rows[0]["total"] if rows else 0
-    results = []
-    for row in rows:
-        has_match = "match_id" in row
-        results.append({
+    results = [
+        {
             "conversation_id": row["conversation_id"],
-            "he_number": row["he_number"],
-            "customer_number": row["customer_number"],
+            "he_id": row["he_id"],
             "total_messages": row["total_messages"],
-            "latest_message_datetime": row["latest_message_datetime"],
-            "hit_count": row["hit_count"] if has_match else 0,
-            "has_profile": row["conversation_id"] in profiled,
+            "latest_message_datetime": format_timestamp(row["latest_message_at"]),
+            "hit_count": row["hit_count"],
+            "has_profile": bool(row["has_profile"]),
             "snippet": {
-                "message_id": row["match_id"] if has_match else row["latest_message_id"],
-                "message_datetime": row["match_datetime"] if has_match else row["latest_message_datetime"],
-                "message_content": row["match_content"] if has_match else row["latest_message_content"],
-                "sender_type": row["match_sender_type"] if has_match else None,
-                "is_match": has_match,
+                "message_id": row["snippet_id"],
+                "message_datetime": format_timestamp(row["snippet_at"]),
+                "message_content": row["snippet_content"],
+                "sender_type": row["snippet_sender_type"],
+                "is_match": row["hit_count"] > 0,
             },
-        })
+        }
+        for row in rows
+    ]
     return {
         "page": page,
         "page_size": page_size,

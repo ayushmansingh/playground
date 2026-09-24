@@ -18,7 +18,7 @@ function InsightCard({ card, selected, onSelect }) {
                 <h3>{destination}</h3>
                 <span className="result-date">{card.latest_message_datetime}</span>
             </div>
-            <p className="card-anchor">{card.customer_number}</p>
+            <p className="card-anchor">{`Lead ${card.conversation_id}`}</p>
             <div className="pill-row">
                 {fieldPill("travel_intent_primary")}
                 {fieldPill("travel_cohort")}
@@ -29,7 +29,6 @@ function InsightCard({ card, selected, onSelect }) {
             <p className="card-summary clamp">{profile.summary || "No summary yet."}</p>
             <div className="card-footer">
                 <span className="pill-row">
-                    <Pill tone={toneForValue("review_status", card.review_status)}>{display("review_status", card.review_status)}</Pill>
                     <Pill tone={toneForValue("signal_quality", card.signal_quality)}>{`${display("signal_quality", card.signal_quality)} signal`}</Pill>
                 </span>
                 <span className="subtle">{`${card.total_messages} messages`}</span>

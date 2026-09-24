@@ -1,12 +1,12 @@
 # Travel Conversation Intelligence (TCI)
 
 Internal tool for a holiday-package sales team (branded "MMT"). It holds
-WhatsApp chats between customers and sales agents ("HE" = the agent side)
-and offers two views:
+the WhatsApp chats of closed HolidayCRM leads, one conversation per lead
+("HE" = the agent side), pulled nightly from Redash, and offers two views:
 
 - **Search chats**: plain phrase search over raw messages. No classification.
-- **AI insights**: filter, analyze, and human-review conversations that have
-  an AI-generated profile (intent, cohort, sentiment, blockers, ...).
+- **AI insights**: filter and analyze conversations that have an
+  AI-generated profile (intent, cohort, sentiment, blockers, ...).
 
 ## Layout
 
@@ -14,19 +14,22 @@ and offers two views:
 tci/
   DESIGN.md                 "Cafe" design spec (from `npx typeui.sh pull cafe`)
   backend/                  FastAPI + SQLite, only /api/* routes
-    main.py                 routes
-    database.py             schema, seed promotion, derived tables (FTS + conversation_index)
-    ingest.py               clean + dedupe + insert messages; CLI for CSV exports
+    README.md               Redash query contract, cron, storage and scale notes
+    main.py                 routes (read-only)
+    database.py             schema (WAL), refresh_conversations() counters
+    redash.py               Redash API client (saved query + params -> rows)
+    sync_closed_leads.py    nightly job: closed leads -> their messages
+    ingest.py               row contracts, clean + dedupe + store; CLI for a messages CSV
     search_service.py       GET /api/search (all filtering/paging in SQL)
     insights_service.py     GET /api/insights, /analysis, /options, /api/meta
-    conversation_service.py GET /api/conversation, POST /api/review/save
+    conversation_service.py GET /api/conversation
     conversation_profile_contract.py  AI profile enums, prompt, sanitizers (for enrichment)
     dev_fixture.py          synthetic test data
   frontend/                 Vite + React 19, no other deps
     src/App.jsx             view switch + header counters
     src/views/SearchView.jsx
     src/views/InsightsView.jsx, src/views/insights/*  (FilterRail, InsightList,
-                            AnalysisPanel, ConversationDetail with inline review)
+                            AnalysisPanel, ConversationDetail)
     src/components/         Header, Transcript (highlight + scroll), ui.jsx
     src/lib/                api.js, labels.js (display labels/tones), useConversation.js
     src/app.css             all styles; Cafe tokens on :root
@@ -38,7 +41,7 @@ tci/
 # backend (Python 3.10+)
 cd tci/backend && python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python dev_fixture.py /tmp/tci-dev                 # optional synthetic data
+python dev_fixture.py /tmp/tci-dev                 # synthetic data
 APP_DATA_DIR=/tmp/tci-dev uvicorn main:app --port 8000
 
 # frontend (Node 18+), second terminal
@@ -46,35 +49,45 @@ cd tci/frontend && npm ci && npm run dev           # http://localhost:5173, prox
 npm run build                                      # the only frontend check there is
 ```
 
-Real data: put the seed DB at `backend/data/conversation_seed_20260909.sqlite3`
-(or in `$APP_DATA_DIR`), or load CSV exports with `python ingest.py *.csv`.
-`data/` and `*.sqlite3` are gitignored; never commit chat data.
+Real data comes from the nightly job, `python sync_closed_leads.py` (Redash
+settings via `REDASH_*` env vars; see `backend/README.md`), or a CSV download
+of the messages query via `python ingest.py file.csv`. `data/` and `*.sqlite3`
+are gitignored; never commit chat data or the Redash API key.
 
 ## How it works (things that are easy to get wrong)
 
-- **Database.** `ensure_database()` runs at import of `main.py`. It copies the
-  seed over the live DB only if the live one is absent/empty/smaller, creates
-  missing tables, and rebuilds `message_search` (FTS5) and `conversation_index`
-  from `messages` when their counts drift. Anything that writes `messages` must
-  call `database.rebuild_derived_tables()` (`ingest.insert_messages` does).
-- **Old databases.** Seeds built by the previous version also contain tables
-  for the retired keyword classifier and DoubleTick import
-  (`conversation_rule_features`, `destination_catalog`, `destination_alias*`,
-  `conversation_aggregate`, `conversation_llm_features`). Nothing reads them;
-  they were deliberately left in place, not dropped.
+- **Keys.** `conversation_id` is the HolidayCRM `leadId` everywhere in the API
+  and in `conversation_profiles`. Inside the database `messages` point at
+  `conversations.id` (an integer) and dedupe on `source_hash`, a 64-bit hash
+  of the WhatsApp message id, unique per conversation. Phone numbers are not
+  stored; `he_id` is the lead's current assignee, not proof of who sent a
+  message.
+- **Database.** `ensure_database()` runs at import of `main.py` and in the
+  job; it creates the schema (`PRAGMA user_version` = 2) and refuses a
+  database built by the old phone-number-keyed version. `message_search` is an
+  external-content FTS5 table kept in step by triggers. Anything that writes
+  `messages` must go through `ingest.store_messages()`, which refreshes the
+  touched conversations' counters and `signal_quality`. Repair if ever
+  needed: `INSERT INTO message_search(message_search) VALUES('rebuild')`.
+- **Nightly sync.** `sync_closed_leads.py` walks day-sized windows of close
+  time; each finished window is a `succeeded` row in `sync_runs` and the next
+  run resumes an hour before the newest one. A Redash result of exactly
+  `ROW_LIMIT` rows is treated as truncated and the window or lead batch is
+  halved. Lead ids are validated before they go into a query parameter. The
+  saved queries are not written yet; the contract is in `backend/README.md`.
+  Tested only against a fake Redash (job polling, retries, splitting,
+  failures, lock), never the real one.
 - **Search semantics.** A query must match as a phrase in FTS5 *and* as a
-  literal case-insensitive substring (`LIKE`), so "prices" does not match
-  "price". The frontend highlights the same literal substring. "Agent" sender
-  = any `sender_type` other than `customer` (same rule as the message counts).
-- **Profiles and reviews.** The newest `status='complete'` row in
-  `conversation_profiles` is the AI profile. A review stores corrections in
-  `conversation_reviews.corrected_profile_json`; they are merged over the AI
-  profile *before* filtering and counting, and the raw profile is never edited.
-  Insights only include conversations that have a profile.
-- **Insights performance.** `insights_service.fetch_profiled_cards()` loads all
-  profiled conversations into Python on every list/analysis request, because
-  review overrides must apply before filtering. Fine at current scale; move to
-  SQL if profiles reach tens of thousands.
+  literal substring (`LIKE`, case-insensitive for ASCII), so "prices" does not
+  match "price". The frontend highlights the same literal substring.
+  `sender_type` is `customer` (INBOUND) or `he` (OUTBOUND).
+- **Profiles.** `conversation_profiles` holds one row per conversation; rows
+  with `status='complete'` are shown and counted as is. Insights only include
+  conversations that have one. There is no human review: at lakhs of
+  conversations nobody has time for it, so it was removed on purpose.
+- **Performance.** Search, insights lists and analysis filter, page and count
+  in SQL (analysis filters once into a materialized CTE). Measured numbers at
+  2 lakh leads / 50 lakh messages are in `backend/README.md`.
 - **Frontend.** Both views stay mounted (CSS toggles `.view-panel.active`) so
   each keeps its inputs and selection. Fetches guard against stale responses
   with a request-id ref. Enum values are labelled via `useDisplayValue()` using
@@ -84,7 +97,7 @@ Real data: put the seed DB at `backend/data/conversation_seed_20260909.sqlite3`
   soft shadows. Fonts are self-hosted in `frontend/public/fonts`. Use the
   tokens in `app.css`; don't add new colours ad hoc.
 
-## Status (2026-09-24)
+## Status (2026-09-25)
 
 Done, on branch `claude/bold-lovelace-1pbg1p`:
 1. Imported the app; removed dead backend code.
@@ -92,36 +105,37 @@ Done, on branch `claude/bold-lovelace-1pbg1p`:
    into React components.
 3. Adopted the Cafe design.
 4. Removed the DoubleTick import and the keyword classification system.
-5. Split into the Search and Insights views; review moved inline into the
-   Insights conversation panel (opening Review defaults status to Approved).
+5. Split into the Search and Insights views.
+6. Removed human review (route, form, filter, counters, KPI).
+7. Re-keyed everything on HolidayCRM lead ids and added the nightly Redash
+   sync of closed leads; compact schema (integer conversation key, hashed
+   message ids, external-content FTS, stored counters); insights moved to SQL.
+   Old phone-number-keyed databases and the seed promotion are no longer used.
 
-Verified with `dev_fixture.py` data, API checks against both a new DB and one
-built by the old code, and Playwright runs of both views. **Not yet run on
-real data. There are no automated tests in the repo.**
+Verified with `dev_fixture.py` data, a fake Redash server, a synthetic
+50-lakh-message database, and browser runs of both views. **Not yet run
+against real Redash or real data. There are no automated tests in the repo.**
 
 ## Next steps
 
-1. **Redash sync** (replaces DoubleTick). Open questions for the user:
-   - In-app "Sync" button / schedule, or an offline script?
-   - Full pull or incremental (since the last synced timestamp)?
-   - What columns does the Redash query return? `ingest.clean_row` expects
-     `Date` (epoch seconds), `HE Number`, `Customer Number`, `Sender Number`,
-     `Sender Type`, `Message Content`, `Message Type`; map to these.
-   Plan: fetch the saved query's results via the Redash API (API key +
-   query id from env vars, never committed), map rows, and feed them through
-   `ingest.insert_messages`, which already dedupes and refreshes derived tables.
+1. **Write the two Redash queries** to the contract in `backend/README.md`,
+   run `sync_closed_leads.py --dry-run` against them, then schedule it.
+   Open with the CRM owners: which timestamp means "closed" (`updatedAt`
+   also moves on unrelated edits; harmless, but a close time is better),
+   whether automated/template OUTBOUND messages can be told apart (they are
+   currently stored and searched like agent messages), and whether booking
+   status (`lead_scores.bookingCompleted`) should be added to `conversations`.
 2. **AI enrichment.** New chats from Redash need profiles or they never appear
    in Insights. The original enrichment script was not in the handed-over code.
    `conversation_profile_contract.py` has the schema, `profile_prompt_spec()`,
    `build_profile_user_prompt()`, and `sanitize_profile_result()` to build on;
-   write results to `conversation_profiles` with `status='complete'`. Ask the
+   upsert one row per conversation into `conversation_profiles` with
+   `status='complete'`; run it after the nightly sync for conversations that
+   have no profile yet (query in `backend/README.md`). Ask the
    user whether they have the old script or want one built on the Claude API.
    Consider adding a cash-payment field (the old keyword filter was dropped).
 
 Smaller follow-ups, when useful:
-- Optional cleanup that drops the retired tables from old databases (ask first;
-  it rewrites the user's DB).
-- Add backend tests (pytest + FastAPI TestClient on `dev_fixture.py` data).
-- The review form edits only one dissatisfaction reason; an emptied summary
-  overwrites the AI summary with blank.
+- Add backend tests (pytest + FastAPI TestClient on `dev_fixture.py` data,
+  and the sync job against a fake Redash).
 - No favicon (harmless 404).

@@ -8,7 +8,7 @@ import InsightList from "./insights/InsightList.jsx";
 import AnalysisPanel from "./insights/AnalysisPanel.jsx";
 import ConversationDetail from "./insights/ConversationDetail.jsx";
 
-export default function InsightsView({ onReviewSaved }) {
+export default function InsightsView() {
     const options = useFilterOptions();
     const [filters, setFilters] = useState(EMPTY_FILTERS);
     const [view, setView] = useState("");
@@ -16,10 +16,8 @@ export default function InsightsView({ onReviewSaved }) {
     const [page, setPage] = useState(1);
     const [result, setResult] = useState(null);
     const [status, setStatus] = useState("");
-    // Bumped after a review save so the list and analysis re-fetch.
-    const [dataVersion, setDataVersion] = useState(0);
     const requestId = useRef(0);
-    const { conversation, open, reload } = useConversation();
+    const { conversation, open } = useConversation();
 
     const query = useMemo(() => ({ ...filters, view }), [filters, view]);
 
@@ -52,13 +50,7 @@ export default function InsightsView({ onReviewSaved }) {
                     setStatus(error.message);
                 }
             });
-    }, [query, page, mode, dataVersion]);
-
-    const handleReviewSaved = () => {
-        reload();
-        setDataVersion((version) => version + 1);
-        onReviewSaved();
-    };
+    }, [query, page, mode]);
 
     const quickViews = [{ value: "", label: "All" }, ...(options?.quick_views || [])];
 
@@ -97,7 +89,7 @@ export default function InsightsView({ onReviewSaved }) {
                 </div>
 
                 {mode === "analysis"
-                    ? <AnalysisPanel query={query} dataVersion={dataVersion} />
+                    ? <AnalysisPanel query={query} />
                     : (
                         <>
                             <div className="results-summary">
@@ -110,7 +102,7 @@ export default function InsightsView({ onReviewSaved }) {
                     )}
             </section>
 
-            {mode === "list" && <ConversationDetail conversation={conversation} onReviewSaved={handleReviewSaved} />}
+            {mode === "list" && <ConversationDetail conversation={conversation} />}
         </div>
     );
 }

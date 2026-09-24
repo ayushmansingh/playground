@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { postJson } from "../../lib/api.js";
-import { formatNumber, toneForValue, useDisplayValue, useFilterOptions } from "../../lib/labels.js";
+import React from "react";
+import { formatNumber, useDisplayValue } from "../../lib/labels.js";
 import Transcript from "../../components/Transcript.jsx";
-import { OptionSelect, PanelHeader, Pill } from "../../components/ui.jsx";
+import { PanelHeader } from "../../components/ui.jsx";
 
-// [profile field, label, option list]; option list null = free text.
+// [profile field, label, option list]; option list null = shown as is.
 const PROFILE_FIELDS = [
     ["travel_intent_primary", "Trip intent", "travel_intents"],
     ["destination_primary", "Primary destination", null],
@@ -25,19 +24,6 @@ function fieldValue(profile, field) {
     return field === "dissatisfaction_reason"
         ? profile.dissatisfaction_reasons.find((value) => value !== "none") || "none"
         : profile[field];
-}
-
-function formFromConversation(data) {
-    const profile = data.profile || {};
-    const form = {
-        review_status: data.review.review_status === "unreviewed" ? "approved" : data.review.review_status,
-        summary: profile.summary || "",
-        reviewer_note: data.review.reviewer_note || "",
-    };
-    for (const [field] of PROFILE_FIELDS) {
-        form[field] = data.profile ? fieldValue(profile, field) || "" : "";
-    }
-    return form;
 }
 
 function ProfileView({ profile }) {
@@ -61,90 +47,9 @@ function ProfileView({ profile }) {
     );
 }
 
-function ReviewForm({ data, onCancel, onSaved }) {
-    const options = useFilterOptions();
-    const [form, setForm] = useState(() => formFromConversation(data));
-    const [reviewedBy, setReviewedBy] = useState(data.review.reviewed_by || "");
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
-
-    const setField = (key, value) => setForm((current) => ({ ...current, [key]: value }));
-
-    const submit = async (event) => {
-        event.preventDefault();
-        const { dissatisfaction_reason: reason, review_status, reviewer_note, ...fields } = form;
-        setSaving(true);
-        setError("");
-        try {
-            const { ok, payload } = await postJson("/api/review/save", {
-                conversation_id: data.conversation_id,
-                review_status,
-                reviewed_by: reviewedBy.trim(),
-                reviewer_note: reviewer_note.trim(),
-                corrected_fields: {
-                    ...fields,
-                    summary: fields.summary.trim(),
-                    destination_primary: fields.destination_primary.trim(),
-                    dissatisfaction_reasons: reason ? [reason] : [],
-                },
-            });
-            if (!ok) {
-                throw new Error(payload.detail || "Could not save the review.");
-            }
-            onSaved();
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    return (
-        <form className="stack-form review-form" onSubmit={submit}>
-            <div className="form-grid">
-                <label className="field">
-                    <span>Review status</span>
-                    <OptionSelect options={options?.review_statuses} value={form.review_status} onChange={(value) => setField("review_status", value)} />
-                </label>
-                <label className="field">
-                    <span>Reviewer</span>
-                    <input type="text" placeholder="Your name" value={reviewedBy} onChange={(event) => setReviewedBy(event.target.value)} />
-                </label>
-            </div>
-            <label className="field">
-                <span>Summary</span>
-                <textarea rows="3" value={form.summary} onChange={(event) => setField("summary", event.target.value)} />
-            </label>
-            <div className="form-grid">
-                {PROFILE_FIELDS.map(([field, label, optionKey]) => (
-                    <label key={field} className="field">
-                        <span>{label}</span>
-                        {optionKey
-                            ? <OptionSelect options={options?.[optionKey]} value={form[field]} onChange={(value) => setField(field, value)} />
-                            : <input type="text" value={form[field]} onChange={(event) => setField(field, event.target.value)} />}
-                    </label>
-                ))}
-            </div>
-            <label className="field">
-                <span>Reviewer note</span>
-                <textarea rows="2" value={form.reviewer_note} onChange={(event) => setField("reviewer_note", event.target.value)} />
-            </label>
-            {error && <div className="form-error">{error}</div>}
-            <div className="form-actions">
-                <button type="submit" className="primary-button" disabled={saving}>{saving ? "Saving..." : "Save review"}</button>
-                <button type="button" className="ghost-button" onClick={onCancel}>Cancel</button>
-            </div>
-        </form>
-    );
-}
-
-export default function ConversationDetail({ conversation, onReviewSaved }) {
+export default function ConversationDetail({ conversation }) {
     const display = useDisplayValue();
-    const [editing, setEditing] = useState(false);
     const { data, status } = conversation;
-
-    // A different conversation always opens in read mode.
-    useEffect(() => setEditing(false), [conversation.conversationId]);
 
     let body = null;
     if (status === "loading" && !data) {
@@ -154,24 +59,15 @@ export default function ConversationDetail({ conversation, onReviewSaved }) {
     } else if (!data) {
         body = <div className="empty-state">Pick a conversation to see its AI profile and chat.</div>;
     } else {
-        const review = data.review;
         body = (
             <div className="detail-body">
                 <section className="detail-section">
                     <div className="section-head">
                         <h3>AI profile</h3>
-                        {!editing && <button type="button" className="ghost-button" onClick={() => setEditing(true)}>Review</button>}
                     </div>
-                    <div className="pill-row">
-                        <Pill tone={toneForValue("review_status", review.review_status)}>{display("review_status", review.review_status)}</Pill>
-                        {review.reviewed_by && <Pill>{`By ${review.reviewed_by}`}</Pill>}
-                    </div>
-                    {review.reviewer_note && !editing && <p className="subtle">{review.reviewer_note}</p>}
-                    {editing
-                        ? <ReviewForm data={data} onCancel={() => setEditing(false)} onSaved={() => { setEditing(false); onReviewSaved(); }} />
-                        : data.profile
-                            ? <ProfileView profile={data.profile} />
-                            : <p className="subtle">No AI profile for this conversation.</p>}
+                    {data.profile
+                        ? <ProfileView profile={data.profile} />
+                        : <p className="subtle">No AI profile for this conversation.</p>}
                 </section>
                 <section className="detail-section">
                     <div className="section-head">
@@ -188,9 +84,9 @@ export default function ConversationDetail({ conversation, onReviewSaved }) {
         <aside className="side-card detail-panel">
             <PanelHeader
                 eyebrow="Conversation"
-                title={data ? data.customer_number : "Select a conversation"}
+                title={data ? `Lead ${data.conversation_id}` : "Select a conversation"}
                 subtitle={data && (
-                    <p className="subtle">{`Agent ${data.he_number} | ${formatNumber(data.total_messages)} messages | ${display("signal_quality", data.signal_quality)} signal`}</p>
+                    <p className="subtle">{`Agent ${data.he_id || "unknown"} | ${formatNumber(data.total_messages)} messages | ${display("signal_quality", data.signal_quality)} signal`}</p>
                 )}
             />
             {body}

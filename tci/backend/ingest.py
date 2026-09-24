@@ -1,148 +1,181 @@
-"""Load chat messages into the database.
+"""Clean and store leads and their chat messages.
 
-Rows are cleaned (system/template messages, the monitoring disclaimer and
-low-signal pleasantries are dropped), deduplicated against what is already
-stored, inserted, and then the search index and conversation summaries are
-rebuilt. AI profiles and human reviews are never touched.
+Rows arrive in the column shapes below, from the Redash queries the nightly
+job runs (see `sync_closed_leads.py`) or from a CSV download of the messages
+query. Messages are cleaned (empty text and the automated monitoring
+disclaimer are dropped), deduplicated on a hash of their
+WhatsApp message id, and inserted; the touched conversations' counters are then refreshed. AI
+profiles are never touched.
 
-Offline use, with CSV exports that have the columns in REQUIRED_COLUMNS:
+Offline use, with a CSV that has the MESSAGE_COLUMNS headers:
 
-    python ingest.py exports/chats_file*.csv
+    python ingest.py messages.csv
 """
 
 from __future__ import annotations
 
 import csv
+import hashlib
+import json
 import re
 import sqlite3
 import sys
-import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from database import DB_PATH, ensure_database, get_connection, rebuild_derived_tables
+from database import DB_PATH, ensure_database, get_connection, refresh_conversations
 
-REQUIRED_COLUMNS = [
-    "Date",
-    "HE Number",
-    "Customer Number",
-    "Sender Number",
-    "Sender Type",
-    "Message Content",
-    "Message Type",
-]
+# Columns the closed-leads query returns (assigned_he_id may be blank).
+LEAD_COLUMNS = ["lead_id", "state", "updated_at", "assigned_he_id"]
+# Columns the lead-messages query returns (he_id may be blank).
+MESSAGE_COLUMNS = ["lead_id", "message_id", "direction", "message_type", "content", "sent_at", "he_id"]
+
+# whatsapp_conversations.direction -> who sent it.
+SENDER_BY_DIRECTION = {"INBOUND": "customer", "OUTBOUND": "he"}
+
+# Lead ids are sent back to Redash inside a query parameter, so only plain
+# identifier characters are accepted.
+LEAD_ID_PATTERN = re.compile(r"^[A-Za-z0-9_.:-]{1,128}$")
 
 DISCLAIMER = "this chat might be monitored for quality and training purpose"
-# Messages containing any of these carry no signal and are dropped.
-STOP_PHRASES = [
-    "good morning", "good evening", "good afternoon",
-    "hi sir", "hi mam", "hi maam", "hello sir", "hello mam",
-    "ok sir", "okay sir", "ok mam", "yes sir", "sure sir", "morning sir",
-    "let know", "let check", "pls check", "kindly check",
-    "ok thanks", "thanks sir", "thank you sir", "thank you mam",
-    "gmail com", "email id",
-]
-SKIPPED_MESSAGE_TYPES = {"system", "template"}
 
 
-def normalize_text(text: str) -> str:
-    value = unicodedata.normalize("NFKD", str(text or ""))
-    value = value.encode("ascii", "ignore").decode("ascii").lower()
-    value = re.sub(r"http\S+", " ", value)
-    value = re.sub(r"[^a-z0-9\s]+", " ", value)
-    return re.sub(r"\s+", " ", value).strip()
+def parse_timestamp(value: Any) -> int:
+    """Epoch seconds from epoch seconds/milliseconds or an ISO 8601 string (UTC if naive)."""
+    if isinstance(value, (int, float)) or (isinstance(value, str) and value.strip().isdigit()):
+        number = float(value)
+        return int(number / 1000 if number > 1e11 else number)
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError("missing timestamp")
+    moment = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return int(moment.timestamp())
 
 
-def clean_row(raw: dict[str, Any], source: str) -> dict[str, Any] | None:
-    """Turn one export row into a messages row, or None if it should be skipped."""
-    content = str(raw.get("Message Content") or "")
-    message_type = str(raw.get("Message Type") or "")
-    lowered = content.lower()
-    if not content.strip() or message_type.lower() in SKIPPED_MESSAGE_TYPES:
-        return None
-    if DISCLAIMER in lowered or any(phrase in lowered for phrase in STOP_PHRASES):
+def message_hash(message_id: str) -> int:
+    """A signed 64-bit key for a WhatsApp message id; messages dedupe on it per lead."""
+    return int.from_bytes(hashlib.blake2b(message_id.encode(), digest_size=8).digest(), "big", signed=True)
+
+
+def valid_lead_id(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return text if LEAD_ID_PATTERN.match(text) else None
+
+
+def clean_lead(raw: dict[str, Any]) -> dict[str, Any] | None:
+    lead_id = valid_lead_id(raw.get("lead_id"))
+    if not lead_id:
         return None
     try:
-        timestamp = int(float(raw.get("Date")))
-    except (TypeError, ValueError):
-        return None
-
-    he_number = str(raw.get("HE Number") or "")
-    customer_number = str(raw.get("Customer Number") or "")
+        updated_at = parse_timestamp(raw.get("updated_at"))
+    except ValueError:
+        updated_at = None
     return {
-        "conversation_id": f"{he_number}_{customer_number}",
-        "message_timestamp": timestamp,
-        "message_datetime": datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
-        "he_number": he_number,
-        "customer_number": customer_number,
-        "sender_number": str(raw.get("Sender Number") or ""),
-        "sender_type": str(raw.get("Sender Type") or ""),
-        "message_type": message_type,
-        "message_content": content,
-        "message_content_lower": lowered,
-        "message_content_normalized": normalize_text(content),
-        "source_file": source,
+        "conversation_id": lead_id,
+        "lead_state": str(raw.get("state") or "").strip().upper() or None,
+        "he_id": str(raw.get("assigned_he_id") or "").strip() or None,
+        "lead_updated_at": updated_at,
     }
 
 
-def insert_messages(conn: sqlite3.Connection, rows: Iterable[dict[str, Any]]) -> dict[str, int]:
-    """Insert cleaned rows that are not already stored, then refresh derived tables."""
-    columns = [
-        "conversation_id", "message_timestamp", "message_datetime", "he_number",
-        "customer_number", "sender_number", "sender_type", "message_type",
-        "message_content", "message_content_lower", "message_content_normalized", "source_file",
-    ]
-    insert_sql = f"INSERT INTO messages ({', '.join(columns)}) VALUES ({', '.join('?' for _ in columns)})"
-    seen: dict[str, set[tuple]] = {}
-    inserted = duplicates = 0
-    for row in rows:
-        conversation_id = row["conversation_id"]
-        if conversation_id not in seen:
-            seen[conversation_id] = {
-                tuple(existing)
-                for existing in conn.execute(
-                    """
-                    SELECT message_timestamp, sender_type, message_type, message_content
-                    FROM messages WHERE conversation_id = ?
-                    """,
-                    (conversation_id,),
-                )
-            }
-        key = (row["message_timestamp"], row["sender_type"], row["message_type"], row["message_content"])
-        if key in seen[conversation_id]:
-            duplicates += 1
-            continue
-        conn.execute(insert_sql, [row[column] for column in columns])
-        seen[conversation_id].add(key)
-        inserted += 1
-    conn.commit()
-    if inserted:
-        rebuild_derived_tables(conn)
-    return {"inserted": inserted, "duplicates": duplicates}
+def clean_message(raw: dict[str, Any]) -> dict[str, Any] | None:
+    """Turn one messages-query row into a messages row, or None if it should be skipped."""
+    lead_id = valid_lead_id(raw.get("lead_id"))
+    message_id = str(raw.get("message_id") or "").strip()
+    sender_type = SENDER_BY_DIRECTION.get(str(raw.get("direction") or "").strip().upper())
+    content = str(raw.get("content") or "").strip()
+    if not (lead_id and message_id and sender_type and content):
+        return None
+    lowered = content.lower()
+    if DISCLAIMER in lowered:
+        return None
+    try:
+        sent_at = parse_timestamp(raw.get("sent_at"))
+    except ValueError:
+        return None
+    return {
+        "conversation_id": lead_id,
+        "source_hash": message_hash(message_id),
+        "sent_at": sent_at,
+        "sender_type": sender_type,
+        "message_type": str(raw.get("message_type") or "").strip().upper() or "TEXT",
+        "he_id": str(raw.get("he_id") or "").strip() or None,
+        "content": content,
+    }
 
 
-def read_csv_exports(paths: Iterable[Path]) -> Iterable[dict[str, Any]]:
-    for path in paths:
-        with open(path, newline="", encoding="utf-8") as handle:
-            reader = csv.DictReader(handle)
-            reader.fieldnames = [name.strip() for name in reader.fieldnames or []]
-            missing = [column for column in REQUIRED_COLUMNS if column not in reader.fieldnames]
-            if missing:
-                raise ValueError(f"{path} is missing columns: {missing}")
-            for raw in reader:
-                cleaned = clean_row(raw, path.name)
-                if cleaned:
-                    yield cleaned
+def store_leads(conn: sqlite3.Connection, leads: Iterable[dict[str, Any]], synced_at: int) -> None:
+    """Insert or update cleaned leads (their CRM state; counters are left alone)."""
+    conn.executemany(
+        """
+        INSERT INTO conversations (conversation_id, lead_state, he_id, lead_updated_at, synced_at)
+        VALUES (:conversation_id, :lead_state, :he_id, :lead_updated_at, :synced_at)
+        ON CONFLICT (conversation_id) DO UPDATE SET
+            lead_state = excluded.lead_state,
+            he_id = COALESCE(excluded.he_id, conversations.he_id),
+            lead_updated_at = excluded.lead_updated_at,
+            synced_at = excluded.synced_at
+        """,
+        [{**lead, "synced_at": synced_at} for lead in leads],
+    )
+
+
+def store_messages(conn: sqlite3.Connection, messages: Iterable[dict[str, Any]], synced_at: int) -> int:
+    """Insert cleaned messages not stored yet; returns how many were new."""
+    rows = list(messages)
+    if not rows:
+        return 0
+    conversation_ids = sorted({row["conversation_id"] for row in rows})
+    # Messages can arrive for a lead the closed-leads query never listed (CSV loads).
+    conn.executemany(
+        "INSERT OR IGNORE INTO conversations (conversation_id, synced_at) VALUES (?, ?)",
+        [(conversation_id, synced_at) for conversation_id in conversation_ids],
+    )
+    keys = dict(conn.execute(
+        "SELECT conversation_id, id FROM conversations WHERE conversation_id IN (SELECT value FROM json_each(?))",
+        (json.dumps(conversation_ids),),
+    ).fetchall())
+    count_sql = "SELECT COUNT(*) FROM messages WHERE conversation_key IN (SELECT value FROM json_each(?))"
+    keys_json = json.dumps(sorted(keys.values()))
+    before = conn.execute(count_sql, (keys_json,)).fetchone()[0]
+    conn.executemany(
+        """
+        INSERT INTO messages (conversation_key, source_hash, sent_at, sender_type, message_type, he_id, content)
+        VALUES (:conversation_key, :source_hash, :sent_at, :sender_type, :message_type, :he_id, :content)
+        ON CONFLICT (conversation_key, source_hash) DO NOTHING
+        """,
+        ({**row, "conversation_key": keys[row["conversation_id"]]} for row in rows),
+    )
+    inserted = conn.execute(count_sql, (keys_json,)).fetchone()[0] - before
+    refresh_conversations(conn, keys.values())
+    return inserted
+
+
+def read_message_csv(path: Path) -> Iterable[dict[str, Any]]:
+    with open(path, newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        reader.fieldnames = [name.strip() for name in reader.fieldnames or []]
+        missing = [column for column in MESSAGE_COLUMNS if column not in reader.fieldnames]
+        if missing:
+            raise ValueError(f"{path} is missing columns: {missing}")
+        yield from reader
 
 
 def main(argv: list[str]) -> None:
     if not argv:
         sys.exit(__doc__)
     ensure_database(DB_PATH)
+    synced_at = int(datetime.now(timezone.utc).timestamp())
+    total = inserted = 0
     with get_connection(DB_PATH) as conn:
-        result = insert_messages(conn, read_csv_exports(Path(arg) for arg in argv))
-    print(f"Inserted {result['inserted']} messages, skipped {result['duplicates']} duplicates.")
+        for arg in argv:
+            raw_rows = list(read_message_csv(Path(arg)))
+            total += len(raw_rows)
+            inserted += store_messages(conn, filter(None, map(clean_message, raw_rows)), synced_at)
+    print(f"Read {total} rows, inserted {inserted} new messages.")
 
 
 if __name__ == "__main__":

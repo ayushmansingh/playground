@@ -6,16 +6,6 @@ export async function fetchJson(url) {
     return response.json();
 }
 
-export async function postJson(url, body) {
-    const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-    });
-    const payload = await response.json();
-    return { ok: response.ok, payload };
-}
-
 export function buildQuery(params) {
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
