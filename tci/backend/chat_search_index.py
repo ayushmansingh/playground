@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING, Iterable
 
 from chat_search_taxonomy import (
     CASH_PAYMENT_DEFINITIONS,
-    DEFAULT_DESTINATION_XLSX,
     DSAT_REASON_DEFINITIONS,
     PHASE1_INTENT_DEFINITIONS,
     build_ngrams,

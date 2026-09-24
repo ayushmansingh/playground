@@ -43,28 +43,6 @@ PHASE1_INTENT_DEFINITIONS = {
     }
 }
 
-LLM_INTENT_LABELS = [
-    ("leisure_trip", "Leisure trip"),
-    ("visa_only", "Visa only"),
-    ("booking_support", "Booking support"),
-    ("booking_change", "Booking change"),
-    ("complaint_only", "Complaint only"),
-    ("unclear", "Unclear"),
-]
-
-LLM_SENTIMENT_LABELS = [
-    ("positive", "Positive"),
-    ("neutral", "Neutral"),
-    ("negative", "Negative"),
-    ("mixed", "Mixed"),
-]
-
-LLM_SEVERITY_LABELS = [
-    ("low", "Low"),
-    ("medium", "Medium"),
-    ("high", "High"),
-]
-
 DSAT_REASON_DEFINITIONS = {
     "price_high": {
         "label": "Price high",
@@ -563,38 +541,6 @@ def resolve_filter_candidates(
     return sorted(fuzzy_matches.values(), key=lambda item: (-item["score"], item["display_value"]))
 
 
-def get_intent_candidates() -> list[dict]:
-    candidates: list[dict] = []
-    for canonical_value, details in PHASE1_INTENT_DEFINITIONS.items():
-        label = details["label"]
-        for alias in [label, canonical_value, *details["aliases"]]:
-            candidates.append(
-                {
-                    "canonical_value": canonical_value,
-                    "display_value": label,
-                    "raw_value": alias,
-                    "normalized": normalize_text(alias),
-                }
-            )
-    return candidates
-
-
-def get_dsat_candidates() -> list[dict]:
-    candidates: list[dict] = []
-    for canonical_value, details in DSAT_REASON_DEFINITIONS.items():
-        label = details["label"]
-        for alias in [label, canonical_value, *details["aliases"]]:
-            candidates.append(
-                {
-                    "canonical_value": canonical_value,
-                    "display_value": label,
-                    "raw_value": alias,
-                    "normalized": normalize_text(alias),
-                }
-            )
-    return candidates
-
-
 def load_destination_seed(workbook_path: Path | None = None) -> list[dict]:
     # Pandas is needed only for an offline source-data rebuild, never while the
     # deployed app reads its packaged SQLite seed.
@@ -631,13 +577,3 @@ def load_destination_seed(workbook_path: Path | None = None) -> list[dict]:
     return rows
 
 
-def get_llm_intent_options() -> list[dict]:
-    return [{"value": value, "label": label} for value, label in LLM_INTENT_LABELS]
-
-
-def get_llm_sentiment_options() -> list[dict]:
-    return [{"value": value, "label": label} for value, label in LLM_SENTIMENT_LABELS]
-
-
-def get_llm_severity_options() -> list[dict]:
-    return [{"value": value, "label": label} for value, label in LLM_SEVERITY_LABELS]

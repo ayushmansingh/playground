@@ -14,20 +14,13 @@ from chat_search_service import (
     resolve_destination_values,
 )
 from conversation_profile_contract import (
-    BUDGET_CONSCIOUS_OPTIONS,
-    COUPON_SEEKING_OPTIONS,
     CONFIDENCE_OPTIONS,
-    DISCOUNT_READINESS_OPTIONS,
     DSAT_REASON_OPTIONS,
-    NEXT_ACTION_OPTIONS,
-    PRIMARY_BLOCKER_OPTIONS,
-    PROFILE_STATUS_OPTIONS,
     REVIEW_STATUS_OPTIONS,
     SENTIMENT_OPTIONS,
     SEVERITY_OPTIONS,
     TRAVEL_INTENT_OPTIONS,
     TRAVEL_COHORT_OPTIONS,
-    WILLINGNESS_OPTIONS,
     merge_profile_overrides,
     sanitize_review_corrections,
 )
@@ -35,10 +28,6 @@ from conversation_profile_contract import (
 
 def label_options(options: list[tuple[str, str]]) -> list[dict[str, str]]:
     return [{"value": value, "label": label} for value, label in options]
-
-
-def custom_label_options(mapping: list[tuple[str, str]]) -> list[dict[str, str]]:
-    return [{"value": value, "label": label} for value, label in mapping]
 
 
 def latest_profile_cte_sql() -> str:
@@ -113,14 +102,14 @@ def fetch_filter_options() -> dict[str, Any]:
         + [row["country"] for row in country_rows],
         "travel_intents": label_options(TRAVEL_INTENT_OPTIONS),
         "travel_cohorts": label_options(TRAVEL_COHORT_OPTIONS),
-        "budget_options": custom_label_options(
+        "budget_options": label_options(
             [
                 ("yes", "Sensitive"),
                 ("no", "Not sensitive"),
                 ("unclear", "Unclear"),
             ]
         ),
-        "discount_levels": custom_label_options(
+        "discount_levels": label_options(
             [
                 ("none", "Not discount-seeking"),
                 ("low", "Low"),
@@ -129,14 +118,14 @@ def fetch_filter_options() -> dict[str, Any]:
                 ("unclear", "Unclear"),
             ]
         ),
-        "coupon_options": custom_label_options(
+        "coupon_options": label_options(
             [
                 ("yes", "Actively asks for coupons"),
                 ("no", "No coupon seeking"),
                 ("unclear", "Unclear"),
             ]
         ),
-        "cash_payment_options": custom_label_options(
+        "cash_payment_options": label_options(
             [
                 ("yes", "Cash payment mentioned"),
                 ("no", "No cash payment mention"),
@@ -145,7 +134,7 @@ def fetch_filter_options() -> dict[str, Any]:
         "sentiments": label_options(SENTIMENT_OPTIONS),
         "dissatisfaction_reasons": label_options(DSAT_REASON_OPTIONS),
         "severities": label_options(SEVERITY_OPTIONS),
-        "willingness_levels": custom_label_options(
+        "willingness_levels": label_options(
             [
                 ("low", "Low readiness"),
                 ("medium", "Medium readiness"),
@@ -153,7 +142,7 @@ def fetch_filter_options() -> dict[str, Any]:
                 ("unclear", "Unclear"),
             ]
         ),
-        "blockers": custom_label_options(
+        "blockers": label_options(
             [
                 ("price", "Price"),
                 ("availability", "Availability"),
@@ -166,7 +155,7 @@ def fetch_filter_options() -> dict[str, Any]:
                 ("unclear", "Unclear"),
             ]
         ),
-        "next_actions": custom_label_options(
+        "next_actions": label_options(
             [
                 ("callback", "Callback"),
                 ("revised_quote", "Share revised quote"),
@@ -182,7 +171,7 @@ def fetch_filter_options() -> dict[str, Any]:
             ]
         ),
         "confidence_levels": label_options(CONFIDENCE_OPTIONS),
-        "profile_statuses": custom_label_options(
+        "profile_statuses": label_options(
             [
                 ("complete", "Ready"),
                 ("unclear", "Unclear"),
