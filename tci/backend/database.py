@@ -19,7 +19,7 @@ Tables:
 - `conversation_profiles`: the current AI profile per conversation.
 - `sync_runs`: one row per synced time window; the newest succeeded window
   is where the next nightly run resumes.
-- `enrichment_batches`: Message Batches submitted by `enrich_profiles.py`
+- `enrichment_batches`: Gemini batch jobs submitted by `enrich_profiles.py`
   and not yet stored, so an interrupted run picks them up again.
 
 The database runs in WAL mode so the nightly write never blocks the app.
@@ -134,7 +134,7 @@ CREATE INDEX IF NOT EXISTS idx_sync_runs_succeeded
 ON sync_runs (window_to) WHERE status = 'succeeded';
 
 CREATE TABLE IF NOT EXISTS enrichment_batches (
-    batch_id TEXT PRIMARY KEY,                  -- Anthropic message batch id
+    batch_id TEXT PRIMARY KEY,                  -- Gemini batch job name (batches/...)
     model TEXT NOT NULL,
     prompt_version TEXT NOT NULL,
     conversation_keys_json TEXT NOT NULL,       -- JSON array of conversations.id

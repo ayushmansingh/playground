@@ -16,7 +16,7 @@ conversation is one lead; the app shows lead ids, never phone numbers.
 | `search_service.py` | `GET /api/search`: phrase search over messages, with sender, date, lead id, agent id and minimum-message filters, paged in SQL. |
 | `insights_service.py` | `GET /api/insights`, `/api/insights/analysis`, `/api/insights/options`, `/api/meta`: filtering and aggregates over AI-profiled conversations, all in SQL. |
 | `conversation_service.py` | `GET /api/conversation`: one transcript with its AI profile. |
-| `enrich_profiles.py` | Offline AI enrichment with Claude: profiles conversations that need one, via direct calls (pilot) or the Message Batches API (nightly). |
+| `enrich_profiles.py` | Offline AI enrichment with Gemini: profiles conversations that need one, via direct calls (pilot) or the Gemini Batch API (nightly). |
 | `conversation_profile_contract.py` | The AI profile schema, prompt (and its version), and output cleaning used by `enrich_profiles.py`. |
 | `dev_fixture.py` | Synthetic data for local work. |
 
@@ -115,31 +115,43 @@ several writers, the same schema moves to Postgres (FTS via `tsvector` + GIN).
 ## AI enrichment
 
 ```bash
-export ANTHROPIC_API_KEY=...                        # or `ant auth login`
+export GEMINI_API_KEY=...                           # paid-tier project: these are customer chats
 python enrich_profiles.py --dry-run                 # how many conversations are due, rough input tokens
-python enrich_profiles.py --now --limit 200 --model claude-haiku-4-5   # pilot: direct calls
-python enrich_profiles.py --now --limit 200 --model claude-sonnet-5    # compare on the same kind of chats
-python enrich_profiles.py --wait                    # nightly: Message Batches (half price), wait, store
+python enrich_profiles.py --now --limit 200         # pilot with gemini-2.5-flash-lite: direct calls
+python enrich_profiles.py --wait                    # nightly: Gemini Batch API (half price), wait, store
 ```
+
+Default model `gemini-2.5-flash-lite` (`--model` to change). Google now limits
+2.5 models to accounts that have used them before; if the key is refused
+access, use `--model gemini-3.1-flash-lite`.
 
 A conversation is due when it has messages and no complete profile, or its
 profile is older than its newest message; `--force` re-profiles anyway, and
 `--min-messages N` skips very short chats. Each request is the prompt from
-`conversation_profile_contract.py` (cached), the conversation's counts and
-signal quality, and its transcript (`[message id] Customer|HE (type): text`,
-newest 12,000 characters). Replies are constrained to the profile JSON schema
-and cleaned by `sanitize_profile_result()`. Failures (refusal, cut-off or
-unreadable output, errors after retries) are recorded with the error and
-retried next run; they never replace a complete profile. Every run ends with
-the average input, cached and output tokens per reply, which is what a pilot
-should be judged on.
+`conversation_profile_contract.py` as the system instruction, the
+conversation's counts and signal quality, and its transcript (`[message id]
+Customer|HE (type): text`, newest 12,000 characters). Replies are constrained
+to the profile JSON schema (`response_json_schema`) and cleaned by
+`sanitize_profile_result()`. Failures (blocked or cut-off output, unreadable
+JSON, errors after retries, batch lines with an error) are recorded with the
+error and retried next run; they never replace a complete profile. Every run
+ends with the average prompt, cached, output and thinking tokens per reply,
+which is what a pilot should be judged on.
 
-Default model `claude-opus-5` at `--effort low`; direct calls on Opus 5 use
-server-side refusal fallbacks (the Batches API does not accept them). Haiku
-4.5 runs without thinking or effort. Batch ids live in `enrichment_batches`,
-so a run that stops before its batches finish stores them on the next run.
-Changing the prompt means bumping `PROFILE_PROMPT_VERSION` and re-running
-with `--force`.
+Batches: requests are written to a JSONL file, uploaded with the Files API,
+and run as one batch job per 10,000 conversations; job names live in
+`enrichment_batches`, so a run that stops before its jobs finish stores them
+on the next run. Changing the prompt means bumping `PROFILE_PROMPT_VERSION`
+and re-running with `--force`.
+
+Estimated cost per 1 lakh conversations (about 3,900 input and 500 output
+tokens each; Google list prices, September 2026):
+
+| Model | Batch | Direct calls |
+| --- | --- | --- |
+| `gemini-2.5-flash-lite` ($0.10 / $0.40 per 1M in / out) | ~$30 | ~$33-59 (implicit caching of the system prompt) |
+| `gemini-3.1-flash-lite` ($0.25 / $1.50) | ~$86 | ~$172 |
+| `gemini-3.5-flash-lite` ($0.30 / $2.50) | ~$121 | ~$242 |
 
 Not carried over from the old enrichment: the rule-based hints the prompt
 still has slots for (explicit destination, intent and dissatisfaction tags)

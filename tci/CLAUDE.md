@@ -21,7 +21,7 @@ tci/
     redash.py               Redash API client (saved query + params -> rows)
     sync_closed_leads.py    nightly job: closed leads -> their messages
     ingest.py               row contracts, clean + dedupe + store; CLI for a messages CSV
-    enrich_profiles.py      AI profiles with Claude (direct calls or Message Batches)
+    enrich_profiles.py      AI profiles with Gemini 2.5 Flash-Lite (direct calls or Batch API)
     search_service.py       GET /api/search (all filtering/paging in SQL)
     insights_service.py     GET /api/insights, /analysis, /options, /api/meta
     conversation_service.py GET /api/conversation
@@ -51,7 +51,7 @@ cd tci/frontend && npm ci && npm run dev           # http://localhost:5173, prox
 npm run build                                      # the only frontend check there is
 ```
 
-AI profiles come from `python enrich_profiles.py` (needs `ANTHROPIC_API_KEY`;
+AI profiles come from `python enrich_profiles.py` (needs `GEMINI_API_KEY`;
 see `backend/README.md`). Real data comes from the nightly job, `python sync_closed_leads.py` (Redash
 settings via `REDASH_*` env vars; see `backend/README.md`), or a CSV download
 of the messages query via `python ingest.py file.csv`. `data/` and `*.sqlite3`
@@ -121,7 +121,8 @@ Done, on branch `claude/bold-lovelace-1pbg1p`:
    message ids, external-content FTS, stored counters); insights moved to SQL.
    Old phone-number-keyed databases and the seed promotion are no longer used.
 8. Minimum-messages filter; Booked and Lead destination placed but disabled
-   (`todo.md`). Greeting filter removed. `enrich_profiles.py` added.
+   (`todo.md`). Greeting filter removed. `enrich_profiles.py` added, on
+   Gemini 2.5 Flash-Lite (file-based Batch API for nightly runs).
 
 Verified with `dev_fixture.py` data, a fake Redash server, a synthetic
 50-lakh-message database, and browser runs of both views. **Not yet run
@@ -137,13 +138,14 @@ against real Redash or real data. There are no automated tests in the repo.**
    whether automated/template OUTBOUND messages can be told apart (they are
    currently stored and searched like agent messages), and whether booking
    status (`lead_scores.bookingCompleted`) should be added to `conversations`.
-2. **AI enrichment pilot.** `enrich_profiles.py` is written and tested against
-   a fake API only. Run `--now --limit 200` with a cheaper model and with the
-   default on real chats, compare quality and the per-reply token averages it
-   prints, pick the model, then add `enrich_profiles.py --wait` after the
-   nightly sync. Ask before spending on the user's key. Open: feed the CRM lead
-   destination into the prompt's destination hints once it is synced
-   (`todo.md`); consider a cash-payment field (the old keyword rule is gone).
+2. **AI enrichment pilot.** `enrich_profiles.py` (Gemini 2.5 Flash-Lite) is
+   tested against a fake API only. Run `--now --limit 200` on real chats,
+   check profile quality by hand and the per-reply token averages it prints,
+   then add `enrich_profiles.py --wait` after the nightly sync. Google limits
+   2.5 models to accounts that used them before; fall back to
+   `--model gemini-3.1-flash-lite` if access is refused. Ask before spending
+   on the user's key. Open: feed the CRM lead destination into the prompt's
+   destination hints once it is synced (`todo.md`).
 
 Smaller follow-ups, when useful:
 - Add backend tests (pytest + FastAPI TestClient on `dev_fixture.py` data,

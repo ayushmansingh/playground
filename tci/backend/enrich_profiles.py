@@ -1,4 +1,4 @@
-"""Offline AI enrichment: give conversations an AI profile with Claude.
+"""Offline AI enrichment: give conversations an AI profile with Gemini.
 
     python enrich_profiles.py --dry-run                 # how many are due, roughly how many tokens
     python enrich_profiles.py --now --limit 200         # pilot: direct calls, stored as they return
@@ -8,20 +8,22 @@
 A conversation is due when it has messages and no complete profile, when its
 profile is older than its newest message (the lead reopened and got more
 chat), or always with --force. Conversations inside a submitted batch are
-skipped. Nightly work goes through the Message Batches API (half price,
-results within 24 hours); batch ids are kept in `enrichment_batches`, so an
-interrupted run collects them next time.
+skipped. Nightly work goes through the Gemini Batch API (half price, target
+turnaround 24 hours): requests are written to a JSONL file, uploaded, and run
+as one batch job per BATCH_MAX_REQUESTS conversations. Job names are kept in
+`enrichment_batches`, so an interrupted run collects them next time.
 
 The prompt, output schema and output cleaning live in
-conversation_profile_contract.py. Each request sends the system prompt
-(cached), the conversation's counts and signal quality, and its transcript,
-one line per message, keeping the most recent TRANSCRIPT_CHAR_LIMIT
-characters. Replies are constrained to the profile JSON schema, cleaned by
-sanitize_profile_result(), and stored as the conversation's one profile row.
-A failed attempt never replaces a complete profile.
+conversation_profile_contract.py. Each request sends the system prompt, the
+conversation's counts and signal quality, and its transcript, one line per
+message, keeping the most recent TRANSCRIPT_CHAR_LIMIT characters. Replies are
+constrained to the profile JSON schema, cleaned by sanitize_profile_result(),
+and stored as the conversation's one profile row. A failed attempt never
+replaces a complete profile.
 
-Credentials: ANTHROPIC_API_KEY (or an `ant auth login` profile). APP_DATA_DIR
-as for the app.
+Credentials: GEMINI_API_KEY (or GOOGLE_API_KEY) on a paid-tier project (the
+free tier may use prompts to improve Google's products; these are customer
+chats). APP_DATA_DIR as for the app.
 """
 
 from __future__ import annotations
@@ -36,7 +38,8 @@ from collections import Counter
 from datetime import datetime, timezone
 from typing import Any
 
-import anthropic
+from google import genai
+from google.genai import errors, types
 
 from conversation_profile_contract import (
     PROFILE_PROMPT_VERSION,
@@ -46,34 +49,41 @@ from conversation_profile_contract import (
     profile_prompt_spec,
     sanitize_profile_result,
 )
-from database import DB_PATH, ensure_database, get_connection
+from database import DATA, DB_PATH, ensure_database, get_connection
 
-DEFAULT_MODEL = "claude-opus-5"
-DEFAULT_EFFORT = "low"          # classification; raise only if a pilot shows it helps
-MAX_TOKENS = 16_000
+# Google limits 2.5 models to accounts that used them before; a new key may
+# need gemini-3.1-flash-lite instead (--model).
+DEFAULT_MODEL = "gemini-2.5-flash-lite"
+MAX_OUTPUT_TOKENS = 8_192
 TRANSCRIPT_CHAR_LIMIT = 12_000
-# Every request carries the ~12 KB system prompt; 5,000 requests keeps a
-# batch far below the API's 256 MB limit.
-BATCH_MAX_REQUESTS = 5_000
+BATCH_MAX_REQUESTS = 10_000     # ~20 KB each: a ~200 MB input file, under the 2 GB file limit
 POLL_SECONDS = 60
-# Models that take server-side refusal fallbacks (direct calls only; the
-# Batches API rejects the parameter).
-FALLBACK_MODELS = {"claude-opus-5", "claude-fable-5-1"}
+DONE_STATES = {
+    "JOB_STATE_SUCCEEDED", "JOB_STATE_PARTIALLY_SUCCEEDED",
+    "JOB_STATE_FAILED", "JOB_STATE_CANCELLED", "JOB_STATE_EXPIRED",
+}
 
 log = logging.getLogger("enrich")
 
-
-def without_max_items(schema: Any) -> Any:
-    """The schema minus maxItems (not a structured-output constraint; the sanitizer caps lists)."""
-    if isinstance(schema, dict):
-        return {key: without_max_items(value) for key, value in schema.items() if key != "maxItems"}
-    if isinstance(schema, list):
-        return [without_max_items(item) for item in schema]
-    return schema
-
-
 SYSTEM_PROMPT = profile_prompt_spec()
-OUTPUT_SCHEMA = without_max_items(profile_json_schema())
+
+
+def generation_config(model: str) -> dict[str, Any]:
+    config: dict[str, Any] = {
+        "response_mime_type": "application/json",
+        "response_json_schema": profile_json_schema(),
+        "max_output_tokens": MAX_OUTPUT_TOKENS,
+    }
+    # Deterministic labels, as the old pipeline ran; Google advises keeping the
+    # default temperature on Gemini 3 models.
+    if model.startswith("gemini-2"):
+        config["temperature"] = 0.0
+    return config
+
+
+def camel(key: str) -> str:
+    head, *rest = key.split("_")
+    return head + "".join(part.title() for part in rest)
 
 
 def due_conversations(conn, *, limit: int | None, force: bool, min_messages: int, conversation_id: str | None):
@@ -125,8 +135,8 @@ def render_transcript(conn, conversation_key: int) -> list[str]:
     return ([f"[{omitted} earlier messages omitted]"] if omitted else []) + kept
 
 
-def request_params(conn, conversation, model: str, effort: str) -> dict[str, Any]:
-    user_prompt = build_profile_user_prompt(
+def user_prompt(conn, conversation) -> str:
+    return build_profile_user_prompt(
         conversation_id=conversation["conversation_id"],
         signal_quality=conversation["signal_quality"],
         customer_message_count=conversation["customer_message_count"],
@@ -140,27 +150,34 @@ def request_params(conn, conversation, model: str, effort: str) -> dict[str, Any
         explicit_dsat=[],
         rendered_messages=render_transcript(conn, conversation["id"]),
     )
-    params: dict[str, Any] = {
-        "model": model,
-        "max_tokens": MAX_TOKENS,
-        "system": [{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
-        "messages": [{"role": "user", "content": user_prompt}],
-        "output_config": {"format": {"type": "json_schema", "schema": OUTPUT_SCHEMA}},
-    }
-    # Haiku 4.5 takes neither adaptive thinking nor effort.
-    if not model.startswith("claude-haiku"):
-        params["thinking"] = {"type": "adaptive"}
-        params["output_config"]["effort"] = effort
-    return params
 
 
-def parse_reply(message) -> tuple[dict | None, str | None]:
+def batch_line(conn, conversation, model: str) -> str:
+    """One JSONL line of a batch input file (REST field names)."""
+    return json.dumps({
+        "key": f"c{conversation['id']}",
+        "request": {
+            "contents": [{"role": "user", "parts": [{"text": user_prompt(conn, conversation)}]}],
+            "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+            "generationConfig": {camel(key): value for key, value in generation_config(model).items()},
+        },
+    })
+
+
+def parse_reply(response: types.GenerateContentResponse) -> tuple[dict | None, str | None]:
     """The profile JSON from a response, or an error describing why there is none."""
-    if message.stop_reason == "refusal":
-        return None, "refused"
-    if message.stop_reason == "max_tokens":
-        return None, f"output cut off at max_tokens={MAX_TOKENS}"
-    text = next((block.text for block in message.content if block.type == "text"), "")
+    if response.prompt_feedback and response.prompt_feedback.block_reason:
+        return None, f"prompt blocked: {response.prompt_feedback.block_reason}"
+    if not response.candidates:
+        return None, "no candidates in the reply"
+    reason = response.candidates[0].finish_reason
+    reason = getattr(reason, "name", reason) or "STOP"
+    if reason == "MAX_TOKENS":
+        return None, f"output cut off at max_output_tokens={MAX_OUTPUT_TOKENS}"
+    if reason not in {"STOP", "FINISH_REASON_UNSPECIFIED"}:
+        return None, f"stopped: {reason}"
+    parts = response.candidates[0].content.parts if response.candidates[0].content else None
+    text = "".join(part.text or "" for part in parts or [] if not part.thought)
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
@@ -243,13 +260,15 @@ def store_failure(conn, conversation_key: int, model: str, error: str) -> None:
 class Tally:
     """Outcome and token counts, logged at the end so a pilot shows its real cost drivers."""
 
+    FIELDS = ("prompt_token_count", "cached_content_token_count", "candidates_token_count", "thoughts_token_count")
+
     def __init__(self) -> None:
         self.outcomes: Counter = Counter()
         self.tokens: Counter = Counter()
 
     def add_usage(self, usage) -> None:
         self.outcomes["replies"] += 1
-        for field in ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens"):
+        for field in self.FIELDS:
             self.tokens[field] += getattr(usage, field, None) or 0
 
     def report(self) -> None:
@@ -259,13 +278,13 @@ class Tally:
             log.info(
                 "Average tokens per reply (%d replies): %s",
                 replies,
-                ", ".join(f"{field} {count / replies:,.0f}" for field, count in sorted(self.tokens.items())),
+                ", ".join(f"{field} {self.tokens[field] / replies:,.0f}" for field in self.FIELDS),
             )
 
 
-def handle_reply(conn, tally: Tally, conversation_key: int, model: str, message) -> None:
-    tally.add_usage(message.usage)
-    raw, error = parse_reply(message)
+def handle_reply(conn, tally: Tally, conversation_key: int, model: str, response) -> None:
+    tally.add_usage(response.usage_metadata)
+    raw, error = parse_reply(response)
     if raw is None:
         store_failure(conn, conversation_key, model, error)
         tally.outcomes["failed"] += 1
@@ -274,24 +293,23 @@ def handle_reply(conn, tally: Tally, conversation_key: int, model: str, message)
         tally.outcomes["stored"] += 1
 
 
-def run_now(client, conn, targets, model: str, effort: str, tally: Tally) -> None:
+def run_now(client, conn, targets, model: str, tally: Tally) -> None:
     """Direct calls, one conversation at a time (pilots and small top-ups)."""
+    config = types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT, **generation_config(model))
     for number, conversation in enumerate(targets, 1):
-        params = request_params(conn, conversation, model, effort)
         try:
-            if model in FALLBACK_MODELS:
-                # A policy decline is re-run on a fallback model inside the same call.
-                message = client.beta.messages.create(
-                    **params, betas=["server-side-fallback-2026-07-01"], fallbacks="default"
-                )
-            else:
-                message = client.messages.create(**params)
-        except (anthropic.RateLimitError, anthropic.InternalServerError, anthropic.APIConnectionError) as exc:
-            # Still failing after the SDK's retries: record it, move on, retry next run.
-            store_failure(conn, conversation["id"], model, f"{type(exc).__name__}: {exc}")
+            response = client.models.generate_content(
+                model=model, contents=user_prompt(conn, conversation), config=config
+            )
+        except errors.APIError as exc:
+            # Rate limits and server errors that outlast the client's retries:
+            # record, move on, retry next run. Anything else is a setup problem.
+            if exc.code != 429 and (exc.code or 0) < 500:
+                raise
+            store_failure(conn, conversation["id"], model, f"HTTP {exc.code}: {exc.message}")
             tally.outcomes["failed"] += 1
         else:
-            handle_reply(conn, tally, conversation["id"], model, message)
+            handle_reply(conn, tally, conversation["id"], model, response)
         conn.commit()
         if number % 25 == 0 or number == len(targets):
             log.info("  %d of %d done", number, len(targets))
@@ -300,47 +318,64 @@ def run_now(client, conn, targets, model: str, effort: str, tally: Tally) -> Non
 def collect_batches(client, conn, tally: Tally) -> int:
     """Store the results of every finished submitted batch; returns how many are still running."""
     running = 0
-    for batch_id, model in conn.execute(
-        "SELECT batch_id, model FROM enrichment_batches WHERE status = 'submitted' ORDER BY submitted_at"
+    for batch_name, model, keys_json in conn.execute(
+        "SELECT batch_id, model, conversation_keys_json FROM enrichment_batches WHERE status = 'submitted' ORDER BY submitted_at"
     ).fetchall():
-        batch = client.messages.batches.retrieve(batch_id)
-        if batch.processing_status != "ended":
+        job = client.batches.get(name=batch_name)
+        state = job.state.name if job.state else "JOB_STATE_UNSPECIFIED"
+        if state not in DONE_STATES:
             running += 1
             continue
-        for entry in client.messages.batches.results(batch_id):
-            key = int(entry.custom_id.removeprefix("c"))
-            if entry.result.type == "succeeded":
-                handle_reply(conn, tally, key, model, entry.result.message)
-            else:
-                detail = getattr(getattr(entry.result, "error", None), "error", None)
-                store_failure(conn, key, model, f"batch {entry.result.type}: {getattr(detail, 'message', '')}".strip())
-                tally.outcomes["failed"] += 1
-        conn.execute("UPDATE enrichment_batches SET status = 'stored' WHERE batch_id = ?", (batch_id,))
+        missing = set(json.loads(keys_json))
+        if job.dest and job.dest.file_name:
+            for line in client.files.download(file=job.dest.file_name).decode("utf-8").splitlines():
+                if not line.strip():
+                    continue
+                entry = json.loads(line)
+                key = int(str(entry.get("key", "")).removeprefix("c") or 0)
+                if key not in missing:
+                    continue
+                missing.discard(key)
+                if "response" in entry:
+                    handle_reply(conn, tally, key, model, types.GenerateContentResponse.model_validate(entry["response"]))
+                else:
+                    error = entry.get("error") or entry.get("status") or {}
+                    store_failure(conn, key, model, f"batch error: {error.get('message', error)}")
+                    tally.outcomes["failed"] += 1
+        for key in missing:
+            store_failure(conn, key, model, f"no result from batch ({state})")
+            tally.outcomes["failed"] += 1
+        conn.execute("UPDATE enrichment_batches SET status = 'stored' WHERE batch_id = ?", (batch_name,))
         conn.commit()
-        log.info("Stored batch %s (%d requests)", batch_id, batch.request_counts.succeeded + batch.request_counts.errored
-                 + batch.request_counts.canceled + batch.request_counts.expired)
+        log.info("Stored batch %s (%s)", batch_name, state)
     return running
 
 
-def submit_batches(client, conn, targets, model: str, effort: str) -> int:
+def submit_batches(client, conn, targets, model: str) -> int:
     for start in range(0, len(targets), BATCH_MAX_REQUESTS):
         chunk = targets[start : start + BATCH_MAX_REQUESTS]
-        batch = client.messages.batches.create(
-            requests=[
-                {"custom_id": f"c{conversation['id']}", "params": request_params(conn, conversation, model, effort)}
-                for conversation in chunk
-            ]
-        )
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+        path = DATA / f"enrich-{stamp}-{start}.jsonl"
+        try:
+            with open(path, "w", encoding="utf-8") as handle:
+                for conversation in chunk:
+                    handle.write(batch_line(conn, conversation, model) + "\n")
+            uploaded = client.files.upload(
+                file=path, config=types.UploadFileConfig(display_name=path.stem, mime_type="jsonl")
+            )
+        finally:
+            path.unlink(missing_ok=True)
+        job = client.batches.create(model=model, src=uploaded.name, config={"display_name": path.stem})
         conn.execute(
             """
             INSERT INTO enrichment_batches (batch_id, model, prompt_version, conversation_keys_json, submitted_at, status)
             VALUES (?, ?, ?, ?, ?, 'submitted')
             """,
-            (batch.id, model, PROFILE_PROMPT_VERSION, json.dumps([c["id"] for c in chunk]),
+            (job.name, model, PROFILE_PROMPT_VERSION, json.dumps([c["id"] for c in chunk]),
              int(datetime.now(timezone.utc).timestamp())),
         )
         conn.commit()
-        log.info("Submitted batch %s with %d conversations", batch.id, len(chunk))
+        log.info("Submitted batch %s with %d conversations", job.name, len(chunk))
     return len(targets)
 
 
@@ -362,24 +397,24 @@ def run(args: argparse.Namespace) -> int:
 
         if args.dry_run:
             targets = due()
-            characters = sum(
-                len(SYSTEM_PROMPT) + len(request_params(conn, c, args.model, args.effort)["messages"][0]["content"])
-                for c in targets
-            )
-            log.info("%d conversations due; about %s input tokens before caching (characters / 4)",
-                     len(targets), f"{characters // 4:,}")
+            characters = sum(len(SYSTEM_PROMPT) + len(user_prompt(conn, c)) for c in targets)
+            log.info("%d conversations due; about %s input tokens (characters / 4)", len(targets), f"{characters // 4:,}")
             return 0
 
-        client = anthropic.Anthropic(max_retries=5)
+        try:
+            client = genai.Client(http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=5)))
+        except ValueError as exc:  # no API key in the environment
+            log.error("Gemini credentials: %s", exc)
+            return 2
         tally = Tally()
         try:
             if args.now:
                 targets = due()
                 log.info("Enriching %d conversations with %s (direct calls)", len(targets), args.model)
-                run_now(client, conn, targets, args.model, args.effort, tally)
+                run_now(client, conn, targets, args.model, tally)
             else:
                 running = collect_batches(client, conn, tally)
-                submitted = submit_batches(client, conn, due(), args.model, args.effort)
+                submitted = submit_batches(client, conn, due(), args.model)
                 if args.wait:
                     while running or submitted:
                         time.sleep(POLL_SECONDS)
@@ -387,13 +422,10 @@ def run(args: argparse.Namespace) -> int:
                         submitted = 0
                 elif running or submitted:
                     log.info("Batches still running; run again later to store their results.")
-        except (anthropic.AuthenticationError, anthropic.PermissionDeniedError) as exc:
-            log.error("Anthropic credentials: %s", exc)
-            return 2
-        except anthropic.APIStatusError as exc:
-            # 400/404 and the like: the request itself is wrong (model name, parameters).
-            log.error("Anthropic API error (%s): %s", exc.status_code, exc.message)
-            return 1
+        except errors.APIError as exc:
+            # 400/403/404 and the like: key, model name or request is wrong.
+            log.error("Gemini API error (%s): %s", exc.code, exc.message)
+            return 2 if exc.code in (401, 403) else 1
         finally:
             tally.report()
     return 0
@@ -405,15 +437,15 @@ def main(argv: list[str]) -> int:
     mode.add_argument("--now", action="store_true", help="call the API directly instead of batching")
     mode.add_argument("--wait", action="store_true", help="after submitting, wait for batches and store them")
     mode.add_argument("--dry-run", action="store_true", help="count due conversations and tokens; no API calls")
-    parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Claude model id (default {DEFAULT_MODEL})")
-    parser.add_argument("--effort", default=DEFAULT_EFFORT, choices=["low", "medium", "high"],
-                        help="thinking effort (ignored for Haiku)")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help=f"Gemini model id (default {DEFAULT_MODEL})")
     parser.add_argument("--limit", type=int, help="at most this many conversations")
     parser.add_argument("--min-messages", type=int, default=1, help="skip conversations with fewer messages")
     parser.add_argument("--conversation-id", help="only this lead id")
     parser.add_argument("--force", action="store_true", help="re-profile even conversations with a current profile")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    logging.getLogger("httpx").setLevel(logging.WARNING)  # one line per API request otherwise
+    # Both log a line per API request otherwise.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("google_genai").setLevel(logging.WARNING)
     return run(parser.parse_args(argv))
 
 

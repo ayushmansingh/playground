@@ -6,13 +6,14 @@
   contract in `backend/README.md`, run `sync_closed_leads.py --dry-run`
   against them, then schedule it. Confirm with the CRM owners which timestamp
   means "closed" (`updatedAt` also moves on unrelated edits).
-- **AI enrichment pilot.** `enrich_profiles.py` is tested only against a fake
-  API. Set `ANTHROPIC_API_KEY`, run `--now --limit 200` with
-  `--model claude-haiku-4-5`, `claude-sonnet-5` and the default
-  `claude-opus-5` on real chats, compare profile quality by hand and the
-  per-reply token averages each run prints, then choose the model (set
-  `DEFAULT_MODEL`) and add `enrich_profiles.py --wait` after the nightly sync.
-  Costs a few dollars; agree the spend first.
+- **AI enrichment pilot.** `enrich_profiles.py` runs on Gemini 2.5
+  Flash-Lite and is tested only against a fake API. Set `GEMINI_API_KEY`
+  (paid-tier project; the free tier may use prompts for training), run
+  `--now --limit 200` on real chats, check the profiles by hand and the
+  per-reply token averages the run prints, then add `enrich_profiles.py
+  --wait` after the nightly sync. If Google refuses 2.5 access to the key
+  (2.5 is limited to accounts that used it before), use
+  `--model gemini-3.1-flash-lite`. A 200-chat pilot costs well under $1.
 
 ## Wire in the Booked and Lead destination filters
 
