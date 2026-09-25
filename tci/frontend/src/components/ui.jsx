@@ -17,6 +17,28 @@ export function PanelHeader({ eyebrow, title, subtitle, children }) {
     );
 }
 
+// Filters whose CRM data is not synced yet (see tci/todo.md). They are shown
+// so the layout is settled, but disabled so nobody trusts an unfiltered list.
+export function PendingFilters() {
+    return (
+        <>
+            <label className="field pending-field" title="Not connected yet: see todo.md">
+                <span>Booked <em className="pending-note">not connected</em></span>
+                <select disabled defaultValue="">
+                    <option value="">Any</option>
+                    <option value="yes">Booked</option>
+                    <option value="no">Not booked</option>
+                    <option value="unknown">Unknown</option>
+                </select>
+            </label>
+            <label className="field pending-field" title="Not connected yet: see todo.md">
+                <span>Lead destination <em className="pending-note">not connected</em></span>
+                <input disabled placeholder="From the CRM lead" />
+            </label>
+        </>
+    );
+}
+
 // A <select> with a leading blank option, fed by an /api/filters option list.
 export function OptionSelect({ options, emptyLabel, value, onChange, ...rest }) {
     return (

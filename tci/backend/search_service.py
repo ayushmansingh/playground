@@ -30,6 +30,14 @@ def page_args(args) -> tuple[int, int, int]:
     return page, page_size, (page - 1) * page_size
 
 
+def min_messages(args) -> int:
+    """The ?min_messages= filter as a positive count, or 0 when absent or invalid."""
+    try:
+        return max(0, int(args.get("min_messages") or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
 def fts_phrase(query: str) -> str | None:
     """Quote the query's word tokens as one FTS5 phrase, or None if it has none."""
     tokens = re.findall(r"[A-Za-z0-9]+", query.lower())
@@ -59,8 +67,9 @@ def search_chats(args) -> dict[str, Any]:
 
     Criteria: q (text, matched as a phrase), sender (customer|he), date_from and
     date_to (YYYY-MM-DD, on message dates), lead_id and he_id (substring
-    match). With no message-level criteria, every conversation matching the
-    id filters is listed, newest first.
+    match), min_messages (stored messages in the conversation). With no
+    message-level criteria, every conversation matching the conversation
+    filters is listed, newest first.
     """
     query = (args.get("q") or "").strip()
     sender = SENDER_TYPES.get((args.get("sender") or "").strip().lower())
@@ -78,6 +87,9 @@ def search_chats(args) -> dict[str, Any]:
     if he_id:
         conversation_where.append("c.he_id LIKE ? ESCAPE '\\'")
         conversation_params.append(f"%{escape_like(he_id)}%")
+    if min_messages(args):
+        conversation_where.append("c.total_messages >= ?")
+        conversation_params.append(min_messages(args))
     conversation_sql = " AND ".join(conversation_where)
 
     message_where: list[str] = []

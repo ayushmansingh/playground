@@ -4,6 +4,8 @@ import json
 from typing import Any
 
 PROFILE_SCHEMA_VERSION = "travel-profile-v3"
+# Change this whenever profile_prompt_spec() or the user prompt changes.
+PROFILE_PROMPT_VERSION = "travel-profile-focused-intent-commercial-v1"
 
 TRAVEL_INTENT_OPTIONS = [
     ("honeymoon", "Honeymoon"),

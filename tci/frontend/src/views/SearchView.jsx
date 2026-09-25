@@ -3,9 +3,9 @@ import { buildQuery, fetchJson } from "../lib/api.js";
 import { formatNumber } from "../lib/labels.js";
 import useConversation from "../lib/useConversation.js";
 import Transcript, { Highlight } from "../components/Transcript.jsx";
-import { PanelHeader, Pagination, Pill } from "../components/ui.jsx";
+import { PanelHeader, Pagination, PendingFilters, Pill } from "../components/ui.jsx";
 
-const EMPTY_SEARCH = { q: "", sender: "", date_from: "", date_to: "", lead_id: "", he_id: "" };
+const EMPTY_SEARCH = { q: "", sender: "", date_from: "", date_to: "", lead_id: "", he_id: "", min_messages: "" };
 
 function ResultItem({ result, term, selected, onSelect }) {
     const { snippet } = result;
@@ -113,6 +113,11 @@ export default function SearchView() {
                             <span>Agent ID</span>
                             <input placeholder="Any" value={draft.he_id} onChange={setField("he_id")} />
                         </label>
+                        <label className="field">
+                            <span>Min. messages</span>
+                            <input type="number" min="1" step="1" placeholder="Any" value={draft.min_messages} onChange={setField("min_messages")} />
+                        </label>
+                        <PendingFilters />
                         <button type="button" className="ghost-button" onClick={clear}>Clear</button>
                     </div>
                 </form>

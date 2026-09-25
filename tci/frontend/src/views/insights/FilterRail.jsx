@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFilterOptions } from "../../lib/labels.js";
-import { OptionSelect, PanelHeader } from "../../components/ui.jsx";
+import { OptionSelect, PanelHeader, PendingFilters } from "../../components/ui.jsx";
 
 // [filter key, label, option list, blank option label]
 const MAIN_FILTERS = [
@@ -24,7 +24,7 @@ const MORE_FILTERS = [
 ];
 
 export const EMPTY_FILTERS = Object.fromEntries(
-    ["destination", ...[...MAIN_FILTERS, ...MORE_FILTERS].map(([key]) => key)].map((key) => [key, ""]),
+    ["destination", "min_messages", ...[...MAIN_FILTERS, ...MORE_FILTERS].map(([key]) => key)].map((key) => [key, ""]),
 );
 
 const DESTINATION_DELAY_MS = 300;
@@ -67,7 +67,7 @@ export default function FilterRail({ filters, onChange }) {
             </PanelHeader>
             <div className="stack-form">
                 <label className="field">
-                    <span>Destination</span>
+                    <span>AI destination</span>
                     <input
                         list="destination-options"
                         placeholder="City or country"
@@ -78,6 +78,18 @@ export default function FilterRail({ filters, onChange }) {
                         {(options?.destination_suggestions || []).map((value) => <option key={value} value={value} />)}
                     </datalist>
                 </label>
+                <label className="field">
+                    <span>Min. messages</span>
+                    <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        placeholder="Any"
+                        value={filters.min_messages}
+                        onChange={(event) => onChange({ ...filters, min_messages: event.target.value.trim() })}
+                    />
+                </label>
+                <PendingFilters />
                 {MAIN_FILTERS.map(select)}
                 <details className="more-filters">
                     <summary>{moreActive ? `More filters (${moreActive} on)` : "More filters"}</summary>

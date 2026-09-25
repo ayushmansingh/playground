@@ -337,6 +337,15 @@ mark {
 .field select:hover,
 .search-bar input:hover { border-color: var(--ink-40); }
 
+.field input:disabled,
+.field select:disabled {
+  background: var(--surface);
+  color: var(--ink-40);
+  cursor: not-allowed;
+}
+
+.pending-note { color: var(--ink-40); font-style: normal; }
+
 .field input:focus,
 .field select:focus,
 .search-bar input:focus {

@@ -13,10 +13,11 @@ conversation is one lead; the app shows lead ids, never phone numbers.
 | `redash.py` | Redash API client: run a saved query with parameters, wait for the job, return rows. |
 | `sync_closed_leads.py` | The nightly job: which leads closed since the last run, then their messages. |
 | `ingest.py` | The row contracts for both queries; cleans, deduplicates and stores leads and messages. `python ingest.py messages.csv` loads a CSV download of the messages query. |
-| `search_service.py` | `GET /api/search`: phrase search over messages, with sender, date, lead id and agent id filters, paged in SQL. |
+| `search_service.py` | `GET /api/search`: phrase search over messages, with sender, date, lead id, agent id and minimum-message filters, paged in SQL. |
 | `insights_service.py` | `GET /api/insights`, `/api/insights/analysis`, `/api/insights/options`, `/api/meta`: filtering and aggregates over AI-profiled conversations, all in SQL. |
 | `conversation_service.py` | `GET /api/conversation`: one transcript with its AI profile. |
-| `conversation_profile_contract.py` | The AI profile schema, prompt, and value cleaning, for offline enrichment. |
+| `enrich_profiles.py` | Offline AI enrichment with Claude: profiles conversations that need one, via direct calls (pilot) or the Message Batches API (nightly). |
+| `conversation_profile_contract.py` | The AI profile schema, prompt (and its version), and output cleaning used by `enrich_profiles.py`. |
 | `dev_fixture.py` | Synthetic data for local work. |
 
 ## Nightly sync
@@ -31,10 +32,11 @@ python sync_closed_leads.py --since 2026-09-01             # first run / backfil
 python sync_closed_leads.py                                 # every night after that
 ```
 
-Cron example (server time; keep secrets in an env file, not the crontab):
+Cron example (server time; keep secrets in an env file, not the crontab).
+Enrichment runs after the sync so the night's new chats get profiles:
 
 ```
-30 2 * * * cd /srv/tci/backend && set -a && . /etc/tci/sync.env && .venv/bin/python sync_closed_leads.py >> /var/log/tci-sync.log 2>&1
+30 2 * * * cd /srv/tci/backend && set -a && . /etc/tci/sync.env && .venv/bin/python sync_closed_leads.py && .venv/bin/python enrich_profiles.py --wait >> /var/log/tci-sync.log 2>&1
 ```
 
 The job works in windows of at most a day. Each finished window is a
@@ -110,7 +112,36 @@ phrases; drop `idx_messages_sent_at` (75 MB) if nobody searches by date alone;
 retire messages past a retention period. Beyond a few crore messages or with
 several writers, the same schema moves to Postgres (FTS via `tsvector` + GIN).
 
-AI enrichment remains an offline workflow and is not exposed by the API.
-Conversations without a profile: `SELECT c.conversation_id FROM conversations
-c LEFT JOIN conversation_profiles p USING (conversation_id) WHERE p.conversation_id
-IS NULL AND c.total_messages > 0`.
+## AI enrichment
+
+```bash
+export ANTHROPIC_API_KEY=...                        # or `ant auth login`
+python enrich_profiles.py --dry-run                 # how many conversations are due, rough input tokens
+python enrich_profiles.py --now --limit 200 --model claude-haiku-4-5   # pilot: direct calls
+python enrich_profiles.py --now --limit 200 --model claude-sonnet-5    # compare on the same kind of chats
+python enrich_profiles.py --wait                    # nightly: Message Batches (half price), wait, store
+```
+
+A conversation is due when it has messages and no complete profile, or its
+profile is older than its newest message; `--force` re-profiles anyway, and
+`--min-messages N` skips very short chats. Each request is the prompt from
+`conversation_profile_contract.py` (cached), the conversation's counts and
+signal quality, and its transcript (`[message id] Customer|HE (type): text`,
+newest 12,000 characters). Replies are constrained to the profile JSON schema
+and cleaned by `sanitize_profile_result()`. Failures (refusal, cut-off or
+unreadable output, errors after retries) are recorded with the error and
+retried next run; they never replace a complete profile. Every run ends with
+the average input, cached and output tokens per reply, which is what a pilot
+should be judged on.
+
+Default model `claude-opus-5` at `--effort low`; direct calls on Opus 5 use
+server-side refusal fallbacks (the Batches API does not accept them). Haiku
+4.5 runs without thinking or effort. Batch ids live in `enrichment_batches`,
+so a run that stops before its batches finish stores them on the next run.
+Changing the prompt means bumping `PROFILE_PROMPT_VERSION` and re-running
+with `--force`.
+
+Not carried over from the old enrichment: the rule-based hints the prompt
+still has slots for (explicit destination, intent and dissatisfaction tags)
+are sent empty, and only one profile per conversation is kept, so model or
+prompt comparisons should be done on a copy of the database.

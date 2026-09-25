@@ -13,6 +13,7 @@ the WhatsApp chats of closed HolidayCRM leads, one conversation per lead
 ```
 tci/
   DESIGN.md                 "Cafe" design spec (from `npx typeui.sh pull cafe`)
+  todo.md                   work that is stubbed in the UI but not wired yet
   backend/                  FastAPI + SQLite, only /api/* routes
     README.md               Redash query contract, cron, storage and scale notes
     main.py                 routes (read-only)
@@ -20,6 +21,7 @@ tci/
     redash.py               Redash API client (saved query + params -> rows)
     sync_closed_leads.py    nightly job: closed leads -> their messages
     ingest.py               row contracts, clean + dedupe + store; CLI for a messages CSV
+    enrich_profiles.py      AI profiles with Claude (direct calls or Message Batches)
     search_service.py       GET /api/search (all filtering/paging in SQL)
     insights_service.py     GET /api/insights, /analysis, /options, /api/meta
     conversation_service.py GET /api/conversation
@@ -49,7 +51,8 @@ cd tci/frontend && npm ci && npm run dev           # http://localhost:5173, prox
 npm run build                                      # the only frontend check there is
 ```
 
-Real data comes from the nightly job, `python sync_closed_leads.py` (Redash
+AI profiles come from `python enrich_profiles.py` (needs `ANTHROPIC_API_KEY`;
+see `backend/README.md`). Real data comes from the nightly job, `python sync_closed_leads.py` (Redash
 settings via `REDASH_*` env vars; see `backend/README.md`), or a CSV download
 of the messages query via `python ingest.py file.csv`. `data/` and `*.sqlite3`
 are gitignored; never commit chat data or the Redash API key.
@@ -81,13 +84,19 @@ are gitignored; never commit chat data or the Redash API key.
   literal substring (`LIKE`, case-insensitive for ASCII), so "prices" does not
   match "price". The frontend highlights the same literal substring.
   `sender_type` is `customer` (INBOUND) or `he` (OUTBOUND).
-- **Profiles.** `conversation_profiles` holds one row per conversation; rows
-  with `status='complete'` are shown and counted as is. Insights only include
+- **Profiles.** `conversation_profiles` holds one row per conversation,
+  written only by `enrich_profiles.py`; rows with `status='complete'` are
+  shown and counted as is (`failed` rows carry the error and are retried). Insights only include
   conversations that have one. There is no human review: at lakhs of
   conversations nobody has time for it, so it was removed on purpose.
 - **Performance.** Search, insights lists and analysis filter, page and count
   in SQL (analysis filters once into a materialized CTE). Measured numbers at
   2 lakh leads / 50 lakh messages are in `backend/README.md`.
+- **Filters.** `min_messages` (stored messages per conversation) works in
+  both views. Booked and Lead destination are shown but disabled
+  (`PendingFilters` in `ui.jsx`) until their CRM data is synced; the steps
+  are in `todo.md`. The Insights "AI destination" filter is the AI profile's
+  destination, a different thing from the CRM lead destination.
 - **Frontend.** Both views stay mounted (CSS toggles `.view-panel.active`) so
   each keeps its inputs and selection. Fetches guard against stale responses
   with a request-id ref. Enum values are labelled via `useDisplayValue()` using
@@ -111,6 +120,8 @@ Done, on branch `claude/bold-lovelace-1pbg1p`:
    sync of closed leads; compact schema (integer conversation key, hashed
    message ids, external-content FTS, stored counters); insights moved to SQL.
    Old phone-number-keyed databases and the seed promotion are no longer used.
+8. Minimum-messages filter; Booked and Lead destination placed but disabled
+   (`todo.md`). Greeting filter removed. `enrich_profiles.py` added.
 
 Verified with `dev_fixture.py` data, a fake Redash server, a synthetic
 50-lakh-message database, and browser runs of both views. **Not yet run
@@ -118,6 +129,7 @@ against real Redash or real data. There are no automated tests in the repo.**
 
 ## Next steps
 
+0. **Booked and Lead destination filters**: wire them in per `todo.md`.
 1. **Write the two Redash queries** to the contract in `backend/README.md`,
    run `sync_closed_leads.py --dry-run` against them, then schedule it.
    Open with the CRM owners: which timestamp means "closed" (`updatedAt`
@@ -125,15 +137,13 @@ against real Redash or real data. There are no automated tests in the repo.**
    whether automated/template OUTBOUND messages can be told apart (they are
    currently stored and searched like agent messages), and whether booking
    status (`lead_scores.bookingCompleted`) should be added to `conversations`.
-2. **AI enrichment.** New chats from Redash need profiles or they never appear
-   in Insights. The original enrichment script was not in the handed-over code.
-   `conversation_profile_contract.py` has the schema, `profile_prompt_spec()`,
-   `build_profile_user_prompt()`, and `sanitize_profile_result()` to build on;
-   upsert one row per conversation into `conversation_profiles` with
-   `status='complete'`; run it after the nightly sync for conversations that
-   have no profile yet (query in `backend/README.md`). Ask the
-   user whether they have the old script or want one built on the Claude API.
-   Consider adding a cash-payment field (the old keyword filter was dropped).
+2. **AI enrichment pilot.** `enrich_profiles.py` is written and tested against
+   a fake API only. Run `--now --limit 200` with a cheaper model and with the
+   default on real chats, compare quality and the per-reply token averages it
+   prints, pick the model, then add `enrich_profiles.py --wait` after the
+   nightly sync. Ask before spending on the user's key. Open: feed the CRM lead
+   destination into the prompt's destination hints once it is synced
+   (`todo.md`); consider a cash-payment field (the old keyword rule is gone).
 
 Smaller follow-ups, when useful:
 - Add backend tests (pytest + FastAPI TestClient on `dev_fixture.py` data,

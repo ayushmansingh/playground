@@ -20,7 +20,7 @@ from conversation_profile_contract import (
 )
 from conversation_service import profile_from_row
 from database import DB_PATH, format_timestamp, get_connection
-from search_service import escape_like, page_args
+from search_service import escape_like, min_messages, page_args
 
 
 def label_options(options: list[tuple[str, str]]) -> list[dict[str, str]]:
@@ -147,6 +147,9 @@ def filter_sql(args) -> tuple[str, list[Any]]:
     if arg("signal_quality"):
         where.append("c.signal_quality = ?")
         params.append(arg("signal_quality"))
+    if min_messages(args):
+        where.append("c.total_messages >= ?")
+        params.append(min_messages(args))
     view = QUICK_VIEWS.get(arg("view"))
     if view:
         where.append(view[1])
