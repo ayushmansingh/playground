@@ -583,16 +583,46 @@
     toast(`${mode === 'mix' ? 'Mixed' : 'Joined'} ${picked.length} tracks into “${t.name}”${note}`);
   }
 
-  function exportTrack(t) {
+  // Inside the claude.ai viewer, pages can't start downloads themselves and
+  // .wav isn't an allowed save type, so the WAV is offered inside a .zip.
+  const inClaudeViewer = !!(window.claude && typeof window.claude.use === 'function');
+  let downloadsPromise = null;
+  function downloadsApi() {
+    if (!downloadsPromise) downloadsPromise = window.claude.use('downloads').catch(() => null);
+    return downloadsPromise;
+  }
+
+  async function exportTrack(t) {
     if (!len(t)) {
       toast('This track is empty.', 'error');
       return;
     }
+    const base = (t.name || 'audio').replace(/[\\/:*?"<>|]+/g, '_');
     const wav = Ops.encodeWav(t.channels, rate());
+    if (inClaudeViewer) {
+      const dl = await downloadsApi();
+      if (!dl) {
+        toast('Saving files isn’t available in this view.', 'error');
+        return;
+      }
+      try {
+        const data = new Blob([Ops.zip([{ name: `${base}.wav`, data: new Uint8Array(wav) }])]);
+        await dl.save({ filename: `${base}.zip`, data });
+        toast(`Saved ${base}.zip (contains ${base}.wav)`);
+      } catch (err) {
+        const code = err && err.code;
+        if (code === 'declined') return;
+        toast(
+          code === 'rate_limited' ? 'Another save is still open. Try again in a moment.' : 'Couldn’t save the file here.',
+          'error'
+        );
+      }
+      return;
+    }
     const url = URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${(t.name || 'audio').replace(/[\\/:*?"<>|]+/g, '_')}.wav`;
+    a.download = `${base}.wav`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -696,6 +726,48 @@
     render();
   }
 
+  // Two short synthesized clips so the editor opens with something to try.
+  function exampleTracks() {
+    const sr = rate();
+    const notes = [220, 261.63, 329.63, 440, 329.63, 261.63, 196, 246.94];
+    const step = Math.round(0.5 * sr);
+    const melody = new Float32Array(step * notes.length);
+    notes.forEach((f, k) => {
+      for (let i = 0; i < step; i++) {
+        const t = i / sr;
+        const env = Math.exp(-t * 6) * Math.min(1, i / 200);
+        melody[k * step + i] = 0.5 * env * (Math.sin(2 * Math.PI * f * t) + 0.3 * Math.sin(4 * Math.PI * f * t));
+      }
+    });
+
+    const L = new Float32Array(sr * 4);
+    const R = new Float32Array(sr * 4);
+    let seed = 7;
+    const noise = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) * 2 - 1;
+    const add = (start, secs, fn, panL, panR) => {
+      for (let i = 0; i < Math.round(secs * sr); i++) {
+        const v = fn(i / sr);
+        L[start + i] += v * panL;
+        R[start + i] += v * panR;
+      }
+    };
+    for (let s = 0; s < 16; s++) {
+      const start = Math.round(s * 0.25 * sr);
+      if (s % 4 === 0 || s === 10) {
+        let phase = 0;
+        add(start, 0.25, (t) => {
+          phase += (2 * Math.PI * (50 + 100 * Math.exp(-t * 30))) / sr;
+          return 0.8 * Math.sin(phase) * Math.exp(-t * 9);
+        }, 1, 1);
+      }
+      if (s === 4 || s === 12) {
+        add(start, 0.18, (t) => (0.35 * noise() + 0.25 * Math.sin(2 * Math.PI * 180 * t)) * Math.exp(-t * 18), 0.9, 0.9);
+      }
+      if (s % 2 === 1) add(start, 0.06, (t) => 0.22 * noise() * Math.exp(-t * 60), 0.5, 1);
+    }
+    return [makeTrack('Example: arpeggio', [melody]), makeTrack('Example: drum loop', [L, R])];
+  }
+
   // ---------- wiring ----------
 
   let themeVersion = 0;
@@ -795,11 +867,16 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(render, 120);
     });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const retheme = () => {
       themeVersion++;
       render();
-    });
+    };
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+    new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
+    if (inClaudeViewer) downloadsApi();
+    state.tracks.push(...exampleTracks());
+    state.activeId = state.tracks[0].id;
     render();
   }
 

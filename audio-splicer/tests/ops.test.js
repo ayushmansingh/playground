@@ -64,3 +64,16 @@ test('encodeWav writes a valid 16-bit PCM header', () => {
   assert.equal(v.getInt16(48, true), 32767);
   assert.equal(v.getInt16(52, true), -32768);
 });
+
+test('zip stores files with correct CRC and directory', () => {
+  const data = new TextEncoder().encode('hello');
+  const z = Ops.zip([{ name: 'a.txt', data }]);
+  const v = new DataView(z.buffer);
+  assert.equal(v.getUint32(0, true), 0x04034b50);
+  assert.equal(v.getUint32(14, true), 0x3610a686); // crc32("hello")
+  assert.equal(new TextDecoder().decode(z.subarray(35, 40)), 'hello');
+  const end = z.length - 22;
+  assert.equal(v.getUint32(end, true), 0x06054b50);
+  assert.equal(v.getUint16(end + 10, true), 1);
+  assert.equal(v.getUint32(end + 16, true), 40); // central directory offset
+});
