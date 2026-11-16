@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audio Splicer</title>
+  <meta name="description" content="Merge audio files and cut and paste between them, entirely in your browser.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-head">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h2M7 8v8M11 4v16M15 7v10M19 10v4M21 12h0" /></svg>
+      <div>
+        <h1>Audio Splicer</h1>
+        <p class="tagline">Merge, cut and paste audio. Nothing leaves your device.</p>
+      </div>
+    </div>
+    <div class="head-actions">
+      <label class="btn primary">
+        <input id="file-input" type="file" accept="audio/*,video/*" multiple hidden>
+        Add files
+      </label>
+      <button id="new-track" class="btn">New empty track</button>
+    </div>
+  </header>
+
+  <div class="toolbar" role="toolbar" aria-label="Editing tools">
+    <div class="group">
+      <button id="play" class="btn" title="Play selection, or from cursor (Space)">Play</button>
+    </div>
+    <div class="group" aria-label="Edit">
+      <button id="cut" class="btn" title="Cut selection (Ctrl+X)">Cut</button>
+      <button id="copy" class="btn" title="Copy selection (Ctrl+C)">Copy</button>
+      <button id="paste" class="btn" title="Paste at cursor, or over selection (Ctrl+V)">Paste</button>
+      <button id="delete" class="btn" title="Delete selection (Del)">Delete</button>
+    </div>
+    <div class="group" aria-label="Process selection">
+      <button id="crop" class="btn" title="Keep only the selection">Crop</button>
+      <button id="silence" class="btn" title="Replace selection with silence">Silence</button>
+      <button id="fade-in" class="btn" title="Fade in across selection">Fade in</button>
+      <button id="fade-out" class="btn" title="Fade out across selection">Fade out</button>
+    </div>
+    <div class="group" aria-label="History">
+      <button id="undo" class="btn" title="Undo (Ctrl+Z)">Undo</button>
+      <button id="redo" class="btn" title="Redo (Ctrl+Shift+Z)">Redo</button>
+    </div>
+    <div class="group" aria-label="Zoom">
+      <button id="zoom-out" class="btn" title="Zoom out" aria-label="Zoom out">−</button>
+      <button id="zoom-fit" class="btn" title="Fit longest track to width">Fit</button>
+      <button id="zoom-in" class="btn" title="Zoom in" aria-label="Zoom in">+</button>
+    </div>
+    <div class="group merge" aria-label="Merge">
+      <select id="merge-mode" aria-label="Merge mode" title="How checked tracks are combined">
+        <option value="concat">Join end to end</option>
+        <option value="mix">Mix together</option>
+      </select>
+      <label class="spacing" title="Seconds between clips. Negative values crossfade.">
+        Gap
+        <input id="merge-spacing" type="number" step="0.1" value="0" aria-label="Gap in seconds (negative = crossfade)">
+        s
+      </label>
+      <button id="merge" class="btn primary" title="Combine the checked tracks into a new track">Merge checked</button>
+    </div>
+  </div>
+
+  <div class="status">
+    <span>Editing: <strong id="active-name">none</strong></span>
+    <span class="dot" aria-hidden="true">·</span>
+    <span>Clipboard: <strong id="clip-info">empty</strong></span>
+    <button id="paste-new" class="link-btn">Paste as new track</button>
+  </div>
+
+  <main id="tracks" aria-label="Tracks"></main>
+
+  <label id="empty" class="empty" for="file-input">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16" /></svg>
+    <strong>Drop audio files here</strong>
+    <span>or click to choose. MP3, WAV, OGG, FLAC, M4A, or any format your browser can decode.</span>
+  </label>
+
+  <footer class="help">
+    <p>
+      <strong>How it works:</strong> click a waveform to place the cursor, drag to select.
+      Copy or cut from one track, click another, and paste. Check the tracks you want and press
+      <em>Merge checked</em> to join or mix them. Export any track as WAV.
+    </p>
+    <p class="keys">
+      <kbd>Space</kbd> play/stop · <kbd>Ctrl</kbd>+<kbd>X</kbd>/<kbd>C</kbd>/<kbd>V</kbd> cut/copy/paste ·
+      <kbd>Del</kbd> delete · <kbd>Ctrl</kbd>+<kbd>A</kbd> select all · <kbd>Shift</kbd>+click extend ·
+      <kbd>Esc</kbd> deselect · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo
+      <span id="rate-info"></span>
+    </p>
+  </footer>
+
+  <div id="drop-overlay" aria-hidden="true"><span>Drop to add tracks</span></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="ops.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
